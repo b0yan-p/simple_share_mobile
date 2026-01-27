@@ -22,15 +22,13 @@ export const routes: Routes = [
           import('./groups/pages/group-list/group-list.component').then(
             (m) => m.GroupListComponent,
           ),
-        // children: [
-        //   {
-        //     path: ':groupId',
-        //     loadComponent: () =>
-        //       import('./groups/pages/group-item/group-item.component').then(
-        //         (m) => m.GroupItemComponent,
-        //       ),
-        //   },
-        // ],
+      },
+      {
+        path: 'groups/:groupId/details',
+        loadComponent: () =>
+          import('./groups/pages/group-details/group-details.component').then(
+            (m) => m.GroupDetailsComponent,
+          ),
       },
       {
         path: 'groups/:groupId',

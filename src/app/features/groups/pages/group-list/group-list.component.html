@@ -5,6 +5,13 @@
 </ion-header>
 
 <ion-content>
-  group-list works!
-  <ion-button [routerLink]="['1']" (click)="kme()">go to group</ion-button>
+  <p>group-list works!</p>
+
+  <ion-button [routerLink]="['1', 'details']">go to group</ion-button>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
+    <ion-fab-button>
+      <ion-icon name="add" />
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
