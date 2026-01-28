@@ -1,0 +1,27 @@
+<ion-content class="ion-padding">
+  <form [formGroup]="form" class="bdd-flex bdd-flex-col bdd-gap-2">
+    <ion-input
+      formControlName="email"
+      type="email"
+      fill="outline"
+      label="Email"
+      labelPlacement="floating"
+      placeholder="name@example.com"
+      required="true"
+    />
+
+    <ion-input
+      formControlName="password"
+      type="password"
+      fill="outline"
+      label="Password"
+      labelPlacement="floating"
+      placeholder="Enter password"
+      required="true"
+    >
+      <ion-input-password-toggle slot="end" />
+    </ion-input>
+
+    <ion-button [disabled]="form.invalid || loading" (click)="login()"> Login </ion-button>
+  </form>
+</ion-content>

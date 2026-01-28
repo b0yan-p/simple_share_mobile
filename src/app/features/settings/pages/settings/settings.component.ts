@@ -1,10 +1,23 @@
-import { Component } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { Component, inject } from '@angular/core';
+import {
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
-  imports: [IonContent, IonTitle, IonToolbar, IonHeader],
+  imports: [IonButton, IonContent, IonTitle, IonToolbar, IonHeader],
 })
-export class SettingsComponent {}
+export class SettingsComponent {
+  auth = inject(AuthService);
+
+  logout() {
+    this.auth.logout();
+  }
+}

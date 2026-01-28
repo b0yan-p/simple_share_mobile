@@ -7,11 +7,6 @@ export const routes: Routes = [
     component: LayoutWrapperComponent,
     children: [
       {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'home',
-      },
-      {
         path: 'home',
         loadComponent: () =>
           import('./home/pages/home/home.component').then((m) => m.HomeComponent),
