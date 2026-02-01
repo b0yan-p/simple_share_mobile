@@ -3,7 +3,7 @@
 :root {
   /* Primary */
   --ion-color-primary: #e0690e;
-  --ion-color-primary-rgb: 30, 111, 255;
+  --ion-color-primary-rgb: 224, 105, 14;
   --ion-color-primary-contrast: #fff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #c85c0c;
@@ -20,6 +20,7 @@
   --ion-color-success: #22c55e;
   --ion-color-warning: #facc15;
   --ion-color-danger: #ef4444;
+  --ion-color-tertiary: #38bdf8;
 }
 
 $primary: #e0690e;
@@ -32,5 +33,5 @@ $info: #38bdf8;
 $bg: #191a1f;
 $surface: #2d2e32;
 $text: #9e9fa1;
-$text-light: #67686b;
+$text-light: #fff;
 $borders: #9e9fa1;

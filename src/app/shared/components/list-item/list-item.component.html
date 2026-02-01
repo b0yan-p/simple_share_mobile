@@ -1,0 +1,34 @@
+<ion-item-sliding class="list-item" [disabled]="disableSwipeActions()" ()>
+  <ion-item button class="list-item" [routerLink]="navigatePath()">
+    <!-- Avatar -->
+    <ion-avatar>
+      <img alt="Group avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+    </ion-avatar>
+
+    <!-- Info -->
+    <div class="list-item-info">
+      <h5>{{ title() }}</h5>
+      <p color="primary">{{ description() }}</p>
+      <small>{{ meta() }}</small>
+    </div>
+  </ion-item>
+
+  <!-- Options -->
+  <ion-item-options>
+    <ion-item-option color="danger" (click)="openDeleteAlert(true)">
+      <ion-icon name="trash-outline" />
+    </ion-item-option>
+    <ion-item-option (click)="onUpdate.emit()">
+      <ion-icon name="create-outline" />
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>
+
+<!-- Delete alert -->
+<ion-alert
+  [isOpen]="isAlertOpen"
+  header="Delete '{{ title() }}'"
+  message="Are you sure you want to delete '{{ title() }}'"
+  [buttons]="alertButtons"
+  (didDismiss)="openDeleteAlert(false)"
+/>

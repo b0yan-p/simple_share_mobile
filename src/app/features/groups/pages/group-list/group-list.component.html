@@ -4,10 +4,21 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <p>group-list works!</p>
-
-  <ion-button [routerLink]="['1', 'details']">go to group</ion-button>
+<ion-content class="ion-paddinga">
+  <ion-list [inset]="true">
+    @for (group of groups$ | async; track group.id) {
+      <!-- TODO implement debt relationships total amount and persons -->
+      <app-list-item
+        [navigatePath]="[group.id, 'details']"
+        [title]="group.name"
+        description="You owe BAM 11.25"
+        meta="You owe Milan C."
+        descriptionColor="primary"
+        (onUpdate)="router.navigate(['groups', group.id])"
+        (onDelete)="onDelete()"
+      />
+    }
+  </ion-list>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
     <ion-fab-button>

@@ -1,0 +1,5 @@
+@use './../../../../theme/variables.scss' as c;
+
+.delete-confirmation {
+  color: c.$error !important;
+}

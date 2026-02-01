@@ -8,4 +8,31 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content> group-item works! </ion-content>
+<ion-content class="ion-padding">
+  <form [formGroup]="form">
+    <ion-input
+      formControlName="name"
+      type="text"
+      fill="outline"
+      label="Group name"
+      labelPlacement="floating"
+      placeholder="Group 1"
+      required="true"
+    />
+    <ion-item>
+      <ion-toggle
+        formControlName="simplifyDebts"
+        class="custom-toggle"
+        [enableOnOffLabels]="true"
+      >
+        Simplify debts
+      </ion-toggle>
+    </ion-item>
+
+    <ion-button [disabled]="form.invalid || uiService.itemLoading()" (click)="submit()">
+      Save
+    </ion-button>
+
+    <!-- TODO add description here that explains what is this option -->
+  </form>
+</ion-content>

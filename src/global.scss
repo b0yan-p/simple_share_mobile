@@ -41,6 +41,17 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import '@ionic/angular/css/palettes/dark.system.css';
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  padding: 0;
+  margin: 0;
+}
+
 // Header
 ion-header ion-toolbar {
   --background: var(--ion-color-dark);
@@ -58,3 +69,91 @@ ion-tab-bar {
     background-color: var(--ion-color-medium);
   }
 }
+
+ion-avatar {
+  --border-radius: 6px;
+  width: 65px;
+  height: 65px;
+}
+
+// List & list item
+
+ion-item-sliding.list-item {
+  & > ion-item-options {
+    margin-bottom: 8px;
+
+    & > ion-item-option {
+      margin-bottom: 8px;
+      border-radius: 60px;
+      --border-radius: 60px;
+      width: 48px;
+      height: 48px;
+      margin-block: auto;
+
+      font-size: 24px;
+
+      &:first-child {
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  & > ion-item {
+    --background: #{c.$surface};
+    --border-radius: 6px;
+    margin-bottom: 8px;
+
+    & > div.list-item-info {
+      padding-left: 12px;
+      & > h5 {
+        color: c.$text-light;
+      }
+      & > p[color|='primary'] {
+        color: c.$primary;
+      }
+      & > p[color|='success'] {
+        color: c.$success;
+      }
+      & > small {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.delete-confirmation {
+  color: c.$error !important;
+}
+
+.delete-cancel {
+  color: c.$text !important;
+}
+
+// !List & list item
+
+// Toast - bottom
+// Move toast above tabs
+ion-toast.custom-toast {
+  transform: translateY(-68px);
+}
+
+// Form inputs
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Toggle
+ion-toggle {
+  --track-background: #{c.$text};
+}
+
+ion-item:has(ion-toggle) {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --border-color: #{c.$surface};
+}
+// !Toggle
