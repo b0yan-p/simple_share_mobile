@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, defer, first, map, Observable, tap } from 'rxjs';
-import { PageData } from '../models/page-data';
 import { environment } from 'src/environments/environment';
+import { PageData } from '../models/page-data';
 import { ToastService } from './toast.service';
 import { UiService } from './ui.service';
 
@@ -26,68 +26,97 @@ export abstract class BaseApiService<T, CreateT = any, UpdateT = any> {
   public getAll(url?: string): Observable<T[]> {
     const listApi = url ?? `${this.baseApi}?skip=0&take=10`;
 
-    return this.httpClient.get<PageData<T>>(listApi).pipe(
+    const ref = this.httpClient.get<PageData<T>>(listApi).pipe(
       first(),
       map((e) => [...e.data]),
+      tap(() => this.uiService.listLoading.set(false)),
       catchError((err) => {
         console.error(err);
+        this.uiService.listLoading.set(false);
         this.toastService.errorToast(err.message);
         throw err;
       }),
     );
+    return defer(() => {
+      this.uiService.listLoading.set(true);
+      return ref;
+    });
   }
 
   public getOne(id: string, url?: string): Observable<T> {
     const api = url ?? `${this.baseApi}/${id}`;
-    console.log({ api });
+
+    const ref = this.httpClient.get<T>(api).pipe(
+      first(),
+      tap(() => this.uiService.itemLoading.set(false)),
+      catchError((err) => {
+        console.error(err);
+        this.uiService.itemLoading.set(false);
+        this.toastService.errorToast(err.message);
+        throw err;
+      }),
+    );
+
     return defer(() => {
       this.uiService.itemLoading.set(true);
-      return this.httpClient.get<T>(api).pipe(
-        first(),
-        tap(() => this.uiService.itemLoading.set(false)),
-        catchError((err) => {
-          console.error(err);
-          this.uiService.itemLoading.set(false);
-          this.toastService.errorToast(err.message);
-          throw err;
-        }),
-      );
+      return ref;
     });
   }
 
   public create(payload: CreateT, url?: string): Observable<T> {
     const api = url ?? this.baseApi;
-    return this.httpClient.post<T>(api, payload).pipe(
+    const ref = this.httpClient.post<T>(api, payload).pipe(
       first(),
+      tap(() => this.uiService.itemLoading.set(false)),
       catchError((err) => {
         console.error(err);
+        this.uiService.itemLoading.set(false);
         this.toastService.errorToast(err.message);
         throw err;
       }),
     );
+
+    return defer(() => {
+      this.uiService.itemLoading.set(true);
+      return ref;
+    });
   }
 
   public update(payload: UpdateT, url?: string): Observable<T> {
     const api = url ?? this.baseApi;
-    return this.httpClient.put<T>(api, payload).pipe(
+    const ref = this.httpClient.put<T>(api, payload).pipe(
       first(),
+      tap(() => this.uiService.itemLoading.set(false)),
       catchError((err) => {
         console.error(err);
+        this.uiService.itemLoading.set(false);
         this.toastService.errorToast(err.message);
         throw err;
       }),
     );
+
+    return defer(() => {
+      this.uiService.itemLoading.set(true);
+      return ref;
+    });
   }
 
   public delete(id: string, url?: string): Observable<{ id: string }> {
-    const api = url ?? `${this.ctrlApi}/id`;
-    return this.httpClient.delete<{ id: string }>(api).pipe(
+    const api = url ?? `${this.ctrlApi}/${id}`;
+    const ref = this.httpClient.delete<{ id: string }>(api).pipe(
       first(),
+      tap(() => this.uiService.itemLoading.set(false)),
       catchError((err) => {
         console.error(err);
+        this.uiService.itemLoading.set(false);
         this.toastService.errorToast(err.message);
         throw err;
       }),
     );
+
+    return defer(() => {
+      this.uiService.itemLoading.set(true);
+      return ref;
+    });
   }
 }
