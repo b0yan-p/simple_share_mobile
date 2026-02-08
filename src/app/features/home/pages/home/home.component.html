@@ -6,4 +6,8 @@
 
 <ion-content>
   <p>home works!</p>
+
+  @for (item of store.items(); track item.id) {
+    <div>{{ item.name }}</div>
+  }
 </ion-content>

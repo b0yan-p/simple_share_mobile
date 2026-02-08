@@ -13,6 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { GroupService } from '../../services/group.service';
+import { GroupStore } from '../../store/group-store';
 
 @Component({
   selector: 'app-group-list',
@@ -35,8 +36,10 @@ import { GroupService } from '../../services/group.service';
 export class GroupListComponent {
   service = inject(GroupService);
   router = inject(Router);
+  store = inject(GroupStore);
 
-  groups$ = this.service.getAll();
+  // groups$ = this.service.getAll();
+  groups = this.store.load();
 
   onDelete() {
     // TODO implement delete group

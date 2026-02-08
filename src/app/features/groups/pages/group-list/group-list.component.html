@@ -6,7 +6,8 @@
 
 <ion-content class="ion-paddinga">
   <ion-list [inset]="true">
-    @for (group of groups$ | async; track group.id) {
+    <!-- @for (group of groups$ | async; track group.id) { -->
+    @for (group of store.items(); track group.id) {
       <!-- TODO implement debt relationships total amount and persons -->
       <app-list-item
         [navigatePath]="[group.id, 'details']"
