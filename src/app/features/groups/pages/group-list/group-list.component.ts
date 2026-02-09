@@ -1,5 +1,4 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import {
   IonContent,
@@ -11,9 +10,10 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
+import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 import { GroupService } from '../../services/group.service';
-import { GroupStore } from '../../store/group-store';
 
 @Component({
   selector: 'app-group-list',
@@ -29,20 +29,23 @@ import { GroupStore } from '../../store/group-store';
     IonToolbar,
     IonTitle,
     IonContent,
-    AsyncPipe,
     ListItemComponent,
+    PaginatorComponent,
   ],
 })
-export class GroupListComponent {
-  service = inject(GroupService);
+export class GroupListComponent implements OnInit {
   router = inject(Router);
-  store = inject(GroupStore);
+  service = inject(GroupService);
+  toastService = inject(ToastService);
 
-  // groups$ = this.service.getAll();
-  groups = this.store.load();
+  ngOnInit(): void {
+    this.service.getAll();
+  }
 
-  onDelete() {
-    // TODO implement delete group
-    console.log('delete group');
+  onDelete(id: string) {
+    this.service.delete(id).subscribe({
+      next: () => this.toastService.successToast('Group deleted successfully!'),
+      error: (err) => this.toastService.errorToast(err),
+    });
   }
 }

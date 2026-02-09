@@ -19,14 +19,14 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'groups/:groupId/details',
+        path: 'groups/:id/details',
         loadComponent: () =>
           import('./groups/pages/group-details/group-details.component').then(
             (m) => m.GroupDetailsComponent,
           ),
       },
       {
-        path: 'groups/:groupId',
+        path: 'groups/:id',
         loadComponent: () =>
           import('./groups/pages/group-item/group-item.component').then(
             (m) => m.GroupItemComponent,

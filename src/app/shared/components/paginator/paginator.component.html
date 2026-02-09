@@ -1,0 +1,11 @@
+@if (service().pageLoading()) {
+  <ion-spinner color="primary" />
+} @else {
+  @if (service().hasMoreData()) {
+    <ion-button fill="clear" (click)="service().loadMoreData()">
+      <span>Show more items</span>
+    </ion-button>
+  } @else {
+    <small>No more data</small>
+  }
+}

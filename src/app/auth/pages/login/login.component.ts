@@ -43,6 +43,8 @@ export class LoginComponent {
     this.loading = true;
     this.auth.login(this.form.value as LoginInput).subscribe({
       next: (res) => {
+        if (!res) return;
+
         this.loading = false;
         this.router.navigate(['home']);
       },

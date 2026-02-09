@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { catchError, first, Observable, of, switchMap } from 'rxjs';
+import { catchError, first, Observable, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginInput } from '../models/login-input.model';
 import { LoginUser } from '../models/login-user.model';
@@ -25,7 +25,7 @@ export class AuthService {
       switchMap((res) => this.tokenStorage.setAccessToken(res.token)),
       catchError((err) => {
         console.error(err);
-        return of(false);
+        throw err;
       }),
     );
   }

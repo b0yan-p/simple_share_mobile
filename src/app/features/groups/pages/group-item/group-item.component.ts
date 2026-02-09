@@ -1,5 +1,4 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -14,7 +13,6 @@ import {
   IonToggle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { filter, switchMap } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { CreateGroup } from '../../models/create-group.model';
@@ -54,11 +52,7 @@ export class GroupItemComponent implements OnInit {
     simplifyDebts: new FormControl<boolean>(false),
   });
 
-  item$ = this.route.params.pipe(
-    filter((p) => p['groupId'] !== 'new'),
-    switchMap((p) => this.service.getOne(p['groupId'])),
-    takeUntilDestroyed(),
-  );
+  item$ = this.service.getOne(this.route);
 
   ngOnInit() {
     this.item$.subscribe({

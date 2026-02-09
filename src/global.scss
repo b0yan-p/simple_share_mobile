@@ -73,7 +73,12 @@ ion-tab-bar {
 ion-avatar {
   --border-radius: 6px;
   width: 65px;
+  min-width: 65px;
   height: 65px;
+}
+
+ion-button {
+  text-transform: none;
 }
 
 // List & list item
