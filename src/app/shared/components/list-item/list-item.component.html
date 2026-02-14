@@ -1,5 +1,5 @@
 <ion-item-sliding class="list-item" [disabled]="disableSwipeActions()" ()>
-  <ion-item button class="list-item" [routerLink]="navigatePath()">
+  <ion-item button class="list-item" (click)="navigate()">
     <!-- Avatar -->
     <ion-avatar>
       <img alt="Group avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />

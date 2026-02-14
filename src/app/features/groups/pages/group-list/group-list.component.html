@@ -9,7 +9,7 @@
     @for (group of service.items(); track group.id) {
       <!-- TODO implement debt relationships total amount and persons -->
       <app-list-item
-        [navigatePath]="[group.id, 'details']"
+        [navigatePath]="['groups', group.id, 'details']"
         [title]="group.name"
         description="You owe BAM 11.25"
         meta="You owe Milan C."

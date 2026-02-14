@@ -1,5 +1,5 @@
-import { Component, input, output } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, inject, input, output } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import {
   IonAlert,
   IonAvatar,
@@ -26,16 +26,21 @@ import {
   ],
 })
 export class ListItemComponent {
-  navigatePath = input.required<string[]>();
+  router = inject(Router);
+
+  navigatePath = input<string[] | undefined>();
   title = input.required<string>();
   description = input<string>();
   meta = input<string>();
   descriptionColor = input<'primary' | 'accent' | 'default'>('default');
 
+  // actions
   disableSwipeActions = input<boolean>(false);
 
+  // events
   onUpdate = output<void>();
   onDelete = output<void>();
+  onClick = output<void>();
 
   isAlertOpen = false;
   alertButtons = [
@@ -56,5 +61,14 @@ export class ListItemComponent {
 
   openDeleteAlert(isOpen: boolean) {
     this.isAlertOpen = isOpen;
+  }
+
+  navigate() {
+    if (!!this.navigatePath()) {
+      this.router.navigate(this.navigatePath()!);
+      return;
+    }
+
+    this.onClick.emit();
   }
 }

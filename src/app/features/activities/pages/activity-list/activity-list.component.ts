@@ -32,4 +32,8 @@ export class ActivityListComponent {
   constructor() {
     this.service.getAll();
   }
+
+  openDetails() {
+    console.log('show bottom sheet details');
+  }
 }

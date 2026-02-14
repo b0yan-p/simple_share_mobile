@@ -9,11 +9,11 @@
     @for (item of service.items(); track item.id) {
       <app-list-item
         [disableSwipeActions]="true"
-        [navigatePath]="['']"
         [title]="item.title"
         [description]="item.description"
         [meta]="(item.createdAt | date: 'dd MMM yyyy, HH:mm')!"
         descriptionColor="primary"
+        (onClick)="openDetails()"
       />
     }
     <app-paginator [service]="service" />
