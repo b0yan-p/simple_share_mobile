@@ -33,10 +33,6 @@ export abstract class BaseService<
     return `${this.rootUrl}/${this.ctrlApi}`;
   }
 
-  mapToListItem(item: ItemT): ListT {
-    return {} as any;
-  }
-
   public getAll(): void {
     const api = this.buildApiUrl(this.listApi);
 
@@ -54,8 +50,7 @@ export abstract class BaseService<
               first(),
               map((e) => {
                 this.totalCount.set(e.totalCount);
-
-                return e.data;
+                return this.customListMap(e.data);
               }),
               tap(() => {
                 this.uiService.listLoading.set(false);
@@ -153,6 +148,14 @@ export abstract class BaseService<
         throw err;
       }),
     );
+  }
+
+  protected mapToListItem(item: ItemT): ListT {
+    return {} as any;
+  }
+
+  protected customListMap(items: any[]): ListT[] {
+    return items;
   }
 
   private buildApiUrl(url: string | null = null) {

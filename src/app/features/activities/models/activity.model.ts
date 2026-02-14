@@ -15,6 +15,14 @@ export interface Activity {
     | ActivityMemberData;
 }
 
+export interface ActivityListItem {
+  id: string;
+  createdAt: string;
+  title: string;
+  description: string;
+  details: Activity;
+}
+
 export enum ActivityType {
   ExpenseCreated = 10,
   ExpenseUpdated = 11,
@@ -46,11 +54,13 @@ export interface ActivityExpenseUpdateData {
 
 export interface ActivitySettleUpData {
   fromMemberId: string;
+  fromMemberName: string;
+  toMemberName: string;
   toMemberId: string;
   amount: number;
 }
 
 export interface ActivityMemberData {
-  TargetMemberId: string;
-  TargetMemberName: string;
+  targetMemberId: string;
+  targetMemberName: string;
 }

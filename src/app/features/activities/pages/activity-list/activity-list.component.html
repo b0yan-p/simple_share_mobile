@@ -10,8 +10,8 @@
       <app-list-item
         [disableSwipeActions]="true"
         [navigatePath]="['']"
-        [title]="item.id"
-        description="You owe BAM 11.25"
+        [title]="item.title"
+        [description]="item.description"
         [meta]="(item.createdAt | date: 'dd MMM yyyy, HH:mm')!"
         descriptionColor="primary"
       />
