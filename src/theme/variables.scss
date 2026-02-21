@@ -3,8 +3,10 @@
 :root {
   /* Primary */
   --ion-color-primary: #e0690e;
+  // --ion-color-primary: #ff5500;
   --ion-color-primary-rgb: 224, 105, 14;
-  --ion-color-primary-contrast: #fff;
+  // --ion-color-primary-contrast: #fff;
+  --ion-color-primary-contrast: #000;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #c85c0c;
   --ion-color-primary-tint: #c85c0c;
@@ -17,21 +19,28 @@
   --ion-text-color: #9e9fa1;
 
   //info colors
-  --ion-color-success: #22c55e;
+  // --ion-color-success: #22c55e;
+  --ion-color-success: #1eff7a;
   --ion-color-warning: #facc15;
   --ion-color-danger: #ef4444;
   --ion-color-tertiary: #38bdf8;
 }
 
 $primary: #e0690e;
+// $primary: #ff5500;
 $secondary: transparent;
 $accent: #fff;
-$success: #22c55e;
+// $success: #22c55e;
+$success: #1eff7a;
+
 $warn: #facc15;
 $error: #ef4444;
 $info: #38bdf8;
 $bg: #191a1f;
-$surface: #2d2e32;
+// $surface: #2d2e32; //
+$surface: #1c1b23; //
+
 $text: #9e9fa1;
 $text-light: #fff;
-$borders: #9e9fa1;
+// $borders: #9e9fa1;
+$borders: #393b3e;

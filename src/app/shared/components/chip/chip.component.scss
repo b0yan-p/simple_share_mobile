@@ -1,0 +1,22 @@
+@use './../../../../theme/variables.scss' as c;
+
+:host {
+  display: flex;
+  width: fit-content;
+  padding: 2px 12px;
+  font-size: 14px;
+}
+
+:host.rounded {
+  border-radius: 100vw;
+}
+
+:host.success {
+  background-color: rgba(c.$success, 0.1);
+  color: c.$success;
+}
+
+:host.error {
+  background-color: rgba(c.$error, 0.1);
+  color: c.$error;
+}

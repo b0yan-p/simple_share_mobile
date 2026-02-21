@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <defs>
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#1eff7a" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1eff7a" stop-opacity="1"/>
+    </linearGradient>
+
+    <!-- Blagi glow na liniji -->
+    <filter id="glow" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Jači glow za strelicu i vrh -->
+    <filter id="glowStrong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Jako naglašen glow za istaknutu tačku -->
+    <filter id="glowPulse" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="8" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Sjena linije — dodatni glow sloj ispod -->
+  <polyline
+    points="10,72 45,58 75,68 105,50 130,60 175,20"
+    fill="none"
+    stroke="#1eff7a"
+    stroke-width="4"
+    stroke-opacity="0.08"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Linija -->
+  <polyline
+    points="10,72 45,58 75,68 105,50 130,60 175,20"
+    fill="none"
+    stroke="url(#lineGrad)"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glow)"
+  />
+
+  <!-- Vrh strelice -->
+  <polyline
+    points="160,18 175,20 170,35"
+    fill="none"
+    stroke="#1eff7a"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#glowStrong)"
+  />
+
+  <!-- Istaknuta tačka rasta — T3 (105, 50) -->
+  <circle cx="105" cy="50" r="14"  fill="#1eff7a" fill-opacity="0.04"/>
+  <circle cx="105" cy="50" r="8"   fill="#1eff7a" fill-opacity="0.08"/>
+  <circle cx="105" cy="50" r="3.5" fill="#1eff7a" fill-opacity="0.3"/>
+  <circle cx="105" cy="50" r="2"   fill="#1eff7a" filter="url(#glowPulse)"/>
+</svg>

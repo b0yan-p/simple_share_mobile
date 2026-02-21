@@ -33,8 +33,8 @@ export abstract class BaseService<
     return `${this.rootUrl}/${this.ctrlApi}`;
   }
 
-  public getAll(): void {
-    const api = this.buildApiUrl(this.listApi);
+  public getAll(url?: string): void {
+    const api = this.buildApiUrl(url ?? this.listApi);
 
     this.pageRequest$
       .pipe(

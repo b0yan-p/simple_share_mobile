@@ -41,6 +41,12 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import '@ionic/angular/css/palettes/dark.system.css';
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 h1,
 h2,
 h3,
@@ -50,6 +56,56 @@ h6,
 p {
   padding: 0;
   margin: 0;
+}
+
+// text colors
+.c-light {
+  color: c.$text-light;
+}
+.c-success {
+  color: c.$success;
+}
+
+.c-primary {
+  color: c.$primary;
+}
+
+.c-error {
+  color: c.$error;
+}
+
+// Font sizes
+.font-14 {
+  font-size: 14px;
+}
+.font-16 {
+  font-size: 16px;
+}
+.font-18 {
+  font-size: 18px;
+}
+.font-20 {
+  font-size: 20px;
+}
+.font-24 {
+  font-size: 24px;
+}
+
+// font wight
+.font-w-400 {
+  font-weight: 400;
+}
+.font-w-500 {
+  font-weight: 500;
+}
+.font-w-600 {
+  font-weight: 600;
+}
+.font-w-700 {
+  font-weight: 700;
+}
+.font-w-900 {
+  font-weight: 900;
 }
 
 // Header
@@ -77,12 +133,7 @@ ion-avatar {
   height: 65px;
 }
 
-ion-button {
-  text-transform: none;
-}
-
 // List & list item
-
 ion-item-sliding.list-item {
   & > ion-item-options {
     margin-bottom: 8px;
@@ -127,6 +178,66 @@ ion-item-sliding.list-item {
   }
 }
 
+// Buttons
+ion-button[color='primary'] {
+  --border-radius: 8px;
+  position: relative;
+
+  text-transform: none;
+
+  background: linear-gradient(135deg, #ff5500, #ff6a00);
+  border-radius: 9px;
+  box-shadow:
+    0 2px 8px rgba(255, 85, 0, 0.4),
+    inset 0 -1px 2px 0px rgba(255, 252, 230, 0.95),
+    inset 1px 1px 1px 0px rgba(255, 200, 140, 0.25);
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 70%;
+    height: 2px;
+    z-index: 1;
+
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 150, 30, 0.35) 15%,
+      rgba(255, 185, 60, 0.8) 50%,
+      rgba(255, 150, 30, 0.35) 85%,
+      transparent 100%
+    );
+    border-radius: 1px;
+    pointer-events: none;
+    transition:
+      opacity 0.25s ease,
+      width 0.25s ease;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: /* diagonal rim from top-left corner sweeping to top-right */ linear-gradient(
+      112deg,
+      rgba(255, 220, 160, 0.28) 0%,
+      rgba(255, 200, 120, 0.12) 35%,
+      transparent 55%
+    );
+    pointer-events: none;
+  }
+}
+// ion-button[color='primary'] button.button-native {
+//   color: red;
+//   border: 1px solid yellow;
+// }
+// !Buttons
+
 .delete-confirmation {
   color: c.$error !important;
 }
@@ -134,8 +245,23 @@ ion-item-sliding.list-item {
 .delete-cancel {
   color: c.$text !important;
 }
-
 // !List & list item
+
+// Surface
+.surface-card {
+  padding: 12px 20px;
+
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: 18px;
+
+  &-title {
+    color: c.$text-light;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+// !Surface
 
 // Toast - bottom
 // Move toast above tabs

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 100">
+  <defs>
+    <linearGradient id="lineGrad" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%"   stop-color="#ff4444" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ff4444" stop-opacity="1"/>
+    </linearGradient>
+
+    <filter id="glow1" x="-60%" y="-150%" width="220%" height="400%">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+    <filter id="glow2" x="-60%" y="-150%" width="220%" height="400%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <filter id="glow3" x="-60%" y="-150%" width="220%" height="400%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="glow2b" x="-60%" y="-150%" width="220%" height="400%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+    <filter id="glow1b" x="-60%" y="-150%" width="220%" height="400%">
+      <feGaussianBlur stdDeviation="1"/>
+    </filter>
+
+    <filter id="glowPulse" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="8" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- SEG 1: 210,28 → 175,42 — halo najslabiji -->
+  <line points="210,28 175,42" x1="210" y1="28" x2="175" y2="42"
+    stroke="#ff4444" stroke-width="4" stroke-opacity="0.06"
+    stroke-linecap="round" filter="url(#glow1)"/>
+  <line x1="210" y1="28" x2="175" y2="42"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- SEG 2: 175,42 → 145,32 — halo malo jači -->
+  <line x1="175" y1="42" x2="145" y2="32"
+    stroke="#ff4444" stroke-width="4" stroke-opacity="0.1"
+    stroke-linecap="round" filter="url(#glow1)"/>
+  <line x1="175" y1="42" x2="145" y2="32"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- SEG 3: 145,32 → 115,50 — halo srednji, raste prema tački -->
+  <line x1="145" y1="32" x2="115" y2="50"
+    stroke="#ff4444" stroke-width="5" stroke-opacity="0.15"
+    stroke-linecap="round" filter="url(#glow2)"/>
+  <line x1="145" y1="32" x2="115" y2="50"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- SEG 4: 115,50 → 90,40 — halo na maksimumu (odmah nakon tačke) -->
+  <line x1="115" y1="50" x2="90" y2="40"
+    stroke="#ff4444" stroke-width="5" stroke-opacity="0.2"
+    stroke-linecap="round" filter="url(#glow3)"/>
+  <line x1="115" y1="50" x2="90" y2="40"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- SEG 5: 90,40 → 60,72 — halo opada -->
+  <line x1="90" y1="40" x2="60" y2="72"
+    stroke="#ff4444" stroke-width="4" stroke-opacity="0.1"
+    stroke-linecap="round" filter="url(#glow2b)"/>
+  <line x1="90" y1="40" x2="60" y2="72"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- SEG 6: 60,72 → 15,72 — ravni dio, halo najslabiji -->
+  <line x1="60" y1="72" x2="15" y2="72"
+    stroke="#ff4444" stroke-width="3" stroke-opacity="0.07"
+    stroke-linecap="round" filter="url(#glow1b)"/>
+  <line x1="60" y1="72" x2="15" y2="72"
+    stroke="#ff4444" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Prekrij sve linijama sa gradientom -->
+  <polyline
+    points="210,28 175,42 145,32 115,50 90,40 60,72 15,72"
+    fill="none"
+    stroke="url(#lineGrad)"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Vrh strelice — bez hala -->
+  <polyline
+    points="30,64 15,72 30,80"
+    fill="none"
+    stroke="#ff4444"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Istaknuta tačka rasta -->
+  <ellipse cx="115" cy="50" rx="18" ry="6"   fill="#ff4444" fill-opacity="0.04" filter="url(#glowPulse)"/>
+  <ellipse cx="115" cy="50" rx="12" ry="4"   fill="#ff4444" fill-opacity="0.1"/>
+  <ellipse cx="115" cy="50" rx="6"  ry="2.5" fill="#ff4444" fill-opacity="0.3"/>
+  <ellipse cx="115" cy="50" rx="3"  ry="1.5" fill="#ff4444" filter="url(#glowPulse)"/>
+</svg>

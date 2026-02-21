@@ -1,0 +1,9 @@
+@for (item of service.items(); track $index) {
+  <!-- Date -->
+  <div>{{ item.date | date: 'MMMM yyyy' }}</div>
+
+  <!-- Items for date -->
+  @for (expense of item.expenses; track expense.id) {
+    <pre>{{ expense.description }}</pre>
+  }
+}

@@ -4,8 +4,94 @@
       <ion-back-button defaultHref="groups"></ion-back-button>
     </ion-buttons>
 
-    <ion-title>Group</ion-title>
+    <ion-title>{{ title }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content> <p>group-details works!</p> </ion-content>
+<ion-content class="ion-padding ion-spacing">
+  <ion-grid>
+    <!-- Debt overview -->
+    @if (group$ | async; as group) {
+      <ion-row class="surface-card balance-overview" style="position: relative">
+        <!-- Balance -->
+        <div class="bdd-flex bdd-flex-col bdd-gap-1">
+          @let net = group.myDebtSummary.net;
+
+          <div class="surface-card-title">Your balance</div>
+          <!-- Amount / Net -->
+          <div class="amount" [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }">
+            @if (net > 0) {
+              <span class="plus-sign">+</span>
+            }
+            <span [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }"> {{ net }} </span>
+            <span
+              class="font-18 font-w-400"
+              [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }"
+            >
+              BAM
+            </span>
+          </div>
+          @if (net >= 0) {
+            <app-chip title="Owed to you" severity="success" />
+          } @else if (net < 0) {
+            <app-chip title="You are owe" severity="error" />
+          } @else {
+            <app-chip title="Settled up" severity="success" />
+          }
+
+          <img
+            [src]="
+              group.myDebtSummary.net >= 0
+                ? 'assets/icons/svg/stonks-up.svg'
+                : 'assets/icons/svg/stonks-down.svg'
+            "
+            alt="Total net chart"
+            style="position: absolute; left: 48px; bottom: 0; width: 120px"
+          />
+        </div>
+
+        <div class="bdd-flex bdd-flex-col bdd-gap-2">
+          <!-- Graph -->
+          <div class="bdd-flex bdd-gap-1">
+            <div class="donut-chart" id="donut" style="--get: 200; --owe: 160">
+              <div class="seg-green"></div>
+              <div class="seg-red"></div>
+            </div>
+
+            <!-- Legends -->
+            <div class="legends">
+              <!-- Get -->
+              <div class="legend">
+                <div class="green"></div>
+                <div class="font-14">
+                  You get <span class="c-success">{{ group.myDebtSummary.paidTotal }}</span>
+                </div>
+              </div>
+              <!-- Owe -->
+              <div class="legend">
+                <div class="warn"></div>
+                <div class="font-14">
+                  You
+                  <span [class]="group.myDebtSummary.owedTotal != 0 ? 'c-error' : ''">
+                    owe {{ group.myDebtSummary.owedTotal }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add expense -->
+          <ion-button color="primary">
+            <ion-icon name="add-outline" />
+            <span>Add expense</span>
+          </ion-button>
+        </div>
+      </ion-row>
+    }
+
+    <!-- Group Expenses -->
+    <ion-col>
+      <app-expense-list />
+    </ion-col>
+  </ion-grid>
+</ion-content>

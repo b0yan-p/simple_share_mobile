@@ -1,0 +1,105 @@
+@use './../../../../../theme/variables.scss' as c;
+
+:host {
+  .balance-overview {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+
+    background: url('./../../../../../assets/icons/svg/grid.svg');
+  }
+  .amount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    font-size: 24px;
+    line-height: 28px;
+    font-weight: 500;
+    color: c.$success;
+
+    .plus-sign {
+      line-height: 32px;
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.donut-chart {
+  --get: 111;
+  --owe: 249;
+  --gap: 4;
+  --size: 90px;
+  --ring: 12px;
+
+  width: 52px;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  position: relative;
+  // background-color: c.$success;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: var(--ring);
+    background: c.$surface;
+
+    border-radius: 50%;
+  }
+
+  .seg-green {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      #1eff7a 0deg,
+      #1eff7a calc(var(--get) * 1deg - var(--gap) * 1deg),
+      transparent calc(var(--get) * 1deg - var(--gap) * 1deg),
+      transparent 360deg
+    );
+    filter: drop-shadow(0 0 4px rgba(30, 255, 122, 0.7));
+  }
+
+  .seg-red {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      transparent 0deg,
+      transparent calc(var(--get) * 1deg),
+      #ff4444 calc(var(--get) * 1deg),
+      #ff4444 calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
+      transparent calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
+      transparent 360deg
+    );
+    filter: drop-shadow(0 0 3px rgba(255, 68, 68, 0.6));
+  }
+}
+
+.legends {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    & > div:first-child {
+      width: 10px;
+      height: 10px;
+
+      border-radius: 100%;
+
+      &.green {
+        background-color: c.$success;
+      }
+
+      &.warn {
+        background-color: c.$error;
+      }
+    }
+  }
+}
