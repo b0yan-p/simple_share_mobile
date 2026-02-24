@@ -9,7 +9,7 @@ import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-
 export class ExpenseService extends BaseService<ExpenseListItem> {
   constructor() {
     super();
-    // super.setPagination(0, 3);
+    super.setPagination(0, 5);
   }
 
   protected override get ctrlApi(): string {

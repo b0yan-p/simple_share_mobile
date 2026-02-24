@@ -3,7 +3,67 @@
   <div>{{ item.date | date: 'MMMM yyyy' }}</div>
 
   <!-- Items for date -->
-  @for (expense of item.expenses; track expense.id) {
-    <pre>{{ expense.description }}</pre>
-  }
+  <ion-list>
+    @for (expense of item.expenses; track expense.id) {
+      <ion-item
+        [button]="true"
+        class="list-item bdd-mb-1"
+        detail="false"
+        color="medium"
+        lines="none"
+      >
+        <div class="bdd-py-1 bdd-flex bdd-gap-1 bdd-flex-1 bdd-ai-center c-text">
+          <div class="bdd-flex bdd-flex-col bdd-ai-center">
+            <span> {{ expense.createdAt | date: 'MMM' }}</span>
+            <span> {{ expense.createdAt | date: 'dd' }}</span>
+          </div>
+
+          <app-avatar icon="plain" alt="Expense icon" />
+
+          <!-- Expense details -->
+          <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-flex-1 bdd-mr-1">
+            <!-- Description & Payers -->
+            <div class="bdd-flex bdd-flex-col">
+              <span class="c-light">{{ expense.description }}</span>
+              @if (!expense.isSettleUp) {
+                <small class="c-text">
+                  Paid by
+                  @if (expense.paidByMembers.length > 1) {
+                    {{ expense.paidByMembers[0] }} and
+                    {{ expense.paidByMembers.length - 1 }} more
+                  } @else {
+                    {{ expense.paidByMembers[0] }}
+                  }
+                </small>
+              }
+            </div>
+
+            <!-- Amount -->
+            @if (!expense.isSettleUp) {
+              <div class="bdd-flex bdd-flex-col bdd-ai-end text-end">
+                @let isLent = expense.net > 0;
+                @let isBorrow = expense.net < 0;
+                @let isSettled = expense.net == 0;
+
+                <span [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
+                  {{ expense.amount }} BAM
+                </span>
+                <small [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
+                  @if (isSettled) {
+                    not involved
+                  } @else if (isBorrow) {
+                    you owe
+                    {{ expense.net * -1 }}
+                  } @else {
+                    you get
+                    {{ expense.net * 1 }}
+                  }
+                </small>
+              </div>
+            }
+          </div>
+        </div>
+      </ion-item>
+    }
+  </ion-list>
 }
