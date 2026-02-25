@@ -27,13 +27,13 @@
               <span class="c-light">{{ expense.description }}</span>
               @if (!expense.isSettleUp) {
                 <small class="c-text">
-                  Paid by
                   @if (expense.paidByMembers.length > 1) {
-                    {{ expense.paidByMembers[0] }} and
-                    {{ expense.paidByMembers.length - 1 }} more
+                    {{ expense.paidByMembers.length }} people
                   } @else {
                     {{ expense.paidByMembers[0] }}
                   }
+                  payed
+                  {{ expense.amount | number: '1.2-2' }} BAM
                 </small>
               }
             </div>
@@ -46,17 +46,18 @@
                 @let isSettled = expense.net == 0;
 
                 <span [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
-                  {{ expense.amount }} BAM
+                  {{ expense.net >= 0 ? expense.net : (expense.net * -1 | number: '1.2-2') }}
+                  BAM
                 </span>
                 <small [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
                   @if (isSettled) {
                     not involved
                   } @else if (isBorrow) {
                     you owe
-                    {{ expense.net * -1 }}
+                    <!-- {{ expense.net * -1 | number: '1.2-2' }} -->
                   } @else {
                     you get
-                    {{ expense.net * 1 }}
+                    <!-- {{ expense.net | number: '1.2-2' }} -->
                   }
                 </small>
               </div>

@@ -19,10 +19,12 @@
   --ion-text-color: #9e9fa1;
 
   //info colors
-  // --ion-color-success: #22c55e;
-  --ion-color-success: #1eff7a;
+  --ion-color-success: #22c55e;
+  // --ion-color-success: #1eff7a;
   --ion-color-warning: #facc15;
-  --ion-color-danger: #ef4444;
+  // --ion-color-danger: #ef4444;
+  --ion-color-danger: #db4545;
+
   --ion-color-tertiary: #38bdf8;
 }
 
@@ -30,8 +32,8 @@ $primary: #e0690e;
 // $primary: #ff5500;
 $secondary: transparent;
 $accent: #fff;
-// $success: #22c55e;
-$success: #1eff7a;
+$success: #22c55e;
+// $success: #1eff7a;
 
 $warn: #facc15;
 $error: #ef4444;

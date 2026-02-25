@@ -53,8 +53,8 @@
     inset: 0;
     border-radius: 50%;
     background: conic-gradient(
-      #1eff7a 0deg,
-      #1eff7a calc(var(--get) * 1deg - var(--gap) * 1deg),
+      c.$success 0deg,
+      c.$success calc(var(--get) * 1deg - var(--gap) * 1deg),
       transparent calc(var(--get) * 1deg - var(--gap) * 1deg),
       transparent 360deg
     );
@@ -68,12 +68,12 @@
     background: conic-gradient(
       transparent 0deg,
       transparent calc(var(--get) * 1deg),
-      #ff4444 calc(var(--get) * 1deg),
-      #ff4444 calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
+      c.$error calc(var(--get) * 1deg),
+      c.$error calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
       transparent calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
       transparent 360deg
     );
-    filter: drop-shadow(0 0 3px rgba(255, 68, 68, 0.6));
+    filter: drop-shadow(0 0 3px rgba(c.$error, 0.6));
   }
 }
 

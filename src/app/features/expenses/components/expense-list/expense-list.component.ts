@@ -1,4 +1,4 @@
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IonItem, IonList } from '@ionic/angular/standalone';
@@ -9,7 +9,7 @@ import { ExpenseService } from '../../services/expense.service';
   selector: 'app-expense-list',
   templateUrl: './expense-list.component.html',
   styleUrls: ['./expense-list.component.scss'],
-  imports: [IonList, IonItem, DatePipe, NgClass, NgClass, AvatarComponent],
+  imports: [NgClass, DatePipe, DecimalPipe, IonList, IonItem, AvatarComponent],
 })
 export class ExpenseListComponent implements OnInit {
   route = inject(ActivatedRoute);

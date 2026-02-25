@@ -1,0 +1,39 @@
+<div class="surface-title bdd-mt-1 bdd-mb-1" style="--width: 152px">Balance details</div>
+
+<ion-list>
+  @for (item of data().debtEdges; track item) {
+    <div class="container" [attr.color]="item.signedAmount > 0 ? 'success' : 'primary'">
+      <ion-item
+        [button]="true"
+        class="list-item bdd-mb-1"
+        detail="false"
+        color="medium"
+        lines="none"
+      >
+        <div class="bdd-flex bdd-flex-1 bdd-jc-space-between bdd-ai-center bdd-gap-1">
+          <div class="bdd-flex bdd-flex-col">
+            <span class="c-light">{{ item.otherDisplayName }}</span>
+            @if (item.signedAmount > 0) {
+              <small class="c-text">owes you</small>
+            } @else {
+              <small class="c-text">you owe</small>
+            }
+          </div>
+
+          <!-- Amount -->
+          <div class="bdd-flex bdd-gap-1 bdd-ai-center">
+            <span
+              [ngClass]="{
+                'c-success': item.signedAmount > 0,
+                'c-primary': item.signedAmount < 0,
+              }"
+            >
+              {{ item.amount | number: '1.2-2' }} BAM</span
+            >
+            <ion-icon name="chevron-forward-outline" class="c-text font-18" />
+          </div>
+        </div>
+      </ion-item>
+    </div>
+  }
+</ion-list>

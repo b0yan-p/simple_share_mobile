@@ -1,4 +1,4 @@
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -18,6 +18,7 @@ import {
 import { switchMap, tap } from 'rxjs';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { GroupBalanceOverviewComponent } from '../../components/group-balance-overview/group-balance-overview.component';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -25,21 +26,25 @@ import { GroupService } from '../../services/group.service';
   templateUrl: './group-details.component.html',
   styleUrls: ['./group-details.component.scss'],
   imports: [
+    NgClass,
+    AsyncPipe,
+    DecimalPipe,
+
     IonIcon,
     IonButton,
     IonRow,
     IonGrid,
     IonCol,
-    AsyncPipe,
     IonContent,
     IonTitle,
     IonBackButton,
     IonButtons,
     IonToolbar,
     IonHeader,
+
     ExpenseListComponent,
     ChipComponent,
-    NgClass,
+    GroupBalanceOverviewComponent,
   ],
 })
 export class GroupDetailsComponent {

@@ -64,7 +64,10 @@
               <div class="legend">
                 <div class="green"></div>
                 <div class="font-14">
-                  You get <span class="c-success">{{ group.myDebtSummary.paidTotal }}</span>
+                  You get
+                  <span class="c-success">{{
+                    group.myDebtSummary.paidTotal | number: '1.2-2'
+                  }}</span>
                 </div>
               </div>
               <!-- Owe -->
@@ -86,6 +89,10 @@
             <span>Add expense</span>
           </ion-button>
         </div>
+      </ion-row>
+
+      <ion-row>
+        <app-group-balance-overview [data]="group.myDebtSummary" />
       </ion-row>
     }
 

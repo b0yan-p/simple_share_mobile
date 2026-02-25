@@ -1,0 +1,69 @@
+@use './../../../../../theme/variables.scss' as c;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  ion-item {
+    border: 1px solid c.$surface-borders;
+    border-radius: 12px;
+    position: relative;
+  }
+  .container {
+    --inset: 24px;
+
+    position: relative;
+    margin-left: var(--inset);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(var(--inset) / -1.5);
+      top: calc(-50% - 12px);
+
+      width: var(--inset);
+      height: calc(var(--inset) * 2 + 12px);
+
+      border-bottom-left-radius: 6px;
+
+      border-left: 1px dashed;
+      border-bottom: 1px dashed;
+    }
+
+    &::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+
+      position: absolute;
+      z-index: 2;
+      left: 0;
+      top: -50%;
+      top: calc(50% - 6px);
+      transform: translate(-50%);
+
+      color: c.$primary;
+      background-color: c.$primary;
+      border-radius: 100%;
+    }
+
+    &[color='primary']::before {
+      border-color: c.$primary;
+    }
+
+    &[color='success']::before {
+      border-color: c.$success;
+    }
+
+    &[color='primary']::after {
+      background-color: c.$primary;
+      box-shadow: 0 0 5px 4px rgba(c.$primary, 0.2);
+    }
+
+    &[color='success']::after {
+      background-color: c.$success;
+      box-shadow: 0 0 5px 4px rgba(c.$success, 0.2);
+    }
+  }
+}
