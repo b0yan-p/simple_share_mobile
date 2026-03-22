@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { BaseService } from 'src/app/core/services/base.service';
 import { DateHelper } from 'src/app/shared/utils/date.helper';
+import { CreateExpenseRequest } from '../models/create-expense.model';
 import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-item.model';
 
 @Injectable({
@@ -50,5 +53,14 @@ export class ExpenseService extends BaseService<ExpenseListItem> {
     });
 
     return data;
+  }
+
+  public createExpense(
+    groupId: string,
+    payload: CreateExpenseRequest,
+  ): Observable<{ id: string }> {
+    return this.httpClient
+      .post<{ id: string }>(`${this.baseApi}/${groupId}`, payload)
+      .pipe(first());
   }
 }

@@ -1,0 +1,308 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      @if (currentStep > 1) {
+        <ion-button (click)="prevStep()">
+          <ion-icon name="chevron-back-outline" slot="icon-only" />
+        </ion-button>
+      } @else {
+        <ion-back-button [defaultHref]="'groups/' + groupId + '/details'"></ion-back-button>
+      }
+    </ion-buttons>
+
+    <div class="bdd-flex bdd-flex-col bdd-jc-center bdd-ai-center bdd-gap-1">
+      <ion-title>Add Expense</ion-title>
+      <div class="step-dots-container">
+        <div
+          class="step-dot"
+          [class.step-dot--active]="currentStep === 1"
+          [class.step-dot--done]="currentStep > 1"
+        ></div>
+        <div
+          class="step-dot"
+          [class.step-dot--active]="currentStep === 2"
+          [class.step-dot--done]="currentStep > 2"
+        ></div>
+        <div class="step-dot" [class.step-dot--active]="currentStep === 3"></div>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form">
+    <!-- ─── Step 1: Details ─── -->
+    @if (currentStep === 1) {
+      <div class="bdd-flex bdd-flex-col bdd-gap-3">
+        <!-- Amount hero -->
+        <div class="amount-hero">
+          <span class="amount-label">Total Amount</span>
+          <div class="amount-display">
+            <ion-input
+              type="number"
+              formControlName="totalAmount"
+              class="amount"
+              placeholder="0.00"
+              inputmode="decimal"
+            />
+            <span class="amount-currency-label">{{ currency }}</span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <ion-input
+          formControlName="description"
+          placeholder="Food, transport..."
+          type="text"
+          fill="outline"
+          label="Description"
+          labelPlacement="floating"
+          [clearInput]="true"
+        >
+          <ion-icon slot="start" name="receipt-outline" />
+        </ion-input>
+
+        <!-- Date -->
+        <ion-list>
+          <ion-item [button]="true" id="open-expense-date-picker">
+            <div
+              class="expense-date bdd-flex bdd-ai-center bdd-jc-space-between bdd-gap-1 bdd-flex-1"
+            >
+              <div class="bdd-flex bdd-gap-1 bdd-ai-center c-text">
+                <ion-icon name="calendar-outline" />
+                <span>Date</span>
+              </div>
+              <div class="bdd-flex bdd-ai-center bdd-gap-1 c-light">
+                <span>{{ form.value.expenseDate | date: 'EE, dd MMM yyyy' }}</span>
+                <ion-icon name="chevron-forward-outline" />
+              </div>
+            </div>
+          </ion-item>
+        </ion-list>
+
+        <ion-modal trigger="open-expense-date-picker" [keepContentsMounted]="true">
+          <ng-template>
+            <ion-toolbar>
+              <div class="bdd-px-3">Select date</div>
+            </ion-toolbar>
+            <ion-content>
+              <ion-datetime
+                size="cover"
+                [showDefaultButtons]="true"
+                presentation="date"
+                formControlName="expenseDate"
+              />
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+      </div>
+    }
+
+    <!-- ─── Step 2: Paid By ─── -->
+    @if (currentStep === 2) {
+      <div class="bdd-flex bdd-flex-col bdd-gap-3" style="padding-bottom: 80px">
+        <div class="section-title" style="--width: 90px">Who paid?</div>
+
+        <ion-segment
+          [value]="paidByMode"
+          (ionChange)="setPaidByMode($any($event).detail.value)"
+        >
+          <ion-segment-button value="equal">
+            <ion-label>Equally</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="custom">
+            <ion-label>Custom</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <div class="bdd-flex bdd-flex-col bdd-gap-2">
+          @for (entry of paidByEntries; track entry.memberId) {
+            <div
+              class="member-card"
+              [class.member-card--selected]="entry.selected"
+              (click)="togglePayer(entry)"
+            >
+              <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+                <div class="avatar-wrap">
+                  <app-avatar icon="plain" [alt]="entry.displayName" [width]="38" />
+                  @if (entry.selected) {
+                    <ion-icon name="checkmark-circle" class="avatar-check" />
+                  }
+                </div>
+                <span class="member-name" [class.member-name--selected]="entry.selected">
+                  {{ entry.displayName }}
+                </span>
+              </div>
+
+              @if (paidByMode === 'equal') {
+                @if (entry.selected) {
+                  <span class="c-primary font-w-500 font-14">
+                    {{ entry.amount | number: '1.2-2' }} {{ currency }}
+                  </span>
+                }
+              } @else {
+                @if (entry.selected) {
+                  <div
+                    class="bdd-flex bdd-ai-center bdd-gap-1"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <ion-input
+                      type="number"
+                      min="0"
+                      class="member-amount-input"
+                      [value]="entry.amount"
+                      (ionInput)="onPayerAmountChange(entry, $any($event).detail.value)"
+                    />
+                    <span class="c-light font-14">{{ currency }}</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (noneSelectedPayer) {
+          <div class="validation-hint">
+            <ion-icon name="information-circle-outline" />
+            <span>Select at least one person who paid</span>
+          </div>
+        } @else if (!paidByValid) {
+          <div class="validation-hint">
+            <ion-icon name="information-circle-outline" />
+            @if (paidByTotal > totalAmount) {
+              <span>
+                Total exceeds expense by
+                {{ paidByTotal - totalAmount | number: '1.2-2' }} {{ currency }}
+              </span>
+            } @else {
+              <span>
+                {{ totalAmount - paidByTotal | number: '1.2-2' }} {{ currency }} not yet
+                assigned
+              </span>
+            }
+          </div>
+        }
+
+        <div class="total-indicator" [class.total-indicator--valid]="paidByValid">
+          <span>Paid</span>
+          <span
+            >{{ paidByTotal | number: '1.2-2' }} / {{ totalAmount | number: '1.2-2' }}
+            {{ currency }}</span
+          >
+        </div>
+      </div>
+    }
+
+    <!-- ─── Step 3: Split Between ─── -->
+    @if (currentStep === 3) {
+      <div class="bdd-flex bdd-flex-col bdd-gap-3" style="padding-bottom: 80px">
+        <div class="section-title" style="--width: 120px">Split between</div>
+
+        <ion-segment [value]="splitMode" (ionChange)="setSplitMode($any($event).detail.value)">
+          <ion-segment-button value="equal">
+            <ion-label>Equally</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="custom">
+            <ion-label>Custom</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <div class="bdd-flex bdd-flex-col bdd-gap-2">
+          @for (entry of splitEntries; track entry.memberId) {
+            <div
+              class="member-card"
+              [class.member-card--selected]="entry.selected"
+              (click)="toggleSplitter(entry)"
+            >
+              <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+                <div class="avatar-wrap">
+                  <app-avatar icon="plain" [alt]="entry.displayName" [width]="38" />
+                  @if (entry.selected) {
+                    <ion-icon name="checkmark-circle" class="avatar-check" />
+                  }
+                </div>
+                <span class="member-name" [class.member-name--selected]="entry.selected">
+                  {{ entry.displayName }}
+                </span>
+              </div>
+
+              @if (splitMode === 'equal') {
+                @if (entry.selected) {
+                  <span class="c-primary font-w-500 font-14">
+                    {{ entry.amount | number: '1.2-2' }} {{ currency }}
+                  </span>
+                }
+              } @else {
+                @if (entry.selected) {
+                  <div
+                    class="bdd-flex bdd-ai-center bdd-gap-1"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <ion-input
+                      type="number"
+                      min="0"
+                      class="member-amount-input"
+                      [value]="entry.amount"
+                      (ionInput)="onSplitterAmountChange(entry, $any($event).detail.value)"
+                    />
+                    <span class="c-light font-14">{{ currency }}</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (noneSelectedSplit) {
+          <div class="validation-hint">
+            <ion-icon name="information-circle-outline" />
+            <span>Select at least one person to split with</span>
+          </div>
+        } @else if (!splitValid) {
+          <div class="validation-hint">
+            <ion-icon name="information-circle-outline" />
+            @if (splitTotal > totalAmount) {
+              <span>
+                Total exceeds expense by
+                {{ splitTotal - totalAmount | number: '1.2-2' }} {{ currency }}
+              </span>
+            } @else {
+              <span>
+                {{ totalAmount - splitTotal | number: '1.2-2' }} {{ currency }} not yet assigned
+              </span>
+            }
+          </div>
+        }
+
+        <div class="total-indicator" [class.total-indicator--valid]="splitValid">
+          <span>Split</span>
+          <span
+            >{{ splitTotal | number: '1.2-2' }} / {{ totalAmount | number: '1.2-2' }}
+            {{ currency }}</span
+          >
+        </div>
+      </div>
+    }
+
+    <!-- ─── CTA ─── -->
+    @if (currentStep < stepsCount) {
+      <ion-button
+        color="primary"
+        class="step-button"
+        [disabled]="(currentStep === 1 && form.invalid) || (currentStep === 2 && !paidByValid)"
+        (click)="nextStep()"
+      >
+        Continue
+      </ion-button>
+    } @else {
+      <ion-button
+        color="primary"
+        class="step-button"
+        [disabled]="!splitValid || uiService.itemLoading()"
+        (click)="submit()"
+      >
+        Save Expense
+      </ion-button>
+    }
+  </form>
+</ion-content>

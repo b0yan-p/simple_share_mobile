@@ -19,6 +19,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'groups/:id',
+        loadComponent: () =>
+          import('./groups/pages/group-item/group-item.component').then(
+            (m) => m.GroupItemComponent,
+          ),
+      },
+      {
         path: 'groups/:id/details',
         loadComponent: () =>
           import('./groups/pages/group-details/group-details.component').then(
@@ -26,13 +33,12 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'groups/:id',
+        path: 'groups/:id/expenses/new',
         loadComponent: () =>
-          import('./groups/pages/group-item/group-item.component').then(
-            (m) => m.GroupItemComponent,
+          import('./expenses/pages/expense-item/expense-item.component').then(
+            (c) => c.ExpenseItemComponent,
           ),
       },
-
       {
         path: 'activities',
         loadComponent: () =>

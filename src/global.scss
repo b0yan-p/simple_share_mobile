@@ -320,3 +320,36 @@ ion-item:has(ion-toggle) {
   --border-color: #{c.$surface};
 }
 // !Toggle
+
+// Input
+ion-input {
+  --border-radius: 12px !important;
+}
+
+.input-clear-icon {
+  background-color: c.$surface !important;
+  border-radius: 100px !important;
+  color: c.$bg !important;
+}
+//!Input
+
+// Datetime picker
+
+ion-datetime {
+  --background: c.$surface;
+  --background-rgb: 45, 46, 50;
+  // --border-radius: 12px;
+  // --border-color: c.$borders;
+}
+
+ion-datetime-button.custom-date-picker {
+  &::part(native) {
+    background-color: c.$surface; /* Replace with your desired color */
+    color: c.$text; /* Change text color for contrast if needed */
+
+    &:first {
+      background-color: red;
+    }
+  }
+}
+// !Datetime picker

@@ -1,7 +1,7 @@
 import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -29,6 +29,7 @@ import { GroupService } from '../../services/group.service';
     NgClass,
     AsyncPipe,
     DecimalPipe,
+    RouterModule,
 
     IonIcon,
     IonButton,
@@ -50,6 +51,7 @@ import { GroupService } from '../../services/group.service';
 export class GroupDetailsComponent {
   service = inject(GroupService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   title = 'Group';
 
@@ -58,4 +60,8 @@ export class GroupDetailsComponent {
     tap((e) => (this.title = e.name)),
     takeUntilDestroyed(),
   );
+
+  goToNewExpense() {
+    this.router.navigate(['expenses', 'new']);
+  }
 }
