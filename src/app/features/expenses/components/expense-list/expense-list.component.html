@@ -3,7 +3,7 @@
   <div>{{ item.date | date: 'MMMM yyyy' }}</div>
 
   <!-- Items for date -->
-  <ion-list>
+  <ion-list [inset]="true">
     @for (expense of item.expenses; track expense.id) {
       <ion-item-sliding class="bdd-mb-1 rounded-options">
         <ion-item

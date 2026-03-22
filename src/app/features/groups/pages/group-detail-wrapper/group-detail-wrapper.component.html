@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="groups"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['..', 'expenses', 'new']">
+        <ion-icon name="add-outline" slot="icon-only" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment
+    class="tab-segment"
+    [value]="activeTab"
+    (ionChange)="activeTab = $any($event).detail.value"
+  >
+    <ion-segment-button value="overview">
+      <ion-label>Overview</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="expenses">
+      <ion-label>Expenses</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="balance">
+      <ion-label>Balance</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div [class.ion-padding]="activeTab !== 'expenses'">
+    @switch (activeTab) {
+      @case ('overview') {
+        <app-group-details />
+      }
+      @case ('expenses') {
+        <app-expense-list />
+      }
+      @case ('balance') {
+        <app-group-balance />
+      }
+    }
+  </div>
+</ion-content>

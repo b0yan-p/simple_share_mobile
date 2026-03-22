@@ -1,6 +1,8 @@
 @use './../../../../../theme/variables.scss' as c;
 
 :host {
+  // ─── Overview card ───
+
   .balance-overview {
     display: flex;
     gap: 16px;
@@ -8,6 +10,7 @@
 
     background: url('./../../../../../assets/icons/svg/grid.svg');
   }
+
   .amount {
     display: flex;
     align-items: center;
@@ -37,14 +40,12 @@
   aspect-ratio: 1;
   border-radius: 100%;
   position: relative;
-  // background-color: c.$success;
 
   &::after {
     content: '';
     position: absolute;
     inset: var(--ring);
     background: c.$surface;
-
     border-radius: 50%;
   }
 
@@ -90,7 +91,6 @@
     & > div:first-child {
       width: 10px;
       height: 10px;
-
       border-radius: 100%;
 
       &.green {

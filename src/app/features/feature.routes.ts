@@ -28,8 +28,8 @@ export const routes: Routes = [
       {
         path: 'groups/:id/details',
         loadComponent: () =>
-          import('./groups/pages/group-details/group-details.component').then(
-            (m) => m.GroupDetailsComponent,
+          import('./groups/pages/group-detail-wrapper/group-detail-wrapper.component').then(
+            (m) => m.GroupDetailWrapperComponent,
           ),
       },
       {
