@@ -5,67 +5,87 @@
   <!-- Items for date -->
   <ion-list>
     @for (expense of item.expenses; track expense.id) {
-      <ion-item
-        [button]="true"
-        class="list-item bdd-mb-1"
-        detail="false"
-        color="medium"
-        lines="none"
-        (click)="navigateToDetail(expense.id)"
-      >
-        <div class="bdd-py-1 bdd-flex bdd-gap-1 bdd-flex-1 bdd-ai-center c-text">
-          <div class="bdd-flex bdd-flex-col bdd-ai-center">
-            <span> {{ expense.createdAt | date: 'MMM' }}</span>
-            <span> {{ expense.createdAt | date: 'dd' }}</span>
-          </div>
-
-          <app-avatar icon="plain" alt="Expense icon" />
-
-          <!-- Expense details -->
-          <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-flex-1 bdd-mr-1">
-            <!-- Description & Payers -->
-            <div class="bdd-flex bdd-flex-col">
-              <span class="c-light">{{ expense.description }}</span>
-              @if (!expense.isSettleUp) {
-                <small class="c-text">
-                  @if (expense.paidByMembers.length > 1) {
-                    {{ expense.paidByMembers.length }} people
-                  } @else {
-                    {{ expense.paidByMembers[0] }}
-                  }
-                  payed
-                  {{ expense.amount | number: '1.2-2' }} BAM
-                </small>
-              }
+      <ion-item-sliding class="bdd-mb-1 rounded-options">
+        <ion-item
+          [button]="true"
+          class="list-item"
+          detail="false"
+          color="medium"
+          lines="none"
+          (click)="navigateToDetail(expense.id)"
+        >
+          <div class="bdd-py-1 bdd-flex bdd-gap-1 bdd-flex-1 bdd-ai-center c-text">
+            <div class="bdd-flex bdd-flex-col bdd-ai-center">
+              <span> {{ expense.createdAt | date: 'MMM' }}</span>
+              <span> {{ expense.createdAt | date: 'dd' }}</span>
             </div>
 
-            <!-- Amount -->
-            @if (!expense.isSettleUp) {
-              <div class="bdd-flex bdd-flex-col bdd-ai-end text-end">
-                @let isLent = expense.net > 0;
-                @let isBorrow = expense.net < 0;
-                @let isSettled = expense.net == 0;
+            <app-avatar icon="plain" alt="Expense icon" />
 
-                <span [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
-                  {{ expense.net >= 0 ? expense.net : (expense.net * -1 | number: '1.2-2') }}
-                  BAM
-                </span>
-                <small [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
-                  @if (isSettled) {
-                    not involved
-                  } @else if (isBorrow) {
-                    you owe
-                    <!-- {{ expense.net * -1 | number: '1.2-2' }} -->
-                  } @else {
-                    you get
-                    <!-- {{ expense.net | number: '1.2-2' }} -->
-                  }
-                </small>
+            <!-- Expense details -->
+            <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-flex-1 bdd-mr-1">
+              <!-- Description & Payers -->
+              <div class="bdd-flex bdd-flex-col">
+                <span class="c-light">{{ expense.description }}</span>
+                @if (!expense.isSettleUp) {
+                  <small class="c-text">
+                    @if (expense.paidByMembers.length > 1) {
+                      {{ expense.paidByMembers.length }} people
+                    } @else {
+                      {{ expense.paidByMembers[0] }}
+                    }
+                    payed
+                    {{ expense.amount | number: '1.2-2' }} BAM
+                  </small>
+                }
               </div>
-            }
+
+              <!-- Amount -->
+              @if (!expense.isSettleUp) {
+                <div class="bdd-flex bdd-flex-col bdd-ai-end text-end">
+                  @let isLent = expense.net > 0;
+                  @let isBorrow = expense.net < 0;
+                  @let isSettled = expense.net == 0;
+
+                  <span [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }">
+                    {{ expense.net >= 0 ? expense.net : (expense.net * -1 | number: '1.2-2') }}
+                    BAM
+                  </span>
+                  <small
+                    [ngClass]="{ 'c-primary': isBorrow, 'c-success': isLent || isSettled }"
+                  >
+                    @if (isSettled) {
+                      not involved
+                    } @else if (isBorrow) {
+                      you owe
+                    } @else {
+                      you get
+                    }
+                  </small>
+                </div>
+              }
+            </div>
           </div>
-        </div>
-      </ion-item>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="openDeleteAlert(expense.id)">
+            <ion-icon name="trash-outline" />
+          </ion-item-option>
+
+          <ion-item-option (click)="navigateToEdit(expense.id)">
+            <ion-icon name="create-outline" />
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
     }
   </ion-list>
 }
+
+<ion-alert
+  [isOpen]="isDeleteAlertOpen"
+  header="Delete Expense"
+  message="Are you sure you want to delete this expense?"
+  [buttons]="alertButtons"
+  (didDismiss)="isDeleteAlertOpen = false"
+/>

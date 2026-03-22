@@ -2,13 +2,13 @@ import { Component, inject, input, output } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import {
   IonAlert,
-  IonAvatar,
   IonIcon,
   IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
 } from '@ionic/angular/standalone';
+import { AvatarComponent } from '../avatar/avatar.component';
 
 @Component({
   selector: 'app-list-item',
@@ -20,9 +20,9 @@ import {
     IonItemOption,
     IonItemOptions,
     IonItemSliding,
-    IonAvatar,
     IonItem,
     RouterModule,
+    AvatarComponent,
   ],
 })
 export class ListItemComponent {

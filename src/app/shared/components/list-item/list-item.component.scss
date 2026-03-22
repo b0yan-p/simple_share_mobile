@@ -1,5 +1,22 @@
 @use './../../../../theme/variables.scss' as c;
 
+:host {
+  .list-item {
+    margin-bottom: 8px;
+  }
+
+  .list-item-inner {
+    border: 1px solid c.$surface-borders;
+    border-radius: 12px;
+  }
+
+  .list-item-meta {
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
 .delete-confirmation {
   color: c.$error !important;
 }

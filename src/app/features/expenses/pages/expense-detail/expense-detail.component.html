@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-title>Expense Details</ion-title>
     <ion-buttons slot="end">
+      <ion-button color="danger" (click)="isDeleteAlertOpen = true">
+        <ion-icon name="trash-outline" slot="icon-only" />
+      </ion-button>
       <ion-button (click)="navigateToEdit()">
         <ion-icon name="create-outline" slot="icon-only" />
       </ion-button>
@@ -108,3 +111,11 @@
     </div>
   }
 </ion-content>
+
+<ion-alert
+  [isOpen]="isDeleteAlertOpen"
+  header="Delete Expense"
+  message="Are you sure you want to delete this expense?"
+  [buttons]="alertButtons"
+  (didDismiss)="isDeleteAlertOpen = false"
+/>

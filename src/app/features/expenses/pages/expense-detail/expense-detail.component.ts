@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  IonAlert,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -35,6 +36,7 @@ import { CURRENCY } from '../../utils/expense.constants';
     IonContent,
     IonIcon,
     IonSpinner,
+    IonAlert,
   ],
 })
 export class ExpenseDetailComponent implements OnInit {
@@ -48,6 +50,17 @@ export class ExpenseDetailComponent implements OnInit {
   loading = signal(true);
   groupId = '';
   expenseId = '';
+  isDeleteAlertOpen = false;
+
+  alertButtons = [
+    { text: 'Cancel', role: 'cancel' },
+    {
+      text: 'Delete',
+      role: 'confirm',
+      cssClass: 'delete-confirmation',
+      handler: () => this.confirmDelete(),
+    },
+  ];
 
   ngOnInit(): void {
     this.groupId = this.route.snapshot.params['id'];
@@ -57,6 +70,16 @@ export class ExpenseDetailComponent implements OnInit {
 
   navigateToEdit(): void {
     this.router.navigate(['groups', this.groupId, 'expenses', this.expenseId]);
+  }
+
+  private confirmDelete(): void {
+    this.expenseService.deleteExpense(this.groupId, this.expenseId).subscribe({
+      next: () => {
+        this.toastService.successToast('Expense deleted');
+        this.router.navigate(['groups', this.groupId, 'details']);
+      },
+      error: () => this.toastService.errorToast('Failed to delete expense'),
+    });
   }
 
   private loadExpense(expenseId: string): void {

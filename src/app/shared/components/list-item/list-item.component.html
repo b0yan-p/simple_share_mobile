@@ -1,15 +1,22 @@
-<ion-item-sliding class="list-item" [disabled]="disableSwipeActions()" ()>
-  <ion-item button class="list-item" (click)="navigate()">
-    <!-- Avatar -->
-    <ion-avatar>
-      <img alt="Group avatar" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-    </ion-avatar>
+<ion-item-sliding class="list-item" [disabled]="disableSwipeActions()">
+  <ion-item button class="list-item-inner" detail="false" color="medium" lines="none" (click)="navigate()">
+    <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1 bdd-py-1">
+      <app-avatar icon="plain" [alt]="title()" />
 
-    <!-- Info -->
-    <div class="list-item-info">
-      <h5>{{ title() }}</h5>
-      <p color="primary">{{ description() }}</p>
-      <small>{{ meta() }}</small>
+      <div class="bdd-flex bdd-flex-col bdd-flex-1">
+        <span class="c-light font-w-500">{{ title() }}</span>
+        @if (description()) {
+          <small
+            [class.c-primary]="descriptionColor() === 'primary'"
+            [class.c-accent]="descriptionColor() === 'accent'"
+            [class.c-text]="descriptionColor() === 'default'"
+          >{{ description() }}</small>
+        }
+      </div>
+
+      @if (meta()) {
+        <span class="list-item-meta c-text">{{ meta() }}</span>
+      }
     </div>
   </ion-item>
 

@@ -138,6 +138,27 @@ ion-tab-bar {
 }
 
 // List & list item
+ion-item-sliding.rounded-options {
+  & > ion-item-options {
+    margin-bottom: 8px;
+    & > ion-item-option {
+      margin-bottom: 8px;
+      border-radius: 60px;
+      --border-radius: 60px;
+      width: 48px;
+      height: 48px;
+      margin-block: auto;
+
+      font-size: 20px;
+
+      &:first-child {
+        margin-left: 4px;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
 ion-item-sliding.list-item {
   & > ion-item-options {
     margin-bottom: 8px;

@@ -74,4 +74,10 @@ export class ExpenseService extends BaseService<ExpenseListItem> {
   public updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<void> {
     return this.httpClient.put<void>(`${this.baseApi}/${groupId}`, payload).pipe(first());
   }
+
+  public deleteExpense(groupId: string, expenseId: string): Observable<void> {
+    return this.httpClient
+      .delete<void>(`${this.baseApi}/${groupId}/${expenseId}`)
+      .pipe(first());
+  }
 }
