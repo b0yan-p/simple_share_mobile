@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -19,6 +19,7 @@ import {
   IonSegmentButton,
   IonTitle,
   IonToolbar,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -63,7 +64,7 @@ interface MemberEntry extends GroupMember {
     IonLabel,
   ],
 })
-export class ExpenseItemComponent implements OnInit {
+export class ExpenseItemComponent implements ViewWillEnter {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private groupService = inject(GroupService);
@@ -76,6 +77,8 @@ export class ExpenseItemComponent implements OnInit {
   readonly stepsCount = 3;
   currentStep = 1;
   groupId = '';
+  editMode = false;
+  expenseId = '';
 
   form = new FormGroup({
     totalAmount: new FormControl<number | null>(null, [
@@ -119,8 +122,20 @@ export class ExpenseItemComponent implements OnInit {
     return !this.noneSelectedSplit && amountsMatch(this.splitTotal, this.totalAmount);
   }
 
-  ngOnInit(): void {
+  ionViewWillEnter(): void {
+    this.currentStep = 1;
+    this.editMode = false;
+    this.expenseId = '';
+    this.paidByMode = 'equal';
+    this.splitMode = 'equal';
+    this.form.reset({ expenseDate: new Date().toISOString() });
+
     this.groupId = this.route.snapshot.params['id'];
+    const expenseId = this.route.snapshot.params['expenseId'];
+    if (expenseId) {
+      this.editMode = true;
+      this.expenseId = expenseId;
+    }
     this.loadMembers();
   }
 
@@ -129,9 +144,40 @@ export class ExpenseItemComponent implements OnInit {
       next: (members) => {
         this.paidByEntries = members.map((m) => ({ ...m, selected: false, amount: 0 }));
         this.splitEntries = members.map((m) => ({ ...m, selected: true, amount: 0 }));
-        this.recalculateEqualSplit();
+        if (this.editMode) {
+          this.loadExpenseData();
+        } else {
+          this.recalculateEqualSplit();
+        }
       },
       error: () => this.toastService.errorToast('Failed to load group members'),
+    });
+  }
+
+  private loadExpenseData(): void {
+    this.expenseService.getExpense(this.groupId, this.expenseId).subscribe({
+      next: (expense) => {
+        this.form.patchValue({
+          totalAmount: expense.amount,
+          description: expense.description,
+          expenseDate: expense.expenseDate,
+        });
+
+        this.paidByEntries.forEach((entry) => {
+          const match = expense.paidBy.find((p) => p.memberId === entry.memberId);
+          entry.selected = !!match;
+          entry.amount = match?.amount ?? 0;
+        });
+        this.paidByMode = 'custom';
+
+        this.splitEntries.forEach((entry) => {
+          const match = expense.splittedBy.find((s) => s.memberId === entry.memberId);
+          entry.selected = !!match;
+          entry.amount = match?.amount ?? 0;
+        });
+        this.splitMode = 'custom';
+      },
+      error: () => this.toastService.errorToast('Failed to load expense'),
     });
   }
 
@@ -241,7 +287,7 @@ export class ExpenseItemComponent implements OnInit {
   submit(): void {
     if (!this.splitValid) return;
 
-    const payload: CreateExpenseRequest = {
+    const basePayload: CreateExpenseRequest = {
       description: this.form.value.description!,
       expenseDate: this.form.value.expenseDate!,
       totalAmount: this.totalAmount,
@@ -254,16 +300,30 @@ export class ExpenseItemComponent implements OnInit {
     };
 
     this.uiService.itemLoading.set(true);
-    this.expenseService.createExpense(this.groupId, payload).subscribe({
-      next: () => {
-        this.uiService.itemLoading.set(false);
-        this.toastService.successToast('Expense added!');
-        this.router.navigate(['groups', this.groupId, 'details']);
-      },
-      error: (err) => {
-        this.uiService.itemLoading.set(false);
-        this.toastService.errorToast(err?.error?.message ?? 'Failed to save expense');
-      },
-    });
+
+    const onSuccess = () => {
+      this.uiService.itemLoading.set(false);
+      this.toastService.successToast(this.editMode ? 'Expense updated!' : 'Expense added!');
+      const dest = this.editMode
+        ? ['groups', this.groupId, 'expenses', this.expenseId, 'details']
+        : ['groups', this.groupId, 'details'];
+
+      this.router.navigate(dest);
+    };
+
+    const onError = (err: { error?: { message?: string } }) => {
+      this.uiService.itemLoading.set(false);
+      this.toastService.errorToast(err?.error?.message ?? 'Failed to save expense');
+    };
+
+    if (this.editMode) {
+      this.expenseService
+        .updateExpense(this.groupId, { ...basePayload, id: this.expenseId })
+        .subscribe({ next: onSuccess, error: onError });
+    } else {
+      this.expenseService
+        .createExpense(this.groupId, basePayload)
+        .subscribe({ next: onSuccess, error: onError });
+    }
   }
 }

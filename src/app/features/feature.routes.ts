@@ -40,6 +40,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'groups/:id/expenses/:expenseId',
+        loadComponent: () =>
+          import('./expenses/pages/expense-item/expense-item.component').then(
+            (c) => c.ExpenseItemComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/:expenseId/details',
+        loadComponent: () =>
+          import('./expenses/pages/expense-detail/expense-detail.component').then(
+            (c) => c.ExpenseDetailComponent,
+          ),
+      },
+      {
         path: 'activities',
         loadComponent: () =>
           import('./activities/pages/activity-list/activity-list.component').then(

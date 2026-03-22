@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'groups/' + groupId + '/details'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Expense Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="navigateToEdit()">
+        <ion-icon name="create-outline" slot="icon-only" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading()) {
+    <div class="loading-state">
+      <ion-spinner name="crescent" color="primary" />
+    </div>
+  }
+
+  @if (expense(); as exp) {
+    <div class="bdd-flex bdd-flex-col bdd-gap-3" style="padding-bottom: 24px">
+      <!-- ─── Amount hero ─── -->
+      <div class="expense-hero">
+        @if (exp.isSettleUp) {
+          <div class="settle-badge">
+            <ion-icon name="swap-horizontal-outline" />
+            <span>Settle up</span>
+          </div>
+        }
+        <div class="expense-hero__amount">
+          {{ exp.amount | number: '1.2-2'
+          }}<span class="expense-hero__currency"> {{ currency }}</span>
+        </div>
+        <div class="expense-hero__description">{{ exp.description }}</div>
+        <div class="expense-hero__date">
+          <ion-icon name="calendar-outline" />
+          <span>{{ exp.expenseDate | date: 'EEEE, dd MMM yyyy' }}</span>
+        </div>
+      </div>
+
+      <!-- ─── Paid by ─── -->
+      <div class="bdd-flex bdd-flex-col bdd-gap-2">
+        <div class="section-title" style="--width: 80px">Paid by</div>
+        @for (payer of exp.paidBy; track payer.memberId) {
+          <div class="member-row">
+            <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+              <app-avatar icon="plain" [alt]="payer.memberName" [width]="36" />
+              <span class="c-light font-w-500">{{ payer.memberName }}</span>
+            </div>
+            <span class="row-amount">{{ payer.amount | number: '1.2-2' }} {{ currency }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- ─── Split between ─── -->
+      @if (!exp.isSettleUp) {
+        <div class="bdd-flex bdd-flex-col bdd-gap-2">
+          <div class="section-title" style="--width: 135px">Split between</div>
+          <div class="members-card">
+            @for (split of exp.splittedBy; track split.memberId) {
+              <div class="member-row-inner">
+                <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+                  <app-avatar icon="plain" [alt]="split.memberName" [width]="36" />
+                  <span class="c-light font-w-500">{{ split.memberName }}</span>
+                </div>
+                <span class="row-amount"
+                  >{{ split.amount | number: '1.2-2' }} {{ currency }}</span
+                >
+              </div>
+              @if (!$last) {
+                <div class="meta-divider"></div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ─── Log ─── -->
+      <div class="bdd-flex bdd-flex-col bdd-gap-2">
+        <div class="section-title" style="--width: 48px">Log</div>
+        <div class="meta-card">
+          <div class="meta-row">
+            <ion-icon name="person-circle-outline" />
+            <span
+              >Added by <strong class="c-light">{{ exp.createdInfo.memberName }}</strong></span
+            >
+            <span class="c-text font-14">{{
+              exp.createdInfo.modificationDate | date: 'dd MMM yyyy'
+            }}</span>
+          </div>
+          @if (exp.modifiedInfo) {
+            <div class="meta-divider"></div>
+            <div class="meta-row">
+              <ion-icon name="create-outline" />
+              <span
+                >Edited by
+                <strong class="c-light">{{ exp.modifiedInfo.memberName }}</strong></span
+              >
+              <span class="c-text font-14">{{
+                exp.modifiedInfo.modificationDate | date: 'dd MMM yyyy'
+              }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</ion-content>

@@ -3,8 +3,9 @@ import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { BaseService } from 'src/app/core/services/base.service';
 import { DateHelper } from 'src/app/shared/utils/date.helper';
-import { CreateExpenseRequest } from '../models/create-expense.model';
+import { CreateExpenseRequest, UpdateExpenseRequest } from '../models/create-expense.model';
 import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-item.model';
+import { ExpenseDetail } from '../models/expense.model';
 
 @Injectable({
   providedIn: 'root',
@@ -62,5 +63,15 @@ export class ExpenseService extends BaseService<ExpenseListItem> {
     return this.httpClient
       .post<{ id: string }>(`${this.baseApi}/${groupId}`, payload)
       .pipe(first());
+  }
+
+  public getExpense(groupId: string, expenseId: string): Observable<ExpenseDetail> {
+    return this.httpClient
+      .get<ExpenseDetail>(`${this.baseApi}/${groupId}/${expenseId}`)
+      .pipe(first());
+  }
+
+  public updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<void> {
+    return this.httpClient.put<void>(`${this.baseApi}/${groupId}`, payload).pipe(first());
   }
 }

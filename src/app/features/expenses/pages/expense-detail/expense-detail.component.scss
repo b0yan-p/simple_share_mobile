@@ -1,0 +1,197 @@
+@use './../../../../../theme/variables.scss' as c;
+
+:host {
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60%;
+  }
+
+  // ─── Amount hero ───
+
+  .expense-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 32px 20px 28px;
+    border-radius: 16px;
+    text-align: center;
+
+    // ── Liquid glass base ──
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(255, 255, 255, 0.22);
+    box-shadow:
+      0 8px 40px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+
+    // ── Internal warm glow (light through coloured glass) ──
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 75%;
+      height: 130px;
+      background: radial-gradient(ellipse, rgba(c.$primary, 0.22) 0%, transparent 70%);
+      filter: blur(14px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    // ── Top surface reflection ──
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 100%);
+      border-radius: 16px 16px 0 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    // Keep content above pseudo-elements
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    &__amount {
+      font-size: 36px;
+      font-weight: 700;
+      color: c.$text-light;
+      line-height: 1.1;
+    }
+
+    &__currency {
+      font-size: 22px;
+      font-weight: 400;
+      color: c.$text;
+    }
+
+    &__description {
+      font-size: 18px;
+      font-weight: 500;
+      color: c.$text-light;
+      margin-top: 2px;
+    }
+
+    &__date {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: c.$text;
+      margin-top: 2px;
+
+      ion-icon {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .settle-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(c.$success, 0.12);
+    border: 1px solid rgba(c.$success, 0.3);
+    color: c.$success;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+
+    ion-icon {
+      font-size: 13px;
+    }
+  }
+
+  // ─── Member rows ───
+
+  .member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: c.$surface;
+    border: 1px solid c.$borders;
+  }
+
+  .row-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: c.$primary;
+    flex-shrink: 0;
+  }
+
+  // ─── Grouped members card (split between) ───
+
+  .members-card {
+    display: flex;
+    flex-direction: column;
+    padding: 2px 14px;
+    border-radius: 12px;
+    background: c.$surface;
+    border: 1px solid c.$borders;
+  }
+
+  .member-row-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  // ─── Meta card ───
+
+  .meta-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: c.$surface;
+    border: 1px solid c.$borders;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: c.$text;
+
+    ion-icon {
+      font-size: 16px;
+      color: c.$text;
+      flex-shrink: 0;
+    }
+
+    span:last-child {
+      margin-left: auto;
+    }
+  }
+
+  .meta-divider {
+    height: 1px;
+    background: c.$borders;
+  }
+}

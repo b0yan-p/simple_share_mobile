@@ -1,6 +1,6 @@
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonItem, IonList } from '@ionic/angular/standalone';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { ExpenseService } from '../../services/expense.service';
@@ -13,9 +13,15 @@ import { ExpenseService } from '../../services/expense.service';
 })
 export class ExpenseListComponent implements OnInit {
   route = inject(ActivatedRoute);
+  router = inject(Router);
   service = inject(ExpenseService);
 
   ngOnInit() {
     this.service.getAll(this.route.snapshot.params['id']);
+  }
+
+  navigateToDetail(expenseId: string): void {
+    const groupId = this.route.snapshot.params['id'];
+    this.router.navigate(['groups', groupId, 'expenses', expenseId, 'details']);
   }
 }

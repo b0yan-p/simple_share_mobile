@@ -6,12 +6,12 @@
           <ion-icon name="chevron-back-outline" slot="icon-only" />
         </ion-button>
       } @else {
-        <ion-back-button [defaultHref]="'groups/' + groupId + '/details'"></ion-back-button>
+        <ion-back-button [defaultHref]="editMode ? 'groups/' + groupId + '/expenses/' + expenseId + '/details' : 'groups/' + groupId + '/details'"></ion-back-button>
       }
     </ion-buttons>
 
     <div class="bdd-flex bdd-flex-col bdd-jc-center bdd-ai-center bdd-gap-1">
-      <ion-title>Add Expense</ion-title>
+      <ion-title>{{ editMode ? 'Edit Expense' : 'Add Expense' }}</ion-title>
       <div class="step-dots-container">
         <div
           class="step-dot"
@@ -301,7 +301,7 @@
         [disabled]="!splitValid || uiService.itemLoading()"
         (click)="submit()"
       >
-        Save Expense
+        {{ editMode ? 'Update Expense' : 'Save Expense' }}
       </ion-button>
     }
   </form>

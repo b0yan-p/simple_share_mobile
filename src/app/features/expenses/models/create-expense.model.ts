@@ -10,3 +10,7 @@ export interface CreateExpenseRequest {
   payments: MemberAmountEntry[];
   splits: MemberAmountEntry[];
 }
+
+export interface UpdateExpenseRequest extends CreateExpenseRequest {
+  id: string;
+}
