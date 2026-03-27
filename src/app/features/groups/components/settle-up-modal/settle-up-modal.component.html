@@ -1,0 +1,116 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()">
+        <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="modal-body">
+    <!-- Title -->
+    <div class="modal-title">Settle up</div>
+    <p class="modal-subtitle c-text">Record a payment between members</p>
+
+    <!-- Transaction flow -->
+    <div class="flow-card">
+      <div class="flow-row">
+        <!-- FROM side -->
+        <div class="flow-participant">
+          <div
+            class="flow-avatar"
+            [class.flow-you]="fromIsCurrentUser"
+            [class.flow-other]="!fromIsCurrentUser"
+          >
+            @if (fromIsCurrentUser) {
+              YOU
+            } @else {
+              {{ fromInitials }}
+            }
+          </div>
+          <span class="flow-label c-text">{{ fromLabel }}</span>
+        </div>
+
+        <!-- Arrow + live amount -->
+        <div class="flow-connector">
+          <span class="flow-amount c-primary">{{ liveAmount() | number: '1.2-2' }} BAM</span>
+          <div class="flow-arrow">
+            <div class="flow-dot"></div>
+            <div class="flow-line"></div>
+            <ion-icon name="arrow-forward-outline" class="flow-arrow-head" />
+          </div>
+        </div>
+
+        <!-- TO side -->
+        <div class="flow-participant">
+          <div
+            class="flow-avatar"
+            [class.flow-you]="toIsCurrentUser"
+            [class.flow-other]="!toIsCurrentUser"
+          >
+            @if (toIsCurrentUser) {
+              YOU
+            } @else {
+              {{ toInitials }}
+            }
+          </div>
+          <span class="flow-label c-text">{{ toLabel }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    @if (error) {
+      <div class="error-banner">
+        <ion-icon name="alert-circle-outline" />
+        <span>Something went wrong. Please try again.</span>
+      </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field-group">
+        <label class="field-label">Amount (BAM)</label>
+        <ion-input
+          type="number"
+          formControlName="amount"
+          fill="solid"
+          inputmode="decimal"
+          [min]="0.01"
+          step="0.01"
+          placeholder="0.00"
+          class="amount-input"
+        />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <ion-input type="date" formControlName="date" fill="solid" />
+      </div>
+
+      <div class="form-actions">
+        <ion-button
+          expand="block"
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid || submitting"
+          class="confirm-btn"
+        >
+          @if (submitting) {
+            <ion-spinner name="crescent" slot="start" />
+            Processing...
+          } @else {
+            <ion-icon name="checkmark-circle-outline" slot="start" />
+            Confirm payment
+          }
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" (click)="dismiss()" class="cancel-btn">
+          Cancel
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

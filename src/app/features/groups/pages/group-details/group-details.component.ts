@@ -2,8 +2,8 @@ import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
-import { switchMap } from 'rxjs';
+import { IonGrid, IonRow } from '@ionic/angular/standalone';
+import { BehaviorSubject, first, switchMap } from 'rxjs';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { GroupBalanceOverviewComponent } from '../../components/group-balance-overview/group-balance-overview.component';
 import { GroupService } from '../../services/group.service';
@@ -19,7 +19,6 @@ import { GroupService } from '../../services/group.service';
     DecimalPipe,
     IonGrid,
     IonRow,
-    IonCol,
     ChipComponent,
     GroupBalanceOverviewComponent,
   ],
@@ -28,8 +27,15 @@ export class GroupDetailsComponent {
   private service = inject(GroupService);
   private route = inject(ActivatedRoute);
 
-  group$ = this.route.params.pipe(
+  private readonly refresh$ = new BehaviorSubject<void>(undefined);
+
+  group$ = this.refresh$.pipe(
+    switchMap(() => this.route.params.pipe(first())),
     switchMap((p) => this.service.groupOverview(p['id'])),
     takeUntilDestroyed(),
   );
+
+  refresh(): void {
+    this.refresh$.next();
+  }
 }

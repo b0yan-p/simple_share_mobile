@@ -68,7 +68,12 @@
     </ion-row>
 
     <ion-row>
-      <app-group-balance-overview [data]="group.myDebtSummary" />
+      <app-group-balance-overview
+        [data]="group.myDebtSummary"
+        [groupId]="group.id"
+        [currentMemberId]="group.currentMemberId"
+        (settled)="refresh()"
+      />
     </ion-row>
   }
 </ion-grid>

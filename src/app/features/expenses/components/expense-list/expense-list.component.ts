@@ -12,6 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 import { ExpenseService } from '../../services/expense.service';
 
 @Component({
@@ -30,6 +31,7 @@ import { ExpenseService } from '../../services/expense.service';
     IonIcon,
     IonAlert,
     AvatarComponent,
+    PaginatorComponent,
   ],
 })
 export class ExpenseListComponent implements OnInit {

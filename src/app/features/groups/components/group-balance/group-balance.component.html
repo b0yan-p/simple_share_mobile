@@ -1,3 +1,150 @@
-<p>
-  group-balance works!
-</p>
+@if (loading()) {
+  <div class="loading-container">
+    <ion-spinner name="crescent" color="primary" />
+  </div>
+} @else if (balance(); as data) {
+  <div class="balance-page">
+
+    <!-- Summary bar -->
+    <div class="summary-bar surface-card bdd-mb-2">
+      <div class="summary-item">
+        <span class="summary-label">Members</span>
+        <span class="summary-value">{{ data.members.length }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Pending debts</span>
+        <span class="summary-value" [ngClass]="{ 'c-primary': data.debts.length > 0 }">
+          {{ data.debts.length }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Members heading -->
+    <div class="section-title bdd-mb-2" style="--width: 90px">Members</div>
+
+    <!-- Member cards -->
+    <div class="members-list">
+      @for (member of data.members; track member.memberId) {
+        <div class="member-card" [class.is-expanded]="expandedMemberId() === member.memberId">
+
+          <!-- Clickable header row -->
+          <div class="member-row" (click)="toggle(member.memberId)">
+
+            <!-- Initials avatar -->
+            <div
+              class="member-avatar"
+              [ngClass]="{
+                'avatar-positive': member.net > 0,
+                'avatar-negative': member.net < 0,
+                'avatar-neutral': member.net === 0,
+              }"
+            >
+              {{ getInitials(member.displayName) }}
+            </div>
+
+            <!-- Name + balance amount -->
+            <div class="member-info">
+              <span class="member-name">{{ member.displayName }}</span>
+              <span
+                class="member-net"
+                [ngClass]="{
+                  'c-success': member.net > 0,
+                  'c-error': member.net < 0,
+                  'c-text': member.net === 0,
+                }"
+              >
+                {{ member.net > 0 ? '+' : '' }}{{ member.net | number: '1.2-2' }} BAM
+              </span>
+            </div>
+
+            <!-- Status chip -->
+            <div class="member-status">
+              @if (member.net > 0) {
+                <app-chip title="Gets back" severity="success" />
+              } @else if (member.net < 0) {
+                <app-chip title="Owes" severity="error" />
+              } @else {
+                <app-chip title="Settled" severity="success" />
+              }
+            </div>
+
+            <!-- Expand chevron -->
+            <ion-icon
+              name="chevron-down-outline"
+              class="expand-chevron"
+              [class.rotated]="expandedMemberId() === member.memberId"
+            />
+          </div>
+
+          <!-- Expanded debt details -->
+          @if (expandedMemberId() === member.memberId) {
+            <div class="debt-details">
+              @if (getEdgesForMember(member.memberId).length === 0) {
+                <div class="settled-row">
+                  <ion-icon name="checkmark-circle-outline" class="c-success" />
+                  <span class="c-text">All settled up</span>
+                </div>
+              } @else {
+                <div class="debt-label">Debt flows</div>
+                @for (edge of getEdgesForMember(member.memberId); track edge) {
+                  <div class="debt-edge">
+
+                    <!-- Debtor -->
+                    <div
+                      class="edge-side"
+                      [class.edge-focus]="edge.debtorMemberId === member.memberId"
+                    >
+                      <div class="edge-avatar edge-debtor">
+                        {{ getInitials(edge.debtorDisplayName) }}
+                      </div>
+                      <span class="edge-name">{{ edge.debtorDisplayName }}</span>
+                    </div>
+
+                    <!-- Arrow + amount -->
+                    <div class="edge-flow">
+                      <span class="edge-amount c-primary">
+                        {{ edge.amount | number: '1.2-2' }} BAM
+                      </span>
+                      <div class="arrow-track">
+                        <div class="arrow-dot"></div>
+                        <div class="arrow-line"></div>
+                        <ion-icon name="arrow-forward-outline" class="arrow-head" />
+                      </div>
+                    </div>
+
+                    <!-- Creditor -->
+                    <div
+                      class="edge-side edge-side-right"
+                      [class.edge-focus]="edge.creditorMemberId === member.memberId"
+                    >
+                      <div class="edge-avatar edge-creditor">
+                        {{ getInitials(edge.creditorDisplayName) }}
+                      </div>
+                      <span class="edge-name">{{ edge.creditorDisplayName }}</span>
+                    </div>
+
+                    <!-- Settle up button -->
+                    <button
+                      class="settle-btn"
+                      (click)="openSettleUp(edge, $event)"
+                    >
+                      <ion-icon name="swap-horizontal-outline" />
+                    </button>
+
+                  </div>
+                }
+              }
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="empty-state">
+    <ion-icon name="people-outline" />
+    <p class="c-text">No balance data available</p>
+  </div>
+}

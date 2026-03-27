@@ -1,0 +1,217 @@
+@use '../../../../../theme/variables.scss' as c;
+
+// ─── Shell ────────────────────────────────────────────────────────────────────
+ion-header ion-toolbar {
+  --background: #{c.$bg};
+  --border-width: 0;
+  --padding-top: 0;
+}
+
+ion-content {
+  --background: #{c.$bg};
+}
+
+.close-icon {
+  color: c.$text;
+  font-size: 22px;
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.modal-body {
+  padding: 0 24px 40px;
+}
+
+.modal-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: c.$text-light;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+// ─── Flow visualization ───────────────────────────────────────────────────────
+.flow-card {
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: 18px;
+  padding: 20px 16px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(c.$primary, 0.6), transparent);
+  }
+}
+
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flow-participant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.flow-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+
+  &.flow-you {
+    background: rgba(c.$primary, 0.14);
+    color: c.$primary;
+    border: 1.5px solid rgba(c.$primary, 0.4);
+    box-shadow: 0 0 14px rgba(c.$primary, 0.18);
+  }
+
+  &.flow-other {
+    background: rgba(c.$success, 0.14);
+    color: c.$success;
+    border: 1.5px solid rgba(c.$success, 0.4);
+    box-shadow: 0 0 14px rgba(c.$success, 0.18);
+  }
+}
+
+.flow-label {
+  font-size: 11px;
+  max-width: 64px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flow-connector {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.flow-amount {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+
+.flow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: c.$primary;
+  box-shadow: 0 0 6px rgba(c.$primary, 0.6);
+  flex-shrink: 0;
+}
+
+.flow-line {
+  flex: 1;
+  height: 1.5px;
+  background: linear-gradient(90deg, c.$primary 0%, rgba(c.$primary, 0.25) 100%);
+}
+
+.flow-arrow-head {
+  color: c.$primary;
+  font-size: 17px;
+  flex-shrink: 0;
+  margin-left: -2px;
+}
+
+// ─── Error ────────────────────────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(c.$error, 0.1);
+  border: 1px solid rgba(c.$error, 0.25);
+  border-radius: 10px;
+  color: c.$error;
+  font-size: 13px;
+  margin-bottom: 16px;
+
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Form fields ──────────────────────────────────────────────────────────────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: c.$text;
+  padding-left: 2px;
+}
+
+ion-input {
+  --background: #{c.$surface} !important;
+  --color: #{c.$text-light};
+  --placeholder-color: #{c.$text};
+  --border-radius: 12px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  border: 1px solid c.$borders;
+  border-radius: 12px;
+
+  &.amount-input {
+    --font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.confirm-btn {
+  --border-radius: 14px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  --color: #{c.$text};
+  font-size: 15px;
+}

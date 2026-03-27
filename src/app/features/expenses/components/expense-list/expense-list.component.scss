@@ -1,8 +1,18 @@
 @use './../../../../../theme/variables.scss' as c;
 
 :host {
+  padding: 16px;
+
+  .list-md.list-inset {
+    margin-top: 0px;
+  }
+
   .list-item {
     border: 1px solid c.$surface-borders;
     border-radius: 12px;
+  }
+
+  .expense-date-label {
+    margin-inline: 16px;
   }
 }

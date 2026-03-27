@@ -6,6 +6,7 @@ import { DateHelper } from 'src/app/shared/utils/date.helper';
 import { CreateExpenseRequest, UpdateExpenseRequest } from '../models/create-expense.model';
 import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-item.model';
 import { ExpenseDetail } from '../models/expense.model';
+import { SettleUpRequest } from '../models/settle-up-request.model';
 
 @Injectable({
   providedIn: 'root',
@@ -78,6 +79,12 @@ export class ExpenseService extends BaseService<ExpenseListItem> {
   public deleteExpense(groupId: string, expenseId: string): Observable<void> {
     return this.httpClient
       .delete<void>(`${this.baseApi}/${groupId}/${expenseId}`)
+      .pipe(first());
+  }
+
+  public settleUp(groupId: string, request: SettleUpRequest): Observable<void> {
+    return this.httpClient
+      .post<void>(`${this.baseApi}/${groupId}/settleUp`, request)
       .pipe(first());
   }
 }

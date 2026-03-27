@@ -9,6 +9,7 @@
         detail="false"
         color="medium"
         lines="none"
+        (click)="openSettleUp(item)"
       >
         <div class="bdd-flex bdd-flex-1 bdd-jc-space-between bdd-ai-center bdd-gap-1">
           <div class="bdd-flex bdd-flex-col">
@@ -20,7 +21,7 @@
             }
           </div>
 
-          <!-- Amount -->
+          <!-- Amount + settle-up hint -->
           <div class="bdd-flex bdd-gap-1 bdd-ai-center">
             <span
               [ngClass]="{
@@ -30,7 +31,7 @@
             >
               {{ item.amount | number: '1.2-2' }} BAM</span
             >
-            <ion-icon name="chevron-forward-outline" class="c-text font-18" />
+            <ion-icon name="swap-horizontal-outline" class="c-text font-18" />
           </div>
         </div>
       </ion-item>

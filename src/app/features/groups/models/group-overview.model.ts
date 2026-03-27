@@ -3,6 +3,7 @@ export interface GroupOverview {
   name: string;
   myDebtSummary: MyDebtSummary;
   memberCount: number;
+  currentMemberId: string;
 }
 
 export interface MyDebtSummary {
