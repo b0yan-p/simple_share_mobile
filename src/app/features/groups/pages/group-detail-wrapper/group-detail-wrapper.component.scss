@@ -7,6 +7,12 @@
     width: 100%;
   }
 
+  .add-expense {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+  }
+
   ion-segment-button {
     --color: #{c.$text};
     --color-checked: #{c.$primary};
