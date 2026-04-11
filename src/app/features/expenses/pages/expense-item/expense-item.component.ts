@@ -206,7 +206,7 @@ export class ExpenseItemComponent implements ViewWillEnter {
 
     if (!user) return;
 
-    const myEntry = this.paidByEntries.find((e) => e.displayName === user.fullName);
+    const myEntry = this.paidByEntries.find((e) => e.userId === user.id);
 
     if (!myEntry) return;
 

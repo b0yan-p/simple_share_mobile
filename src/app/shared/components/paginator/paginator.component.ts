@@ -1,7 +1,6 @@
 import { Component, input } from '@angular/core';
 import { IonButton, IonSpinner } from '@ionic/angular/standalone';
-import { BaseModel } from 'src/app/core/models/base-model';
-import { BaseService } from 'src/app/core/services/base.service';
+import { PaginatorService } from 'src/app/core/services/paginator.service';
 
 @Component({
   selector: 'app-paginator',
@@ -10,5 +9,5 @@ import { BaseService } from 'src/app/core/services/base.service';
   imports: [IonSpinner, IonButton],
 })
 export class PaginatorComponent {
-  service = input.required<BaseService<BaseModel>>();
+  service = input.required<PaginatorService>();
 }

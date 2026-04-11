@@ -4,12 +4,11 @@ import { distinctUntilChanged } from 'rxjs';
 import { PageQueryParams } from '../models/base-query-params';
 
 export abstract class PaginatorService {
-  protected pageSize = signal<number>(5);
-  protected pageIndex = signal<number>(0);
-  protected totalCount = signal<number>(0);
+  readonly pageSize = signal<number>(5);
   protected pageRequest = signal<PageQueryParams>({ skip: 0, take: this.pageSize() });
   public pageLoading = signal<boolean>(false);
 
+  totalCount = signal<number>(0);
   hasMoreData = computed(
     () => this.pageRequest().skip + this.pageRequest().take < this.totalCount(),
   );
@@ -24,18 +23,16 @@ export abstract class PaginatorService {
 
   public resetPagination(skip: number = 0, take: number = this.pageSize()) {
     this.setPagination(skip, take);
-    this.pageIndex.set(0);
   }
 
   loadMoreData(data: any = null) {
     if (!this.hasMoreData()) return;
 
     this.pageRequest.set({
-      skip: this.pageRequest().take * (this.pageIndex() + 1),
+      skip: this.pageRequest().take + this.pageRequest().skip,
       take: this.pageRequest().take,
     });
 
-    this.pageIndex.set(this.pageIndex() + 1);
     this.pageLoading.set(true);
   }
 }

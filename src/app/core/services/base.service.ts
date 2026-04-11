@@ -1,7 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, filter, finalize, first, map, Observable, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  filter,
+  finalize,
+  first,
+  map,
+  Observable,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { BaseModel } from '../models/base-model';
 import { PageData } from '../models/page-data';
@@ -29,14 +39,19 @@ export abstract class BaseService<
 
   items = signal<ListT[]>([]);
 
+  private listSubscription?: Subscription;
+
   public get baseApi(): string {
     return `${this.rootUrl}/${this.ctrlApi}`;
   }
 
   public getAll(url?: string): void {
+    this.listSubscription?.unsubscribe();
+    this.resetPagination();
+
     const api = this.buildApiUrl(url ?? this.listApi);
 
-    this.pageRequest$
+    this.listSubscription = this.pageRequest$
       .pipe(
         switchMap((qp) => {
           this.uiService.listLoading.set(qp.skip === 0);
@@ -71,6 +86,11 @@ export abstract class BaseService<
         if (this.pageRequest().skip === 0) this.items.set([...data]);
         else this.items.set([...(this.items() ?? []), ...data]);
       });
+  }
+
+  public cancelList(): void {
+    this.listSubscription?.unsubscribe();
+    this.listSubscription = undefined;
   }
 
   public getOne(route: ActivatedRoute): Observable<ItemT> {

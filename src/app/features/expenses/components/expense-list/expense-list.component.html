@@ -1,4 +1,4 @@
-@for (item of service.items(); track $index) {
+@for (item of facade.store.expenses(); track $index) {
   <!-- Date -->
   <div class="expense-date-label">{{ item.date | date: 'MMMM yyyy' }}</div>
 
@@ -82,7 +82,7 @@
   </ion-list>
 }
 
-<app-paginator [service]="service" />
+<app-paginator [service]="paginator" />
 
 <ion-alert
   [isOpen]="isDeleteAlertOpen"

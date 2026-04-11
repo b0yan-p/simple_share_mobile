@@ -14,7 +14,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = tokenService.token() ?? tokenService.user()?.token;
 
-  if (!token) authService.logout();
+  if (!token) {
+    authService.logout();
+    return throwError(() => new Error('No token'));
+  }
 
   const authReq = req.clone({
     setHeaders: { Authorization: `Bearer ${token}` },
