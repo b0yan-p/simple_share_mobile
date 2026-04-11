@@ -1,0 +1,129 @@
+@use '../../../../../theme/variables.scss' as c;
+
+ion-header ion-toolbar {
+  --background: #{c.$bg};
+  --border-width: 0;
+}
+
+ion-content {
+  --background: #{c.$bg};
+}
+
+.close-icon {
+  color: c.$text;
+  font-size: 22px;
+}
+
+.sheet-body {
+  padding: 0 20px 40px;
+}
+
+.sheet-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: c.$text-light;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.sheet-subtitle {
+  font-size: 13px;
+  color: c.$text;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pending-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-left: 3px solid rgba(c.$primary, 0.6);
+
+  &__main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__icon {
+    font-size: 20px;
+    color: c.$primary;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__description {
+    font-size: 15px;
+    font-weight: 500;
+    color: c.$text-light;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: c.$text;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid c.$borders;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  ion-icon {
+    font-size: 17px;
+  }
+
+  &--edit {
+    color: c.$text;
+
+    &:active {
+      background: rgba(c.$text, 0.08);
+    }
+  }
+
+  &--delete {
+    color: c.$error;
+    border-color: rgba(c.$error, 0.2);
+
+    &:active {
+      background: rgba(c.$error, 0.08);
+    }
+  }
+}

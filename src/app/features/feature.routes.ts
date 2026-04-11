@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'groups/:id/expenses/pending/:pendingId',
+        loadComponent: () =>
+          import('./expenses/pages/expense-item/expense-item.component').then(
+            (c) => c.ExpenseItemComponent,
+          ),
+      },
+      {
         path: 'groups/:id/expenses/:expenseId',
         loadComponent: () =>
           import('./expenses/pages/expense-item/expense-item.component').then(

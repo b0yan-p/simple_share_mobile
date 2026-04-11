@@ -28,6 +28,7 @@ import { GroupMember } from 'src/app/features/groups/models/group-member.model';
 import { GroupService } from 'src/app/features/groups/services/group.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
+import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
 import { AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
 import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
@@ -69,6 +70,7 @@ export class ExpenseItemComponent implements ViewWillEnter {
   private router = inject(Router);
   private groupService = inject(GroupService);
   private expenseService = inject(ExpenseService);
+  private expenseFacade = inject(ExpenseFacade);
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
   uiService = inject(UiService);
@@ -79,6 +81,8 @@ export class ExpenseItemComponent implements ViewWillEnter {
   groupId = '';
   editMode = false;
   expenseId = '';
+  pendingMode = false;
+  pendingTempId = '';
 
   form = new FormGroup({
     totalAmount: new FormControl<number | null>(null, [
@@ -126,15 +130,22 @@ export class ExpenseItemComponent implements ViewWillEnter {
     this.currentStep = 1;
     this.editMode = false;
     this.expenseId = '';
+    this.pendingMode = false;
+    this.pendingTempId = '';
     this.paidByMode = 'equal';
     this.splitMode = 'equal';
     this.form.reset({ expenseDate: new Date().toISOString() });
 
     this.groupId = this.route.snapshot.params['id'];
     const expenseId = this.route.snapshot.params['expenseId'];
+    const pendingId = this.route.snapshot.params['pendingId'];
+
     if (expenseId) {
       this.editMode = true;
       this.expenseId = expenseId;
+    } else if (pendingId) {
+      this.pendingMode = true;
+      this.pendingTempId = pendingId;
     }
     this.loadMembers();
   }
@@ -144,13 +155,43 @@ export class ExpenseItemComponent implements ViewWillEnter {
       next: (members) => {
         this.paidByEntries = members.map((m) => ({ ...m, selected: false, amount: 0 }));
         this.splitEntries = members.map((m) => ({ ...m, selected: true, amount: 0 }));
-        if (this.editMode) {
+        if (this.pendingMode) {
+          this.loadPendingExpenseData();
+        } else if (this.editMode) {
           this.loadExpenseData();
         } else {
           this.recalculateEqualSplit();
         }
       },
       error: () => this.toastService.errorToast('Failed to load group members'),
+    });
+  }
+
+  private loadPendingExpenseData(): void {
+    this.expenseFacade.getPendingExpense(this.pendingTempId).subscribe({
+      next: (pending) => {
+        if (!pending) return;
+        this.form.patchValue({
+          totalAmount: pending.payload.totalAmount,
+          description: pending.payload.description,
+          expenseDate: pending.payload.expenseDate,
+        });
+
+        this.paidByEntries.forEach((entry) => {
+          const match = pending.payload.payments.find((p) => p.memberId === entry.memberId);
+          entry.selected = !!match;
+          entry.amount = match?.amount ?? 0;
+        });
+        this.paidByMode = 'custom';
+
+        this.splitEntries.forEach((entry) => {
+          const match = pending.payload.splits.find((s) => s.memberId === entry.memberId);
+          entry.selected = !!match;
+          entry.amount = match?.amount ?? 0;
+        });
+        this.splitMode = 'custom';
+      },
+      error: () => this.toastService.errorToast('Failed to load pending expense'),
     });
   }
 
@@ -301,29 +342,42 @@ export class ExpenseItemComponent implements ViewWillEnter {
 
     this.uiService.itemLoading.set(true);
 
-    const onSuccess = () => {
-      this.uiService.itemLoading.set(false);
-      this.toastService.successToast(this.editMode ? 'Expense updated!' : 'Expense added!');
-      const dest = this.editMode
-        ? ['groups', this.groupId, 'expenses', this.expenseId, 'details']
-        : ['groups', this.groupId, 'details'];
-
-      this.router.navigate(dest);
-    };
-
     const onError = (err: { error?: { message?: string } }) => {
       this.uiService.itemLoading.set(false);
       this.toastService.errorToast(err?.error?.message ?? 'Failed to save expense');
     };
 
-    if (this.editMode) {
+    if (this.pendingMode) {
+      this.expenseFacade
+        .updatePendingExpense(this.pendingTempId, this.groupId, basePayload)
+        .subscribe({
+          next: () => {
+            this.uiService.itemLoading.set(false);
+            this.toastService.successToast('Pending expense updated');
+            this.router.navigate(['groups', this.groupId, 'details']);
+          },
+          error: onError,
+        });
+    } else if (this.editMode) {
+      const onSuccess = () => {
+        this.uiService.itemLoading.set(false);
+        this.toastService.successToast('Expense updated!');
+        this.router.navigate(['groups', this.groupId, 'expenses', this.expenseId, 'details']);
+      };
       this.expenseService
         .updateExpense(this.groupId, { ...basePayload, id: this.expenseId })
         .subscribe({ next: onSuccess, error: onError });
     } else {
-      this.expenseService
-        .createExpense(this.groupId, basePayload)
-        .subscribe({ next: onSuccess, error: onError });
+      this.expenseFacade.createExpense(this.groupId, basePayload).subscribe({
+        next: ({ queued }) => {
+          this.uiService.itemLoading.set(false);
+          this.toastService.successToast(
+            queued ? 'Expense saved offline, will sync when connected' : 'Expense added!',
+          );
+          this.router.navigate(['groups', this.groupId, 'details']);
+        },
+        error: onError,
+      });
     }
   }
 }

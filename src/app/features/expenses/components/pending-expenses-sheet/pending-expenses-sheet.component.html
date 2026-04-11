@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close-outline" class="close-icon" slot="icon-only" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sheet-body">
+    <div class="sheet-title">Pending sync</div>
+    <p class="sheet-subtitle">These expenses will sync automatically when you're back online.</p>
+
+    <div class="pending-list">
+      @for (item of pendingExpenses; track item.tempId) {
+        <div class="pending-card">
+          <div class="pending-card__main">
+            <ion-icon name="time-outline" class="pending-card__icon" />
+            <div class="pending-card__info">
+              <span class="pending-card__description">{{ item.payload.description }}</span>
+              <span class="pending-card__meta">
+                {{ item.payload.totalAmount | number: '1.2-2' }} BAM &nbsp;·&nbsp; {{ item.createdAt | date: 'dd MMM yyyy' }}
+              </span>
+            </div>
+          </div>
+          <div class="pending-card__actions">
+            <button class="action-btn action-btn--edit" (click)="onEdit(item)">
+              <ion-icon name="create-outline" />
+            </button>
+            <button class="action-btn action-btn--delete" (click)="onDelete(item)">
+              <ion-icon name="trash-outline" />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</ion-content>

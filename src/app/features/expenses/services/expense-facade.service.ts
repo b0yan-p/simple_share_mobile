@@ -1,8 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import {
   catchError,
+  concatMap,
   filter,
+  forkJoin,
   from,
+  map,
   merge,
   Observable,
   of,
@@ -10,6 +13,7 @@ import {
   Subscription,
   switchMap,
   tap,
+  toArray,
 } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -19,7 +23,7 @@ import { ExpenseListItem } from '../models/expense-list-item.model';
 import { ExpenseDetail } from '../models/expense.model';
 import { mapExpenses } from '../utils/expense-list.utils';
 import { ExpenseApiService } from './expense-api.service';
-import { ExpenseIdbService } from './expense-idb.service';
+import { ExpenseIdbService, PendingExpense } from './expense-idb.service';
 import { ExpensePaginatorService } from './expense-paginator.service';
 import { ExpenseStore } from './expense-store';
 
@@ -75,7 +79,7 @@ export class ExpenseFacade {
   }
 
   private loadFirstPage(groupId: string, page: { skip: number; take: number }) {
-    return from(this.idb.getExpenses(groupId)).pipe(
+    return this.idb.getExpenses(groupId).pipe(
       switchMap((cached) => {
         if (cached) {
           console.log(
@@ -114,7 +118,7 @@ export class ExpenseFacade {
               return of([] as ExpenseListItem[]);
             }
 
-            return from(this.idb.saveExpenses(groupId, res.totalCount, items)).pipe(
+            return this.idb.saveExpenses(groupId, res.totalCount, items).pipe(
               tap(() => {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
@@ -152,10 +156,10 @@ export class ExpenseFacade {
         }
 
         // Read existing cached items, append new ones, re-map the full list
-        return from(this.idb.getExpenses(groupId)).pipe(
+        return this.idb.getExpenses(groupId).pipe(
           switchMap((existing) => {
             const allItems = [...(existing?.items ?? []), ...newItems];
-            return from(this.idb.saveExpenses(groupId, res.totalCount, allItems)).pipe(
+            return this.idb.saveExpenses(groupId, res.totalCount, allItems).pipe(
               tap(() => {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
@@ -187,10 +191,21 @@ export class ExpenseFacade {
   // #endregion
 
   // #region Mutation methods
-  createExpense(groupId: string, payload: CreateExpenseRequest): Observable<{ id: string }> {
-    return this.expenseApi
-      .createExpense(groupId, payload)
-      .pipe(tap(() => this.idb.deleteExpenses(groupId)));
+  createExpense(
+    groupId: string,
+    payload: CreateExpenseRequest,
+  ): Observable<{ id: string; queued: boolean }> {
+    if (!this.networkService.isOnline()) {
+      const tempId = crypto.randomUUID();
+      return this.idb
+        .savePendingExpense({ tempId, groupId, payload, createdAt: new Date().toISOString() })
+        .pipe(map(() => ({ id: tempId, queued: true })));
+    }
+
+    return this.expenseApi.createExpense(groupId, payload).pipe(
+      tap(() => this.idb.deleteExpenses(groupId)),
+      map((res) => ({ ...res, queued: false })),
+    );
   }
 
   updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<void> {
@@ -206,13 +221,80 @@ export class ExpenseFacade {
   }
   // #endregion
 
+  // #region pending expense operations
+  getPendingExpenses(): Observable<PendingExpense[]> {
+    return this.idb.getPendingExpenses();
+  }
+
+  getPendingExpense(tempId: string): Observable<PendingExpense | undefined> {
+    return this.idb.getPendingExpense(tempId);
+  }
+
+  updatePendingExpense(
+    tempId: string,
+    groupId: string,
+    payload: CreateExpenseRequest,
+  ): Observable<void> {
+    return this.idb.savePendingExpense({
+      tempId,
+      groupId,
+      payload,
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  removePendingExpense(tempId: string): Observable<void> {
+    return this.idb.deletePendingExpense(tempId);
+  }
+  // #endregion
+
   // #region sync/refresh methods
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   refreshExpenses(_groupId: string): Observable<ExpenseListItem[]> {
     return of();
   }
 
-  syncPendingExpenses() {}
+  syncPendingExpenses(): Observable<void> {
+    return this.idb.getPendingExpenses().pipe(
+      switchMap((pending) => {
+        if (!pending.length) return of(void 0);
+
+        return from(pending).pipe(
+          concatMap((item) =>
+            this.expenseApi.createExpense(item.groupId, item.payload).pipe(
+              switchMap(() =>
+                forkJoin([
+                  this.idb.deletePendingExpense(item.tempId),
+                  this.idb.deleteExpenses(item.groupId),
+                ]),
+              ),
+              map(() => true),
+              catchError((err) => {
+                console.error('[SYNC] Failed to sync pending expense', item.tempId, err);
+                return of(false);
+              }),
+            ),
+          ),
+          toArray(),
+          tap((results) => {
+            const synced = results.filter(Boolean).length;
+            const failed = results.length - synced;
+            if (synced > 0) {
+              this.toastService.successToast(
+                `${synced} pending expense${synced > 1 ? 's' : ''} synced successfully`,
+              );
+            }
+            if (failed > 0) {
+              this.toastService.errorToast(
+                `Failed to sync ${failed} expense${failed > 1 ? 's' : ''}. Will retry when online.`,
+              );
+            }
+          }),
+          map(() => void 0),
+        );
+      }),
+    );
+  }
   // #endregion
 
   // #region util methods

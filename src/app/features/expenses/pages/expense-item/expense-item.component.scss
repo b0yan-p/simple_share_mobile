@@ -43,6 +43,26 @@
     --border-radius: 8px;
   }
 
+  // ─── Pending chip ───
+
+  .pending-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(c.$primary, 0.08);
+    border: 1px solid rgba(c.$primary, 0.3);
+    color: c.$primary;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 4px;
+
+    ion-icon {
+      font-size: 13px;
+    }
+  }
+
   // ─── Step progress dots ───
 
   .step-dots-container {

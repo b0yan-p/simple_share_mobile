@@ -1,7 +1,7 @@
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonAlert,
   IonIcon,
@@ -10,12 +10,14 @@ import {
   IonItemOptions,
   IonItemSliding,
   IonList,
+  ModalController,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
-import { distinctUntilChanged, map, Observable } from 'rxjs';
+import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
+import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
 
@@ -44,9 +46,11 @@ export class ExpenseListComponent implements OnInit {
   facade = inject(ExpenseFacade);
   toastService = inject(ToastService);
   paginator = inject(ExpensePaginatorService);
+  private readonly modalController = inject(ModalController);
 
   pendingDeleteId = '';
   isDeleteAlertOpen = false;
+  pendingCount = signal(0);
 
   routeParams$?: Observable<string>;
 
@@ -70,7 +74,35 @@ export class ExpenseListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.routeParams$?.subscribe((groupId) => this.facade.loadExpenses(groupId));
+    this.routeParams$?.subscribe((groupId) => {
+      this.facade.loadExpenses(groupId);
+      this.loadPendingCount(groupId);
+    });
+  }
+
+  private loadPendingCount(groupId: string): void {
+    this.facade
+      .getPendingExpenses()
+      .pipe(map((p) => p.filter((e) => e.groupId === groupId).length))
+      .subscribe((count) => this.pendingCount.set(count));
+  }
+
+  openPendingSheet(): void {
+    const groupId = this.route.snapshot.params['id'];
+    from(
+      this.modalController.create({
+        component: PendingExpensesSheetComponent,
+        componentProps: { groupId },
+        breakpoints: [0, 0.85],
+        initialBreakpoint: 0.85,
+      }),
+    )
+      .pipe(
+        switchMap((modal) => from(modal.present()).pipe(map(() => modal))),
+        switchMap((modal) => from(modal.onWillDismiss())),
+        tap(() => this.loadPendingCount(groupId)),
+      )
+      .subscribe();
   }
 
   navigateToDetail(expenseId: string): void {
