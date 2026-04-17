@@ -11,15 +11,14 @@ import {
   IonItemSliding,
   IonList,
   ModalController,
-  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
-import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
+import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
 
 @Component({
   selector: 'app-expense-list',

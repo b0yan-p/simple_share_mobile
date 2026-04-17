@@ -21,10 +21,13 @@ import {
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { of, switchMap, tap, throwError } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
+import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
+import { GroupMemberIdbService } from 'src/app/features/groups/services/group-member-idb.service';
 import { GroupService } from 'src/app/features/groups/services/group.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
@@ -73,6 +76,8 @@ export class ExpenseItemComponent implements ViewWillEnter {
   private expenseFacade = inject(ExpenseFacade);
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
+  private networkService = inject(NetworkService);
+  private groupMemberIdb = inject(GroupMemberIdbService);
   uiService = inject(UiService);
 
   readonly currency = CURRENCY;
@@ -151,19 +156,33 @@ export class ExpenseItemComponent implements ViewWillEnter {
   }
 
   private loadMembers(): void {
-    this.groupService.getGroupMembers(this.groupId).subscribe({
+    const source$ = this.networkService.isOnline()
+      ? this.groupService
+          .getGroupMembers(this.groupId)
+          .pipe(
+            tap((members) =>
+              this.groupMemberIdb.saveGroupMembers(this.groupId, members).subscribe(),
+            ),
+          )
+      : this.groupMemberIdb.getGroupMembers(this.groupId).pipe(
+          switchMap((members) => {
+            if (!members) return throwError(() => new Error('No cached member data'));
+            return of(members);
+          }),
+        );
+
+    source$.subscribe({
       next: (members) => {
         this.paidByEntries = members.map((m) => ({ ...m, selected: false, amount: 0 }));
         this.splitEntries = members.map((m) => ({ ...m, selected: true, amount: 0 }));
-        if (this.pendingMode) {
-          this.loadPendingExpenseData();
-        } else if (this.editMode) {
-          this.loadExpenseData();
-        } else {
-          this.recalculateEqualSplit();
-        }
+        if (this.pendingMode) this.loadPendingExpenseData();
+        else if (this.editMode) this.loadExpenseData();
+        else this.recalculateEqualSplit();
       },
-      error: () => this.toastService.errorToast('Failed to load group members'),
+      error: () => {
+        this.toastService.errorToast('No member data available offline');
+        this.router.navigate(['groups', this.groupId, 'details']);
+      },
     });
   }
 

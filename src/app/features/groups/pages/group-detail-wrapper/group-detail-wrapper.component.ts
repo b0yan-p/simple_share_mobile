@@ -14,9 +14,10 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { switchMap } from 'rxjs';
+import { catchError, of, switchMap } from 'rxjs';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
+import { GroupMemberIdbService } from '../../services/group-member-idb.service';
 import { GroupService } from '../../services/group.service';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
@@ -46,6 +47,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
 export class GroupDetailWrapperComponent {
   private route = inject(ActivatedRoute);
   private service = inject(GroupService);
+  private groupMemberIdb = inject(GroupMemberIdbService);
 
   title = 'Group';
   activeTab = 'overview';
@@ -57,5 +59,17 @@ export class GroupDetailWrapperComponent {
         takeUntilDestroyed(),
       )
       .subscribe((g) => (this.title = g.name));
+
+    this.route.params
+      .pipe(
+        switchMap((p) =>
+          this.service.getGroupMembers(p['id']).pipe(
+            switchMap((members) => this.groupMemberIdb.saveGroupMembers(p['id'], members)),
+            catchError(() => of(void 0)),
+          ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
   }
 }
