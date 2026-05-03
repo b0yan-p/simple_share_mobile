@@ -1,0 +1,140 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Light theme — CSS custom properties.
+// Loaded via variables.scss → consumed at runtime by all components.
+// ─────────────────────────────────────────────────────────────────────────────
+@use 'palette' as p;
+
+:root {
+  // ─── Ionic colour system ───────────────────────────────────────────────────
+  --ion-color-primary: #{p.$lp-purple-600};
+  --ion-color-primary-rgb: 83, 74, 183;
+  --ion-color-primary-contrast: #{p.$lp-text-on-dark};
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #{p.$lp-purple-800};
+  --ion-color-primary-tint: #{p.$lp-purple-200};
+
+  // --ion-color-success: #{p.$lp-teal-600};
+  --ion-color-success: #{p.$lp-bg};
+  --ion-color-success-rgb: 15, 110, 86;
+  --ion-color-success-contrast: #{p.$lp-text-on-dark};
+  --ion-color-warning: #{p.$lp-warning};
+  --ion-color-warning-rgb: 250, 204, 21;
+  --ion-color-danger: #{p.$lp-coral-600};
+  --ion-color-danger-rgb: 153, 60, 29;
+  --ion-color-danger-contrast: #{p.$lp-text-on-dark};
+  --ion-color-tertiary: #{p.$lp-purple-200};
+
+  --ion-background-color: #{p.$lp-bg};
+  --ion-background-color-rgb: 240, 238, 249;
+  --ion-text-color: #{p.$lp-text-heading};
+  --ion-text-color-rgb: 26, 22, 64;
+
+  --ion-color-dark: #{p.$lp-text-heading};
+  --ion-color-medium: #{p.$lp-purple-50};
+
+  // Toolbar
+  --ion-toolbar-background: #{p.$lp-surface};
+  --ion-toolbar-color: #{p.$lp-text-heading};
+  --ion-toolbar-border-color: transparent;
+
+  // Item
+  --ion-item-background: transparent;
+  --ion-item-border-color: #{p.$lp-border-card};
+  --ion-item-color: #{p.$lp-text-heading};
+
+  // Card
+  --ion-card-background: #{p.$lp-surface};
+
+  // Tab bar
+  --ion-tab-bar-background: #{p.$lp-surface};
+  --ion-tab-bar-border-color: transparent;
+  --ion-tab-bar-color: #{p.$lp-text-body};
+  --ion-tab-bar-color-selected: #{p.$lp-purple-600};
+
+  // ─── App semantic tokens (--ss-*) ─────────────────────────────────────────
+  // Backgrounds
+  --ss-bg: #{p.$lp-bg};
+  --ss-surface: #{p.$lp-surface};
+  --ss-surface-subtle: #{p.$lp-surface-subtle};
+  --ss-surface-selected: #{p.$lp-surface-selected};
+
+  // Primary
+  --ss-primary: #{p.$lp-purple-600};
+  --ss-primary-rgb: 83, 74, 183;
+  --ss-primary-hover: #{p.$lp-purple-800};
+  --ss-primary-subtle: #{p.$lp-purple-50};
+  --ss-primary-border: #{p.$lp-purple-100};
+  --ss-primary-fg: #{p.$lp-text-on-dark};
+
+  // Typography
+  --ss-text-heading: #{p.$lp-text-heading};
+  --ss-text: #{p.$lp-text-body};
+  --ss-text-placeholder: #{p.$lp-text-placeholder};
+  --ss-text-on-primary: #{p.$lp-text-on-dark};
+  --ss-text-disabled: #{p.$lp-purple-200};
+
+  // Positive (teal)
+  --ss-positive: #{p.$lp-teal-600};
+  --ss-positive-muted: #{p.$lp-teal-400};
+  --ss-positive-bg: #{p.$lp-teal-50};
+  --ss-positive-border: #{p.$lp-teal-400};
+
+  // Negative (coral)
+  --ss-negative: #{p.$lp-coral-600};
+  --ss-negative-muted: #{p.$lp-coral-200};
+  --ss-negative-bg: #{p.$lp-coral-50};
+  --ss-negative-border: #{p.$lp-coral-200};
+
+  // Warning
+  --ss-warning: #{p.$lp-warning};
+  --ss-warning-text: #{p.$lp-warning-text};
+  --ss-warning-bg: #{p.$lp-tint-amber};
+
+  // Success
+  --ss-success: #{p.$lp-success};
+  --ss-success-text: #{p.$lp-success-text};
+  --ss-success-bg: #{p.$lp-tint-amber};
+
+  // Error
+  --ss-error: #{p.$lp-error};
+  --ss-error-text: #{p.$lp-error-text};
+  --ss-error-bg: #{p.$lp-tint-amber};
+
+  // Borders
+  --ss-border: #{p.$lp-border-card};
+  --ss-border-input: #{p.$lp-border-input};
+  --ss-border-focus: #{p.$lp-purple-600};
+  --ss-border-valid: #{p.$lp-teal-600};
+  --ss-border-error: #{p.$lp-coral-600};
+  --ss-border-selected: #{p.$lp-purple-600};
+
+  // Category tints
+  --ss-tint-purple: #{p.$lp-tint-purple};
+  --ss-tint-teal: #{p.$lp-tint-teal};
+  --ss-tint-amber: #{p.$lp-tint-amber};
+  --ss-tint-coral: #{p.$lp-tint-coral};
+  --ss-tint-pink: #{p.$lp-tint-pink};
+
+  // Shadows (purple-tinted, cohesive with palette)
+  --ss-shadow-sm: 0 1px 3px rgba(26, 22, 64, 0.06), 0 1px 2px rgba(26, 22, 64, 0.04);
+  --ss-shadow-md: 0 4px 12px rgba(26, 22, 64, 0.08), 0 2px 4px rgba(26, 22, 64, 0.04);
+  --ss-shadow-lg: 0 12px 32px rgba(26, 22, 64, 0.12), 0 4px 8px rgba(26, 22, 64, 0.06);
+
+  // Spacing scale (4px base)
+  --ss-space-1: 4px;
+  --ss-space-2: 8px;
+  --ss-space-3: 12px;
+  --ss-space-4: 16px;
+  --ss-space-5: 20px;
+  --ss-space-6: 24px;
+  --ss-space-8: 32px;
+  --ss-space-12: 48px;
+
+  // Border radius scale
+  --ss-radius-sm: 4px;
+  --ss-radius-md: 8px;
+  --ss-radius-lg: 12px;
+  --ss-radius-xl: 16px;
+  --ss-radius-2xl: 24px;
+  --ss-radius-full: 9999px;
+}

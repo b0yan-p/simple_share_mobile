@@ -1,49 +1,36 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
-:root {
-  /* Primary */
-  --ion-color-primary: #e0690e;
-  // --ion-color-primary: #ff5500;
-  --ion-color-primary-rgb: 224, 105, 14;
-  // --ion-color-primary-contrast: #fff;
-  --ion-color-primary-contrast: #000;
-  --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #c85c0c;
-  --ion-color-primary-tint: #c85c0c;
+// ─────────────────────────────────────────────────────────────────────────────
+// variables.scss — Main theme entry point.
+//
+// Imported by:
+//   - angular.json (compiled globally)
+//   - All component SCSS via: @use './...../theme/variables.scss' as c;
+//
+// Exports:
+//   - CSS custom properties (via _theme.light + _theme.dark)
+//   - SCSS compile-time aliases (c.$primary, c.$success, etc.)
+// ─────────────────────────────────────────────────────────────────────────────
+@use 'palette' as p;
+@use 'theme.light' as light;
+@use 'theme.dark' as dark;
 
-  --ion-color-dark: #1f1e26;
-  --ion-color-medium: #2d2e32;
+// ─── SCSS semantic aliases ────────────────────────────────────────────────────
+// These are compile-time values (light theme as default).
+// Used in component SCSS for rgba(c.$primary, 0.12) etc.
+// Runtime theming (light/dark switch) happens via CSS custom properties above.
 
-  /* Background / text */
-  --ion-background-color: #191a1f;
-  --ion-text-color: #9e9fa1;
+$primary:         p.$lp-purple-600;   // #534ab7
+$success:         p.$lp-teal-400;     // #1d9e75
+$error:           p.$lp-coral-600;    // #993c1d
+$warn:            p.$lp-warning;      // #facc15
+$info:            p.$dp-info;         // #38bdf8
 
-  //info colors
-  --ion-color-success: #22c55e;
-  // --ion-color-success: #1eff7a;
-  --ion-color-warning: #facc15;
-  // --ion-color-danger: #ef4444;
-  --ion-color-danger: #db4545;
+$bg:              p.$lp-bg;           // #f0eef9
+$surface:         p.$lp-surface;      // #ffffff
+$surface-borders: p.$lp-purple-50;    // #eeedfe
+$text:            p.$lp-text-body;    // #6b6993
+$text-light:      p.$lp-text-heading; // #1a1640
+$borders:         p.$lp-border-card;  // #e8e4f8
 
-  --ion-color-tertiary: #38bdf8;
-}
-
-$primary: #e0690e;
-// $primary: #ff5500;
-$secondary: transparent;
-$accent: #fff;
-$success: #22c55e;
-// $success: #1eff7a;
-
-$warn: #facc15;
-$error: #ef4444;
-$info: #38bdf8;
-$bg: #191a1f;
-$surface: #2d2e32; //
-// $surface: #1c1b23; //
-$surface-borders: #494d53;
-
-$text: #9e9fa1;
-$text-light: #fff;
-// $borders: #9e9fa1;
-$borders: #393b3e;
+// Kept for backward compatibility with any remaining references
+$secondary:       transparent;
+$accent:          p.$lp-text-on-dark;

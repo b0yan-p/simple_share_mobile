@@ -1,0 +1,19 @@
+<div class="bdd-flex bdd-jc-space-between bdd-ai-center">
+  <h5>Recent groups</h5>
+  <ion-button fill="clear" (click)="navigateToGroups()">View all</ion-button>
+</div>
+
+<div class="list-container">
+  <ion-list>
+    @for (group of groups; track group.id) {
+      <app-list-item
+        [title]="group.name"
+        [showChevron]="true"
+        [id]="group.id"
+        [description]="'you owe to $14.45'"
+        descriptionColor="success"
+        (click)="navigateToGroupDetails(group.id)"
+      />
+    }
+  </ion-list>
+</div>

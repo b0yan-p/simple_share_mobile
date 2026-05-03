@@ -7,6 +7,7 @@
         } @else {
           <ion-icon aria-hidden="true" [name]="item.icon" />
         }
+        <ion-label>{{ item.name | titlecase }}</ion-label>
       </ion-tab-button>
     }
   </ion-tab-bar>

@@ -1,0 +1,119 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Dark theme — CSS custom properties.
+// Preserves the existing orange palette for dark mode.
+// Activated via system preference OR manual .dark class on <html>.
+// ─────────────────────────────────────────────────────────────────────────────
+@use 'palette' as p;
+
+@mixin dark-tokens {
+  // ─── Ionic colour system ─────────────────────────────────────────────────
+  --ion-color-primary:              #{p.$dp-primary};
+  --ion-color-primary-rgb:          224, 105, 14;
+  --ion-color-primary-contrast:     #{p.$dp-text-light};
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade:        #{p.$dp-primary-shade};
+  --ion-color-primary-tint:         #{p.$dp-primary-tint};
+
+  --ion-color-success:              #{p.$dp-success};
+  --ion-color-success-rgb:          34, 197, 94;
+  --ion-color-warning:              #{p.$dp-warning};
+  --ion-color-danger:               #{p.$dp-error};
+  --ion-color-danger-rgb:           239, 68, 68;
+  --ion-color-tertiary:             #{p.$dp-info};
+
+  --ion-background-color:           #{p.$dp-bg};
+  --ion-background-color-rgb:       25, 26, 31;
+  --ion-text-color:                 #{p.$dp-text};
+  --ion-text-color-rgb:             158, 159, 161;
+
+  --ion-color-dark:                 #{p.$dp-surface};
+  --ion-color-medium:               #{p.$dp-surface};
+
+  --ion-toolbar-background:         #{p.$dp-surface};
+  --ion-toolbar-color:              #{p.$dp-text-light};
+  --ion-toolbar-border-color:       transparent;
+
+  --ion-item-background:            transparent;
+  --ion-item-border-color:          #{p.$dp-borders};
+  --ion-item-color:                 #{p.$dp-text};
+
+  --ion-card-background:            #{p.$dp-surface};
+
+  --ion-tab-bar-background:         #{p.$dp-surface};
+  --ion-tab-bar-border-color:       transparent;
+  --ion-tab-bar-color:              #{p.$dp-text};
+  --ion-tab-bar-color-selected:     #{p.$dp-primary};
+
+  // ─── App semantic tokens (--ss-*) ───────────────────────────────────────
+  // Backgrounds
+  --ss-bg:               #{p.$dp-bg};
+  --ss-surface:          #{p.$dp-surface};
+  --ss-surface-subtle:   #{p.$dp-surface};
+  --ss-surface-selected: #3a3b40;
+
+  // Primary
+  --ss-primary:          #{p.$dp-primary};
+  --ss-primary-rgb:      224, 105, 14;
+  --ss-primary-hover:    #{p.$dp-primary-shade};
+  --ss-primary-subtle:   rgba(224, 105, 14, 0.12);
+  --ss-primary-border:   #{p.$dp-primary};
+  --ss-primary-fg:       #{p.$dp-text-light};
+
+  // Typography
+  --ss-text-heading:     #{p.$dp-text-light};
+  --ss-text:             #{p.$dp-text};
+  --ss-text-placeholder: #6b6d70;
+  --ss-text-on-primary:  #{p.$dp-text-light};
+  --ss-text-disabled:    #555759;
+
+  // Positive — lighter variant for readability on dark bg
+  --ss-positive:         #{p.$dp-success};
+  --ss-positive-muted:   #16a34a;
+  --ss-positive-bg:      rgba(34, 197, 94, 0.12);
+  --ss-positive-border:  #{p.$dp-success};
+
+  // Negative — lighter variant for readability on dark bg
+  --ss-negative:         #{p.$dp-error};
+  --ss-negative-muted:   #f87171;
+  --ss-negative-bg:      rgba(239, 68, 68, 0.12);
+  --ss-negative-border:  #{p.$dp-error};
+
+  // Warning
+  --ss-warning:          #{p.$dp-warning};
+  --ss-warning-text:     #{p.$dp-warning};
+  --ss-warning-bg:       rgba(250, 204, 21, 0.12);
+
+  // Borders — use solid borders instead of shadows in dark mode
+  --ss-border:           #{p.$dp-borders};
+  --ss-border-input:     #{p.$dp-surf-bord};
+  --ss-border-focus:     #{p.$dp-primary};
+  --ss-border-valid:     #{p.$dp-success};
+  --ss-border-error:     #{p.$dp-error};
+  --ss-border-selected:  #{p.$dp-primary};
+
+  // Category tints — semi-transparent on dark bg
+  --ss-tint-purple: rgba(83, 74, 183, 0.18);
+  --ss-tint-teal:   rgba(34, 197, 94, 0.15);
+  --ss-tint-amber:  rgba(250, 204, 21, 0.15);
+  --ss-tint-coral:  rgba(239, 68, 68, 0.15);
+  --ss-tint-pink:   rgba(251, 234, 240, 0.12);
+
+  // Shadows — borders replace shadows in dark mode
+  --ss-shadow-sm: none;
+  --ss-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --ss-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+
+  // Spacing & radius inherited from light theme (not mode-specific)
+}
+
+// System preference
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    @include dark-tokens;
+  }
+}
+
+// Manual toggle — always wins
+[data-theme='dark'] {
+  @include dark-tokens;
+}

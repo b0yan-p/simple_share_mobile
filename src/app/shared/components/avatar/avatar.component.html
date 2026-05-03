@@ -1,3 +1,9 @@
-<div class="glowing-avatar" [ngStyle]="{ width: widthInPx() }">
-  <img [alt]="alt()" width="22px" [src]="iconPath()" />
+<div class="avatar" [ngStyle]="avatarStyles" [attr.aria-label]="name || 'Avatar'">
+  @if (shouldShowImage) {
+    <img class="avatar-image" [src]="src" [alt]="name || 'Avatar'" (error)="onImageError()" />
+  } @else {
+    <span class="avatar-initials">
+      {{ initials }}
+    </span>
+  }
 </div>

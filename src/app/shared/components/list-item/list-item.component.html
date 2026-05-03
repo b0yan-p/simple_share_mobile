@@ -1,21 +1,21 @@
-<ion-item-sliding class="list-item" [disabled]="disableSwipeActions()">
-  <ion-item button class="list-item-inner" detail="false" color="medium" lines="none" (click)="navigate()">
-    <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1 bdd-py-1">
-      <app-avatar icon="plain" [alt]="title()" />
+<ion-item-sliding class="rounded-options" [disabled]="disableSwipeActions()">
+  <ion-item button class="list-item-inner" detail="false" lines="none" (click)="navigate()">
+    <div class="list-item-content">
+      <app-avatar [src]="null" [name]="title()" [colorKey]="id()" />
 
       <div class="bdd-flex bdd-flex-col bdd-flex-1">
         <span class="c-light font-w-500">{{ title() }}</span>
         @if (description()) {
-          <small
-            [class.c-primary]="descriptionColor() === 'primary'"
-            [class.c-accent]="descriptionColor() === 'accent'"
-            [class.c-text]="descriptionColor() === 'default'"
-          >{{ description() }}</small>
+          <small [class]="descriptionColor()">{{ description() }}</small>
         }
       </div>
 
       @if (meta()) {
         <span class="list-item-meta c-text">{{ meta() }}</span>
+      }
+
+      @if (showChevron()) {
+        <ion-icon name="chevron-forward-outline" class="c-text" />
       }
     </div>
   </ion-item>

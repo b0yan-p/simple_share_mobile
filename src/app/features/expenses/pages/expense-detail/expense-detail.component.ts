@@ -14,10 +14,10 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { ToastService } from 'src/app/core/services/toast.service';
-import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { ExpenseDetail } from '../../models/expense.model';
 import { ExpenseService } from '../../services/expense.service';
 import { CURRENCY } from '../../utils/expense.constants';
+import { AvatarDarkComponent } from 'src/app/shared/components/avatar-dark/avatar-dark.component';
 
 @Component({
   selector: 'app-expense-detail',
@@ -26,7 +26,7 @@ import { CURRENCY } from '../../utils/expense.constants';
   imports: [
     DatePipe,
     DecimalPipe,
-    AvatarComponent,
+    AvatarDarkComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

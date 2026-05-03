@@ -1,0 +1,148 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Card
+// Covers: .surface-card (main card class), .balance-card (hero/featured),
+//         .list-card (compact list items), ion-card global overrides.
+//
+// Light mode: white surface + purple-tinted shadow (no border).
+// Dark mode:  dark surface + 1px border (shadows invisible on dark bg).
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── ion-card global overrides ────────────────────────────────────────────────
+// Applied globally so any ion-card used in the future picks up the design system.
+ion-card {
+  --background: var(--ss-surface);
+  --color:      var(--ss-text-heading);
+
+  margin: 0;                            // Remove Ionic default 8px margin
+  border-radius: var(--ss-radius-xl);   // 16px
+  box-shadow: var(--ss-shadow-sm);
+
+  // Dark mode: switch shadow → border
+  @media (prefers-color-scheme: dark) {
+    box-shadow: none;
+    border: 1px solid var(--ss-border);
+  }
+
+  [data-theme='dark'] & {
+    box-shadow: none;
+    border: 1px solid var(--ss-border);
+  }
+
+  ion-card-header {
+    padding: 16px 16px 8px;
+  }
+
+  ion-card-content {
+    padding: 8px 16px 16px;
+  }
+
+  ion-card-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ss-text-heading);
+  }
+
+  ion-card-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ss-text);
+  }
+}
+
+// ─── .surface-card ────────────────────────────────────────────────────────────
+// Main card pattern used across the app.
+// Light: white bg + shadow. Dark: surface bg + border.
+.surface-card {
+  padding: 16px 20px;
+  background: var(--ss-surface);
+  border-radius: var(--ss-radius-xl);   // 16px
+  box-shadow: var(--ss-shadow-sm);
+
+  // Dark mode: border instead of shadow
+  @media (prefers-color-scheme: dark) {
+    box-shadow: none;
+    border: 1px solid var(--ss-border);
+  }
+
+  &-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ss-text-heading);
+  }
+}
+
+// [data-theme] override (for manual dark toggle)
+[data-theme='dark'] .surface-card {
+  box-shadow: none;
+  border: 1px solid var(--ss-border);
+}
+
+// ─── .balance-card ────────────────────────────────────────────────────────────
+// Hero card with primary colour background — used for net balance display.
+// Text always white (on-primary), regardless of theme.
+.balance-card {
+  padding: 20px;
+  background: var(--ss-primary);
+  border-radius: var(--ss-radius-xl);
+  box-shadow: var(--ss-shadow-md);
+
+  // Sub-cards inside balance card (e.g. "owed to you / you owe" split)
+  &__sub {
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: var(--ss-radius-lg);  // 12px
+    padding: 10px 14px;
+  }
+
+  // All text inside is on-primary (white)
+  * {
+    color: var(--ss-text-on-primary);
+  }
+
+  .balance-card__amount {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .balance-card__label {
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.8;
+  }
+}
+
+// ─── .list-card ───────────────────────────────────────────────────────────────
+// Compact card for list items (groups list, expense list).
+// Tighter padding, smaller radius than .surface-card.
+.list-card {
+  padding: 12px 16px;
+  background: var(--ss-surface);
+  border-radius: var(--ss-radius-lg);   // 12px
+  box-shadow: var(--ss-shadow-sm);
+  margin-bottom: var(--ss-space-3);     // 12px gap between items
+
+  @media (prefers-color-scheme: dark) {
+    box-shadow: none;
+    border: 1px solid var(--ss-border);
+  }
+}
+
+[data-theme='dark'] .list-card {
+  box-shadow: none;
+  border: 1px solid var(--ss-border);
+}
+
+// ─── Selected state ───────────────────────────────────────────────────────────
+// Applied to any card variant when in a selected/active state.
+// Switches from shadow to border to signal state change.
+.surface-card,
+.list-card,
+ion-card {
+  &.card-selected {
+    background: var(--ss-surface-selected);
+    border: 1.5px solid var(--ss-border-selected);
+    box-shadow: none;
+  }
+}

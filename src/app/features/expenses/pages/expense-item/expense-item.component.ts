@@ -29,12 +29,12 @@ import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
 import { GroupMemberIdbService } from 'src/app/features/groups/services/group-member-idb.service';
 import { GroupService } from 'src/app/features/groups/services/group.service';
-import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
 import { AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
 import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
+import { AvatarDarkComponent } from 'src/app/shared/components/avatar-dark/avatar-dark.component';
 
 interface MemberEntry extends GroupMember {
   selected: boolean;
@@ -49,7 +49,7 @@ interface MemberEntry extends GroupMember {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
-    AvatarComponent,
+    AvatarDarkComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

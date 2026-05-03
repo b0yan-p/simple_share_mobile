@@ -10,6 +10,11 @@
  */
 
 @use './theme/variables.scss' as c;
+@use './theme/components/typography';
+@use './theme/components/button';
+@use './theme/components/card';
+@use './theme/components/tab-bar';
+@use './theme/components/input';
 
 /* Core CSS required for Ionic components to work properly */
 @import '@ionic/angular/css/core.css';
@@ -47,274 +52,101 @@
   box-sizing: border-box;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p {
-  padding: 0;
-  margin: 0;
-}
-
-small {
-  font-size: 13px;
-}
-
-// text colors
-.c-light {
-  color: c.$text-light;
-}
-.c-text {
-  color: c.$text;
-}
-.c-success {
-  color: c.$success;
-}
-
-.c-primary {
-  color: c.$primary;
-}
-
-.c-error {
-  color: c.$error;
-}
-
-// Font sizes
-.font-14 {
-  font-size: 14px;
-}
-.font-16 {
-  font-size: 16px;
-}
-.font-18 {
-  font-size: 18px;
-}
-.font-20 {
-  font-size: 20px;
-}
-.font-24 {
-  font-size: 24px;
-}
-
-// font wight
-.font-w-400 {
-  font-weight: 400;
-}
-.font-w-500 {
-  font-weight: 500;
-}
-.font-w-600 {
-  font-weight: 600;
-}
-.font-w-700 {
-  font-weight: 700;
-}
-.font-w-900 {
-  font-weight: 900;
-}
-
-.text-end {
-  text-align: end;
-}
+// Typography styles moved to theme/components/_typography.scss
 
 // Header
-ion-header ion-toolbar {
-  --background: var(--ion-color-dark);
-  --color: var(--ion-color-dark-contrast);
-}
+// ion-header ion-toolbar {
+//   --background: var(--ion-color-dark);
+//   --color: var(--ion-color-dark-contrast);
+// }
 
-// Tab Bar
-ion-tab-bar {
-  border-radius: 100px;
-  margin-bottom: 8px;
-  margin-inline: 12px;
-  background: var(--ion-color-medium);
+// Tab bar styles moved to theme/components/_tab-bar.scss
 
-  ion-tab-button {
-    background-color: var(--ion-color-medium);
-  }
+// List container
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 // List & list item
-ion-item-sliding.rounded-options {
-  & > ion-item-options {
-    margin-bottom: 8px;
-    & > ion-item-option {
-      margin-bottom: 8px;
-      border-radius: 60px;
-      --border-radius: 60px;
-      width: 48px;
-      height: 48px;
-      margin-block: auto;
+// ion-item-sliding.rounded-options {
+//   & > ion-item-options {
+//     margin-bottom: 8px;
+//     & > ion-item-option {
+//       margin-bottom: 8px;
+//       border-radius: 60px;
+//       --border-radius: 60px;
+//       width: 48px;
+//       height: 48px;
+//       margin-block: auto;
 
-      font-size: 20px;
+//       font-size: 20px;
 
-      &:first-child {
-        margin-left: 4px;
-        margin-right: 4px;
-      }
-    }
-  }
-}
-
-ion-item-sliding.list-item {
-  & > ion-item-options {
-    margin-bottom: 8px;
-
-    & > ion-item-option {
-      margin-bottom: 8px;
-      border-radius: 60px;
-      --border-radius: 60px;
-      width: 48px;
-      height: 48px;
-      margin-block: auto;
-
-      font-size: 24px;
-
-      &:first-child {
-        margin-left: 4px;
-        margin-right: 4px;
-      }
-    }
-  }
-
-  & > ion-item {
-    --background: #{c.$surface};
-    --border-radius: 6px;
-    margin-bottom: 8px;
-
-    & > div.list-item-info {
-      padding-left: 12px;
-      & > h5 {
-        color: c.$text-light;
-      }
-      & > p[color|='primary'] {
-        color: c.$primary;
-      }
-      & > p[color|='success'] {
-        color: c.$success;
-      }
-      & > small {
-        font-size: 14px;
-      }
-    }
-  }
-}
-
-// Buttons
-ion-button[color='primary'] {
-  --border-radius: 8px;
-  position: relative;
-
-  text-transform: none;
-
-  background: linear-gradient(135deg, #ff5500, #ff6a00);
-  border-radius: 9px;
-  box-shadow:
-    0 2px 8px rgba(255, 85, 0, 0.4),
-    inset 0 -1px 2px 0px rgba(255, 252, 230, 0.95),
-    inset 1px 1px 1px 0px rgba(255, 200, 140, 0.25);
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: 70%;
-    height: 2px;
-    z-index: 1;
-
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 150, 30, 0.35) 15%,
-      rgba(255, 185, 60, 0.8) 50%,
-      rgba(255, 150, 30, 0.35) 85%,
-      transparent 100%
-    );
-    border-radius: 1px;
-    pointer-events: none;
-    transition:
-      opacity 0.25s ease,
-      width 0.25s ease;
-  }
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: /* diagonal rim from top-left corner sweeping to top-right */ linear-gradient(
-      112deg,
-      rgba(255, 220, 160, 0.28) 0%,
-      rgba(255, 200, 120, 0.12) 35%,
-      transparent 55%
-    );
-    pointer-events: none;
-  }
-}
-// ion-button[color='primary'] button.button-native {
-//   color: red;
-//   border: 1px solid yellow;
+//       &:first-child {
+//         margin-left: 4px;
+//         margin-right: 4px;
+//       }
+//     }
+//   }
 // }
-// !Buttons
 
-.delete-confirmation {
-  color: c.$error !important;
-}
+// ion-item-sliding.list-item {
+//   & > ion-item-options {
+//     margin-bottom: 8px;
 
-.delete-cancel {
-  color: c.$text !important;
-}
+//     & > ion-item-option {
+//       margin-bottom: 8px;
+//       border-radius: 60px;
+//       --border-radius: 60px;
+//       width: 48px;
+//       height: 48px;
+//       margin-block: auto;
+
+//       font-size: 24px;
+
+//       &:first-child {
+//         margin-left: 4px;
+//         margin-right: 4px;
+//       }
+//     }
+//   }
+
+//   & > ion-item {
+//     --background: #{c.$surface} !important;
+//     --border-radius: 6px;
+//     margin-bottom: 8px;
+
+//     & > div.list-item-info {
+//       padding-left: 12px;
+
+//       & > h5 {
+//         color: c.$text-light;
+//       }
+
+//       & > p[color|='primary'] {
+//         color: c.$primary;
+//       }
+
+//       & > p[color|='success'] {
+//         color: c.$success;
+//       }
+
+//       & > p[color|='accent'] {
+//         color: c.$accent;
+//       }
+
+//       & > small {
+//         font-size: 14px;
+//       }
+//     }
+//   }
+// }
+
+// Button styles moved to theme/components/_button.scss
 // !List & list item
 
-// Surface
-.surface-card {
-  padding: 12px 20px;
-
-  background: c.$surface;
-  border: 1px solid c.$borders;
-  border-radius: 18px;
-
-  &-title {
-    color: c.$text-light;
-    font-size: 16px;
-    font-weight: 500;
-  }
-}
-
-.section-title {
-  --width: 120px;
-
-  color: c.$text-light;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-
-  border-bottom: 1px solid c.$borders;
-  position: relative;
-  padding-inline: 8px;
-  padding-bottom: 6px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    width: var(--width);
-    height: 2px;
-    background: c.$primary;
-    box-shadow:
-      0 0 6px rgba(c.$primary, 0.7),
-      0 0 12px rgba(c.$primary, 0.45);
-    border-radius: 12px;
-  }
-}
-// !Surface
+// Surface styles moved to theme/components/_card.scss
 
 // Toast - bottom
 // Move toast above tabs
@@ -322,55 +154,4 @@ ion-toast.custom-toast {
   transform: translateY(-68px);
 }
 
-// Form inputs
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-// Toggle
-ion-toggle {
-  --track-background: #{c.$text};
-}
-
-ion-item:has(ion-toggle) {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  --border-color: #{c.$surface};
-}
-// !Toggle
-
-// Input
-ion-input {
-  --border-radius: 12px !important;
-}
-
-.input-clear-icon {
-  background-color: c.$surface !important;
-  border-radius: 100px !important;
-  color: c.$bg !important;
-}
-//!Input
-
-// Datetime picker
-
-ion-datetime {
-  --background: c.$surface;
-  --background-rgb: 45, 46, 50;
-  // --border-radius: 12px;
-  // --border-color: c.$borders;
-}
-
-ion-datetime-button.custom-date-picker {
-  &::part(native) {
-    background-color: c.$surface; /* Replace with your desired color */
-    color: c.$text; /* Change text color for contrast if needed */
-
-    &:first {
-      background-color: red;
-    }
-  }
-}
-// !Datetime picker
+// Input / toggle / datetime styles moved to theme/components/_input.scss

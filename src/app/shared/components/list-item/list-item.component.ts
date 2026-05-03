@@ -28,11 +28,15 @@ import { AvatarComponent } from '../avatar/avatar.component';
 export class ListItemComponent {
   router = inject(Router);
 
+  id = input<string | number | null | undefined>();
   navigatePath = input<string[] | undefined>();
   title = input.required<string>();
   description = input<string>();
   meta = input<string>();
-  descriptionColor = input<'primary' | 'accent' | 'default'>('default');
+  showChevron = input<boolean>(false);
+  descriptionColor = input<'default' | 'primary' | 'accent' | 'success' | 'warning' | 'error'>(
+    'default',
+  );
 
   // actions
   disableSwipeActions = input<boolean>(false);

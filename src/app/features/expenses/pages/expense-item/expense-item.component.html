@@ -11,7 +11,9 @@
     </ion-buttons>
 
     <div class="bdd-flex bdd-flex-col bdd-jc-center bdd-ai-center bdd-gap-1">
-      <ion-title>{{ pendingMode ? 'Edit Pending' : (editMode ? 'Edit Expense' : 'Add Expense') }}</ion-title>
+      <ion-title>{{
+        pendingMode ? 'Edit Pending' : editMode ? 'Edit Expense' : 'Add Expense'
+      }}</ion-title>
       @if (pendingMode) {
         <div class="pending-chip">
           <ion-icon name="time-outline" />
@@ -130,7 +132,7 @@
             >
               <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
                 <div class="avatar-wrap">
-                  <app-avatar icon="plain" [alt]="entry.displayName" [width]="38" />
+                  <app-avatar-dark icon="plain" [alt]="entry.displayName" [width]="38" />
                   @if (entry.selected) {
                     <ion-icon name="checkmark-circle" class="avatar-check" />
                   }
@@ -222,7 +224,7 @@
             >
               <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
                 <div class="avatar-wrap">
-                  <app-avatar icon="plain" [alt]="entry.displayName" [width]="38" />
+                  <app-avatar-dark icon="plain" [alt]="entry.displayName" [width]="38" />
                   @if (entry.selected) {
                     <ion-icon name="checkmark-circle" class="avatar-check" />
                   }
@@ -307,7 +309,7 @@
         [disabled]="!splitValid || uiService.itemLoading()"
         (click)="submit()"
       >
-        {{ pendingMode ? 'Update Pending' : (editMode ? 'Update Expense' : 'Save Expense') }}
+        {{ pendingMode ? 'Update Pending' : editMode ? 'Update Expense' : 'Save Expense' }}
       </ion-button>
     }
   </form>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IDBPDatabase, openDB } from 'idb';
-import { from, map, Observable } from 'rxjs';
+import { from, map, Observable, of } from 'rxjs';
 import { SimpleShareDB } from 'src/app/core/models/simpleshare-db.types';
 
 @Injectable({
@@ -10,6 +10,8 @@ export class SimpleShareIdbService {
   db!: IDBPDatabase<SimpleShareDB>;
 
   initialize(): Observable<void> {
+    if (this.db) return of(void 0);
+
     return from(
       openDB<SimpleShareDB>('simpleshare-db', 1, {
         upgrade(db) {

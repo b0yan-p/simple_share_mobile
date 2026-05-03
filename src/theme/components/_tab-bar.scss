@@ -1,0 +1,143 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Tab bar & Segment
+//
+// 1. ion-tab-bar  — floating pill at bottom (Home / Groups / Stats / Profile)
+// 2. ion-segment.tab-segment — underline style (Overview / Expenses / Balances)
+// 3. ion-segment  — default pill style (wizard toggles: Equal/Custom, One/Multiple)
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── 1. Bottom tab bar ───────────────────────────────────────────────────────
+ion-tab-bar {
+  // Floating pill
+  background:     var(--ss-surface);
+  border-radius:  var(--ss-radius-full);
+  border:         none;
+  box-shadow:     var(--ss-shadow-md);
+
+  margin-inline:  16px;
+  margin-bottom:  16px;
+
+  // Safe area on phones with home indicator
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+
+  height: 64px;
+}
+
+ion-tab-button {
+  background:     transparent;
+  --color:        var(--ss-text);
+  --color-selected: var(--ss-primary);
+
+  // Icon sizing
+  ion-icon {
+    font-size: 24px;
+    margin-bottom: 2px;
+  }
+
+  // Label
+  ion-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin-top: 2px;
+  }
+
+  // Dot indicator — visible only on active tab
+  &::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: transparent;
+    margin-top: 3px;
+    transition: background 0.2s ease;
+  }
+
+  &[aria-selected='true']::after {
+    background: var(--ss-primary);
+  }
+}
+
+// Dark mode: border instead of shadow
+@media (prefers-color-scheme: dark) {
+  ion-tab-bar {
+    box-shadow: none;
+    border: 1px solid var(--ss-border);
+  }
+}
+
+[data-theme='dark'] ion-tab-bar {
+  box-shadow: none;
+  border: 1px solid var(--ss-border);
+}
+
+// ─── Scroll content padding ───────────────────────────────────────────────────
+// Prevents last content items from being hidden behind the floating tab bar.
+ion-content {
+  --padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+// ─── 2. Segment — underline style (.tab-segment) ─────────────────────────────
+// Used in group detail: Overview / Expenses / Balances.
+// Clean underline with no background pill.
+ion-segment.tab-segment {
+  --background:    transparent;
+  background:      transparent;
+
+  border-radius:   0;
+  border-bottom:   1px solid var(--ss-border);
+  padding-inline:  4px;
+  margin-bottom:   16px;
+
+  ion-segment-button {
+    --color:              var(--ss-text);
+    --color-checked:      var(--ss-primary);
+    --background:         transparent;
+    --background-checked: transparent;
+
+    // The sliding indicator bar
+    --indicator-color:    var(--ss-primary);
+    --indicator-height:   2px;
+    --indicator-box-shadow: none;
+    --border-radius:      0;
+
+    min-height: 44px;
+    font-size:  15px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.01em;
+
+    // Active: semibold
+    &.segment-button-checked {
+      font-weight: 600;
+    }
+  }
+}
+
+// ─── 3. Segment — default pill style (wizard toggles) ────────────────────────
+// Used in expense wizard: Equal/Custom split, One person/Multiple.
+ion-segment:not(.tab-segment) {
+  --background: var(--ss-surface);
+  background:   var(--ss-surface);
+
+  border:        1px solid var(--ss-border-input);
+  border-radius: var(--ss-radius-md);  // 8px
+  padding:       3px;
+
+  ion-segment-button {
+    --color:              var(--ss-text);
+    --color-checked:      var(--ss-text-heading);
+    --background:         transparent;
+    --background-checked: var(--ss-surface-subtle);
+    --indicator-color:    transparent;
+    --border-radius:      var(--ss-radius-md);
+    --indicator-box-shadow: none;
+
+    min-height: 36px;
+    font-size:  14px;
+    font-weight: 500;
+    text-transform: none;
+  }
+}

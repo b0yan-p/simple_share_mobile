@@ -1,0 +1,210 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Typography
+// Includes: base resets, type scale, color utilities,
+//           semantic heading/amount classes, section title, form labels.
+//
+// All colors use CSS custom properties (--ss-*) for light/dark mode support.
+// SCSS vars (c.$) used only where CSS vars can't work (e.g. rgba()).
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── Base resets (moved from global.scss) ────────────────────────────────────
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  padding: 0;
+  margin: 0;
+}
+
+small {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+// ─── Type scale utilities ─────────────────────────────────────────────────────
+.text-xs   { font-size: 12px; line-height: 16px; }
+.text-sm   { font-size: 14px; line-height: 20px; }
+.text-base { font-size: 16px; line-height: 24px; }
+.text-lg   { font-size: 18px; line-height: 26px; }
+.text-xl   { font-size: 20px; line-height: 28px; }
+.text-2xl  { font-size: 24px; line-height: 32px; }
+.text-3xl  { font-size: 32px; line-height: 40px; }
+.text-4xl  { font-size: 40px; line-height: 48px; }
+
+// Backward compat aliases
+.font-14 { font-size: 14px; }
+.font-16 { font-size: 16px; }
+.font-18 { font-size: 18px; }
+.font-20 { font-size: 20px; }
+.font-24 { font-size: 24px; }
+
+// ─── Font weight utilities ────────────────────────────────────────────────────
+.font-regular  { font-weight: 400; }
+.font-medium   { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold     { font-weight: 700; }
+
+// Backward compat aliases
+.font-w-400 { font-weight: 400; }
+.font-w-500 { font-weight: 500; }
+.font-w-600 { font-weight: 600; }
+.font-w-700 { font-weight: 700; }
+.font-w-900 { font-weight: 900; }
+
+// ─── Text alignment ───────────────────────────────────────────────────────────
+.text-start  { text-align: start; }
+.text-center { text-align: center; }
+.text-end    { text-align: end; }
+
+// ─── Text color utilities ─────────────────────────────────────────────────────
+// Semantic classes — use CSS vars so dark mode works at runtime.
+.text-heading    { color: var(--ss-text-heading); }
+.text-body       { color: var(--ss-text); }
+.text-primary    { color: var(--ss-primary); }
+.text-positive   { color: var(--ss-positive); }
+.text-negative   { color: var(--ss-negative); }
+.text-warning    { color: var(--ss-warning-text); }
+.text-on-primary { color: var(--ss-text-on-primary); }
+.text-disabled   { color: var(--ss-text-disabled); }
+
+// Backward compat aliases
+.c-light   { color: var(--ss-text-heading); }
+.c-text    { color: var(--ss-text); }
+.c-primary { color: var(--ss-primary); }
+.c-success { color: var(--ss-positive); }
+.c-error   { color: var(--ss-negative); }
+
+// ─── Semantic heading styles ──────────────────────────────────────────────────
+.screen-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  color: var(--ss-text-heading);
+}
+
+.screen-subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--ss-text-heading);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  color: var(--ss-text-heading);
+}
+
+.card-meta {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ss-text);
+}
+
+// ─── Amount / numeric display ─────────────────────────────────────────────────
+// font-variant-numeric: tabular-nums ensures numbers are same width —
+// prevents layout shifts when balance values change.
+
+.amount-hero {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+  color: var(--ss-text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-large {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.01em;
+  color: var(--ss-text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-positive {
+  color: var(--ss-positive);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-negative {
+  color: var(--ss-negative);
+  font-variant-numeric: tabular-nums;
+}
+
+// ─── Section title ────────────────────────────────────────────────────────────
+// Heading with a short purple accent underline.
+// --width controls the accent line length (default 120px, override inline).
+.section-title {
+  --width: 120px;
+
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: 0.01em;
+  color: var(--ss-text-heading);
+
+  border-bottom: 1px solid var(--ss-border);
+  position: relative;
+  padding-inline: 8px;
+  padding-bottom: 6px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--width);
+    height: 2px;
+    background: var(--ss-primary);
+    border-radius: 12px;
+    box-shadow:
+      0 0 6px rgba(c.$primary, 0.5),
+      0 0 12px rgba(c.$primary, 0.3);
+  }
+}
+
+// ─── Form labels ──────────────────────────────────────────────────────────────
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--ss-text);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field-error {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--ss-negative);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// ─── Captions & timestamps ────────────────────────────────────────────────────
+.caption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ss-text);
+}
+
+.timestamp {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ss-text);
+  font-variant-numeric: tabular-nums;
+}

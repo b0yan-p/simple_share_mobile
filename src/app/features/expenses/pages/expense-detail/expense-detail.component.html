@@ -49,7 +49,7 @@
         @for (payer of exp.paidBy; track payer.memberId) {
           <div class="member-row">
             <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
-              <app-avatar icon="plain" [alt]="payer.memberName" [width]="36" />
+              <app-avatar-dark icon="plain" [alt]="payer.memberName" [width]="36" />
               <span class="c-light font-w-500">{{ payer.memberName }}</span>
             </div>
             <span class="row-amount">{{ payer.amount | number: '1.2-2' }} {{ currency }}</span>
@@ -65,7 +65,7 @@
             @for (split of exp.splittedBy; track split.memberId) {
               <div class="member-row-inner">
                 <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
-                  <app-avatar icon="plain" [alt]="split.memberName" [width]="36" />
+                  <app-avatar-dark icon="plain" [alt]="split.memberName" [width]="36" />
                   <span class="c-light font-w-500">{{ split.memberName }}</span>
                 </div>
                 <span class="row-amount"

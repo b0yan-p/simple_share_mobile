@@ -1,0 +1,123 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Button
+// Covers: ion-button global defaults, primary / ghost / subtle variants,
+//         size modifiers (sm, lg), danger state, FAB, action text classes.
+//
+// Variants:
+//   Primary  → ion-button (default / color="primary")
+//   Ghost    → ion-button[fill='outline']
+//   Subtle   → ion-button[fill='clear'] or .btn-subtle
+//   Danger   → ion-button[color='danger']
+//   Small    → + .btn-sm  (inline Pay / Remind actions)
+//   Large    → + .btn-lg  (bottom CTA)
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── Global ion-button defaults ───────────────────────────────────────────────
+ion-button {
+  --border-radius: var(--ss-radius-full);
+  --padding-start: 24px;
+  --padding-end: 24px;
+  --box-shadow: none;
+
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+// ─── Primary ──────────────────────────────────────────────────────────────────
+// Solid purple fill, white text, subtle colour-matched shadow.
+// Replaces the old orange gradient.
+ion-button[color='primary'],
+ion-button:not([fill]):not([color]) {
+  --background: var(--ss-primary);
+  --background-activated: var(--ss-primary-hover);
+  --background-hover: var(--ss-primary-hover);
+  --background-focused: var(--ss-primary-hover);
+  --color: var(--ss-primary-fg);
+  --box-shadow: 0 2px 8px #{rgba(c.$primary, 0.25)};
+
+  // Press scale — subtle tactile feedback
+  &::part(native):active {
+    transform: scale(0.98);
+  }
+}
+
+// ─── Ghost ────────────────────────────────────────────────────────────────────
+// White background, purple border, purple text.
+ion-button[fill='outline'] {
+  --background: transparent;
+  --background-activated: var(--ss-primary-subtle);
+  --background-hover: var(--ss-primary-subtle);
+  --border-color: var(--ss-primary-border);
+  --border-width: 1.5px;
+  --border-style: solid;
+  --color: var(--ss-primary);
+  --box-shadow: none;
+}
+
+// ─── Subtle ───────────────────────────────────────────────────────────────────
+// Light purple fill, purple text. No border, no shadow.
+// Use ion-button[fill='clear'].btn-subtle or just .btn-subtle on ion-button.
+ion-button[fill='clear'],
+ion-button.btn-subtle {
+  // --background:           var(--ss-primary-subtle);
+  --background-activated: #{rgba(c.$primary, 0.18)};
+  --background-hover: #{rgba(c.$primary, 0.18)};
+  --color: var(--ss-primary);
+  --box-shadow: none;
+  --border-width: 0;
+}
+
+// ─── Danger ───────────────────────────────────────────────────────────────────
+ion-button[color='danger'] {
+  --background: var(--ss-negative);
+  --background-activated: #{rgba(c.$error, 0.85)};
+  --background-hover: #{rgba(c.$error, 0.85)};
+  --color: #ffffff;
+  --box-shadow: 0 2px 8px #{rgba(c.$error, 0.2)};
+}
+
+// ─── Size modifiers ───────────────────────────────────────────────────────────
+// Small — inline actions (Pay / Remind)
+ion-button.btn-sm {
+  height: 36px;
+  font-size: 14px;
+  font-weight: 500;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+// Large — primary CTA at bottom of flows
+ion-button.btn-lg {
+  height: 56px;
+  font-size: 18px;
+  --padding-start: 32px;
+  --padding-end: 32px;
+}
+
+// ─── Full width ───────────────────────────────────────────────────────────────
+ion-button.btn-full {
+  width: 100%;
+}
+
+// ─── FAB ──────────────────────────────────────────────────────────────────────
+// Floating action button — purple circle with + icon.
+ion-fab-button {
+  --background: var(--ss-primary);
+  --background-activated: var(--ss-primary-hover);
+  --background-hover: var(--ss-primary-hover);
+  --color: var(--ss-primary-fg);
+  --box-shadow: var(--ss-shadow-md);
+}
+
+// ─── Action text classes (delete confirmation) ────────────────────────────────
+.delete-confirmation {
+  color: var(--ss-negative) !important;
+}
+
+.delete-cancel {
+  color: var(--ss-text) !important;
+}

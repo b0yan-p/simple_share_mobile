@@ -1,0 +1,111 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Input
+// Covers: ion-input (outline + solid), ion-toggle, ion-item form rows,
+//         ion-datetime, clear icon, form layout.
+//
+// IMPORTANT: font-size >= 16px on inputs prevents iOS viewport auto-zoom.
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── Form layout ──────────────────────────────────────────────────────────────
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ─── ion-input — shared base ─────────────────────────────────────────────────
+ion-input {
+  --color:             var(--ss-text-heading);
+  --placeholder-color: var(--ss-text-placeholder);
+  --border-radius:     var(--ss-radius-lg);    // 12px
+  --padding-start:     14px;
+  --padding-end:       14px;
+  --padding-top:       14px;
+  --padding-bottom:    14px;
+
+  font-size: 16px;    // Prevents iOS auto-zoom on focus
+}
+
+// ─── ion-input[fill='outline'] — main form input ──────────────────────────────
+ion-input[fill='outline'] {
+  --background:               var(--ss-surface);
+  --border-color:             var(--ss-border-input);
+  --border-width:             1.5px;
+  --highlight-color-focused:  var(--ss-border-focus);
+  --highlight-color-valid:    var(--ss-border-valid);
+  --highlight-color-invalid:  var(--ss-border-error);
+
+  // Floating label
+  --label-color:              var(--ss-text);
+  --label-color-focused:      var(--ss-primary);
+}
+
+// ─── ion-input[fill='solid'] — solid background input (e.g. date field) ──────
+ion-input[fill='solid'] {
+  --background:              var(--ss-surface-subtle);
+  --border-color:            transparent;
+  --border-width:            1.5px;
+  --highlight-color-focused: var(--ss-border-focus);
+  --highlight-color-valid:   var(--ss-border-valid);
+  --highlight-color-invalid: var(--ss-border-error);
+  --label-color:             var(--ss-text);
+}
+
+// ─── Clear icon ───────────────────────────────────────────────────────────────
+.input-clear-icon {
+  background-color: var(--ss-surface-subtle) !important;
+  border-radius:    var(--ss-radius-full) !important;
+  color:            var(--ss-text) !important;
+}
+
+// ─── ion-toggle ───────────────────────────────────────────────────────────────
+ion-toggle {
+  --track-background:        var(--ss-border-input);
+  --track-background-checked:var(--ss-primary);
+  --handle-background:       #ffffff;
+}
+
+ion-item:has(ion-toggle) {
+  --background:       transparent;
+  --padding-start:    0;
+  --inner-padding-end:0;
+  --border-color:     var(--ss-border);
+}
+
+// ─── ion-item — generic form row (date picker trigger etc.) ───────────────────
+ion-item {
+  --background:       transparent;
+  --border-color:     var(--ss-border);
+  --color:            var(--ss-text-heading);
+  --border-radius:    var(--ss-radius-lg);
+
+  &[button='true'] {
+    --background-hover:     var(--ss-surface-subtle);
+    --background-activated: var(--ss-surface-subtle);
+  }
+}
+
+// ─── ion-datetime ─────────────────────────────────────────────────────────────
+ion-datetime {
+  --background:     var(--ss-surface);
+  --background-rgb: 255, 255, 255;  // Light mode: white
+
+  @media (prefers-color-scheme: dark) {
+    --background-rgb: 45, 46, 50;   // Dark mode: #2d2e32
+  }
+}
+
+[data-theme='dark'] ion-datetime {
+  --background:     var(--ss-surface);
+  --background-rgb: 45, 46, 50;
+}
+
+ion-datetime-button.custom-date-picker {
+  &::part(native) {
+    background-color: var(--ss-surface-subtle);
+    color:            var(--ss-text);
+    border-radius:    var(--ss-radius-md);
+    padding:          8px 12px;
+  }
+}

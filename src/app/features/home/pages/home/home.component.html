@@ -1,9 +1,25 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>Home</ion-title>
+    <ion-title>Hi, Alex</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <p>home works!</p>
+<ion-content class="ion-padding">
+  <!-- Welcome -->
+  <section class="home-greetings">
+    <h1>Good to see you!</h1>
+    <p>Here's what's happening</p>
+  </section>
+
+  <!-- Total net worth across all groups -->
+  <section class="total-debt-card">
+    <p>You are owed</p>
+    <p class="amount">$48.56</p>
+    <p>across 3 groups</p>
+  </section>
+
+  <!-- Recent groups -->
+  <app-recent-groups class="recent-gorups" />
+
+  <!-- Recent activities -->
 </ion-content>

@@ -1,0 +1,59 @@
+ion-header ion-toolbar {
+  --background: transparent;
+
+  ion-title {
+    font-size: 16px;
+    color: var(--ion-text-color);
+  }
+}
+
+ion-content {
+  --padding-top: 0;
+}
+
+:host {
+  .home-greetings {
+    h1 {
+      line-height: 1.08;
+      letter-spacing: -0.7px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    p {
+      font-size: 16px;
+      color: var(--ss-text);
+    }
+  }
+
+  p {
+    line-height: 1.4;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ss-text);
+  }
+
+  .total-debt-card {
+    padding: 24px;
+    border-radius: 20px;
+    margin-top: 22px;
+
+    background: linear-gradient(45deg, #7e6cf2 0%, #6354d8 55%, #afa9ec 100%);
+
+    p {
+      color: var(--ss-text-on-primary);
+      font-size: 15px;
+      font-weight: 500;
+
+      &.amount {
+        font-size: 38px;
+        font-weight: 800;
+      }
+    }
+  }
+
+  .recent-gorups {
+    display: block;
+    margin-top: 22px;
+  }
+}

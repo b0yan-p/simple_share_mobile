@@ -1,0 +1,80 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Palette — Single source of truth for all raw colour values.
+// Never consume these directly in components. Use variables.scss aliases
+// or CSS custom properties (--ss-*) instead.
+// Mirror: src/app/shared/utils/theme-variables.helper.ts
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Light palette — Purple ───────────────────────────────────────────────────
+$lp-purple-50: #eeedfe;
+$lp-purple-100: #cecbf6;
+$lp-purple-200: #afa9ec;
+$lp-purple-600: #534ab7;
+$lp-purple-800: #3c3489;
+
+// ─── Light palette — Teal (positive / success) ────────────────────────────────
+$lp-teal-50: #e1f5ee;
+$lp-teal-400: #1d9e75;
+$lp-teal-600: #0f6e56;
+$lp-teal-800: #085041;
+
+// ─── Light palette — Coral (negative / error) ─────────────────────────────────
+$lp-coral-50: #faece7;
+$lp-coral-200: #f0997b;
+$lp-coral-600: #993c1d;
+$lp-coral-800: #712b13;
+
+// ─── Light palette — Backgrounds ─────────────────────────────────────────────
+// $lp-bg:             #f0eef9;
+$lp-bg: #fefefe;
+$lp-surface: #ffffff;
+$lp-surface-subtle: #eeedfe;
+$lp-surface-selected: #faf9ff;
+
+// ─── Light palette — Typography ──────────────────────────────────────────────
+$lp-text-heading: #1a1640;
+$lp-text-body: #6b6993; // Darkened from #7a78a0 for WCAG AA on bg
+$lp-text-placeholder: #8583b0; // Darkened from #afa9ec for WCAG AA
+$lp-text-on-dark: #ffffff;
+
+// ─── Light palette — Borders ─────────────────────────────────────────────────
+$lp-border-card: #e8e4f8;
+$lp-border-input: #cecbf6;
+
+// ─── Light palette — Category tints (avatars / icons) ────────────────────────
+$lp-tint-purple: #eeedfe;
+$lp-tint-teal: #e1f5ee;
+$lp-tint-amber: #faeeda;
+$lp-tint-coral: #faece7;
+$lp-tint-pink: #fbeaf0;
+
+// ─── Light palette — Warning ─────────────────────────────────────────────────
+$lp-warning: #facc15;
+$lp-warning-text: #92600a; // Darkened for WCAG AA on warning-bg
+
+$lp-success: #22c55e;
+$lp-success-text: #22c55e;
+
+$lp-error: #ef4444;
+$lp-error-text: #ef4444;
+
+$lp-info: #38bdf8;
+$lp-info-text: #38bdf8;
+
+// ─── Dark palette — existing theme, preserved ────────────────────────────────
+$dp-primary: #e0690e;
+$dp-primary-shade: #c85c0c;
+$dp-primary-tint: #c85c0c;
+
+$dp-bg: #191a1f;
+$dp-surface: #2d2e32;
+$dp-surf-bord: #494d53;
+
+$dp-text: #9e9fa1;
+$dp-text-light: #ffffff;
+$dp-borders: #393b3e;
+
+$dp-success: #22c55e;
+$dp-error: #ef4444;
+$dp-warning: #facc15;
+$dp-info: #38bdf8;
