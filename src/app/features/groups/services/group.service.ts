@@ -20,14 +20,16 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
     return null;
   }
 
-  override mapToListItem(item: Group) {
-    return {
-      id: item.id,
-      name: item.name,
-      simplifyDebts: item.simplifyDebts,
-      createdAt: new Date(),
-      deletedAt: null,
-    } as GroupListItem;
+  protected override customListMap(items: GroupListItem[]): GroupListItem[] {
+    return items.map((item) => ({
+      ...item,
+      netBalanceMessage:
+        item.netBalance === 0
+          ? 'Settled Up'
+          : item.netBalance > 0
+            ? `You are Owed BAM ${item.netBalance.toFixed(2)}`
+            : `You Owe BAM ${Math.abs(item.netBalance).toFixed(2)}`,
+    }));
   }
 
   public groupOverview(id: string): Observable<GroupOverview> {

@@ -25,25 +25,30 @@ ion-item-sliding.rounded-options {
     background-color: var(--ss-surface);
     border-radius: 16px;
     margin-bottom: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+
+    box-shadow:
+      0 8px 24px rgba(83, 74, 183, 0.08),
+      0 2px 6px rgba(83, 74, 183, 0.04);
+    // border: 1px solid rgba(0, 0, 0, 0.08);
   }
 }
 
 .list-item-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding-block: 8px;
+  gap: 14px;
+  padding-block: 12px;
   flex: 1;
 
-  // border: 1px solid c.$surface-borders;
-  // border-radius: 12px;
+  .arrow-icon {
+    font-size: 24px;
+    color: var(--ss-primary);
+  }
 
   small {
     font-size: 14px;
     line-height: 1.25;
     font-weight: 500;
-
     &.primary {
       color: var(--ss-primary);
     }
@@ -61,7 +66,7 @@ ion-item-sliding.rounded-options {
     }
 
     &.warning {
-      color: var(--ss-warning);
+      color: var(--ss-warning-text);
     }
 
     &.error {

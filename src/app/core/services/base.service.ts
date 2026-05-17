@@ -82,7 +82,6 @@ export abstract class BaseService<
         }),
       )
       .subscribe((data) => {
-        console.log('get list data: ', data);
         if (this.pageRequest().skip === 0) this.items.set([...data]);
         else this.items.set([...(this.items() ?? []), ...data]);
       });

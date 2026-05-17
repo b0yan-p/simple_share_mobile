@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-title>Groups</ion-title>
   </ion-toolbar>
@@ -7,13 +7,13 @@
 <ion-content class="ion-paddinga">
   <ion-list [inset]="true">
     @for (group of service.items(); track group.id) {
-      <!-- TODO implement debt relationships total amount and persons -->
       <app-list-item
         [navigatePath]="['groups', group.id, 'details']"
         [title]="group.name"
-        description="You owe BAM 11.25"
-        meta="You owe Milan C."
-        descriptionColor="primary"
+        [description]="group.netBalanceMessage"
+        [descriptionColor]="
+          group.netBalance > 0 ? 'success' : group.netBalance < 0 ? 'error' : 'default'
+        "
         (onUpdate)="router.navigate(['groups', group.id])"
         (onDelete)="onDelete(group.id)"
       />

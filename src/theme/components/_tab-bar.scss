@@ -10,13 +10,13 @@
 // ─── 1. Bottom tab bar ───────────────────────────────────────────────────────
 ion-tab-bar {
   // Floating pill
-  background:     var(--ss-surface);
-  border-radius:  var(--ss-radius-full);
-  border:         none;
-  box-shadow:     var(--ss-shadow-md);
+  background: var(--ss-surface);
+  border-radius: var(--ss-radius-2xl);
+  border: none;
+  box-shadow: var(--ss-shadow-md);
 
-  margin-inline:  16px;
-  margin-bottom:  16px;
+  margin-inline: 16px;
+  margin-bottom: 16px;
 
   // Safe area on phones with home indicator
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -25,8 +25,8 @@ ion-tab-bar {
 }
 
 ion-tab-button {
-  background:     transparent;
-  --color:        var(--ss-text);
+  background: transparent;
+  --color: var(--ss-text);
   --color-selected: var(--ss-primary);
 
   // Icon sizing
@@ -63,14 +63,17 @@ ion-tab-button {
 // Dark mode: border instead of shadow
 @media (prefers-color-scheme: dark) {
   ion-tab-bar {
-    box-shadow: none;
-    border: 1px solid var(--ss-border);
+    // border: 1px solid var(--ss-border);
+    box-shadow:
+      0 8px 24px rgba(83, 74, 183, 0.08),
+      0 2px 6px rgba(83, 74, 183, 0.04);
   }
 }
 
 [data-theme='dark'] ion-tab-bar {
-  box-shadow: none;
-  border: 1px solid var(--ss-border);
+  box-shadow:
+    0 8px 24px rgba(83, 74, 183, 0.08),
+    0 2px 6px rgba(83, 74, 183, 0.04);
 }
 
 // ─── Scroll content padding ───────────────────────────────────────────────────
@@ -83,28 +86,28 @@ ion-content {
 // Used in group detail: Overview / Expenses / Balances.
 // Clean underline with no background pill.
 ion-segment.tab-segment {
-  --background:    transparent;
-  background:      transparent;
+  --background: transparent;
+  background: transparent;
 
-  border-radius:   0;
-  border-bottom:   1px solid var(--ss-border);
-  padding-inline:  4px;
-  margin-bottom:   16px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--ss-border);
+  padding-inline: 4px;
+  margin-bottom: 16px;
 
   ion-segment-button {
-    --color:              var(--ss-text);
-    --color-checked:      var(--ss-primary);
-    --background:         transparent;
+    --color: var(--ss-text);
+    --color-checked: var(--ss-primary);
+    --background: transparent;
     --background-checked: transparent;
 
     // The sliding indicator bar
-    --indicator-color:    var(--ss-primary);
-    --indicator-height:   2px;
+    --indicator-color: var(--ss-primary);
+    --indicator-height: 2px;
     --indicator-box-shadow: none;
-    --border-radius:      0;
+    --border-radius: 0;
 
     min-height: 44px;
-    font-size:  15px;
+    font-size: 15px;
     font-weight: 500;
     text-transform: none;
     letter-spacing: 0.01em;
@@ -120,23 +123,23 @@ ion-segment.tab-segment {
 // Used in expense wizard: Equal/Custom split, One person/Multiple.
 ion-segment:not(.tab-segment) {
   --background: var(--ss-surface);
-  background:   var(--ss-surface);
+  background: var(--ss-surface);
 
-  border:        1px solid var(--ss-border-input);
-  border-radius: var(--ss-radius-md);  // 8px
-  padding:       3px;
+  border: 1px solid var(--ss-border-input);
+  border-radius: var(--ss-radius-md); // 8px
+  padding: 3px;
 
   ion-segment-button {
-    --color:              var(--ss-text);
-    --color-checked:      var(--ss-text-heading);
-    --background:         transparent;
+    --color: var(--ss-text);
+    --color-checked: var(--ss-text-heading);
+    --background: transparent;
     --background-checked: var(--ss-surface-subtle);
-    --indicator-color:    transparent;
-    --border-radius:      var(--ss-radius-md);
+    --indicator-color: transparent;
+    --border-radius: var(--ss-radius-md);
     --indicator-box-shadow: none;
 
     min-height: 36px;
-    font-size:  14px;
+    font-size: 14px;
     font-weight: 500;
     text-transform: none;
   }

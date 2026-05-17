@@ -33,7 +33,7 @@ export class ListItemComponent {
   title = input.required<string>();
   description = input<string>();
   meta = input<string>();
-  showChevron = input<boolean>(false);
+  showChevron = input<boolean>(true);
   descriptionColor = input<'default' | 'primary' | 'accent' | 'success' | 'warning' | 'error'>(
     'default',
   );

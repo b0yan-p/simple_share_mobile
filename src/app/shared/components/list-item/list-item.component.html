@@ -1,5 +1,11 @@
 <ion-item-sliding class="rounded-options" [disabled]="disableSwipeActions()">
-  <ion-item button class="list-item-inner" detail="false" lines="none" (click)="navigate()">
+  <ion-item
+    button
+    [detail]="showChevron()"
+    class="list-item-inner"
+    lines="none"
+    (click)="navigate()"
+  >
     <div class="list-item-content">
       <app-avatar [src]="null" [name]="title()" [colorKey]="id()" />
 
@@ -12,10 +18,6 @@
 
       @if (meta()) {
         <span class="list-item-meta c-text">{{ meta() }}</span>
-      }
-
-      @if (showChevron()) {
-        <ion-icon name="chevron-forward-outline" class="c-text" />
       }
     </div>
   </ion-item>

@@ -25,8 +25,8 @@ $lp-coral-600: #993c1d;
 $lp-coral-800: #712b13;
 
 // ─── Light palette — Backgrounds ─────────────────────────────────────────────
-// $lp-bg:             #f0eef9;
-$lp-bg: #fefefe;
+$lp-bg: #f7f6fb;
+// $lp-bg: #f9f7ff;
 $lp-surface: #ffffff;
 $lp-surface-subtle: #eeedfe;
 $lp-surface-selected: #faf9ff;
@@ -50,7 +50,7 @@ $lp-tint-pink: #fbeaf0;
 
 // ─── Light palette — Warning ─────────────────────────────────────────────────
 $lp-warning: #facc15;
-$lp-warning-text: #92600a; // Darkened for WCAG AA on warning-bg
+$lp-warning-text: #993c1d; // Darkened for WCAG AA on warning-bg
 
 $lp-success: #22c55e;
 $lp-success-text: #22c55e;

@@ -1,50 +1,56 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="groups"></ion-back-button>
-    </ion-buttons>
-    <ion-title>{{ title }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button [routerLink]="['..', 'expenses', 'new']">
-        <ion-icon name="add-outline" slot="icon-only" />
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+@if (group$ | async; as group) {
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="groups"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ group.name }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button [routerLink]="['..', 'expenses', 'new']">
+          <ion-icon name="add-outline" slot="icon-only" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-  <ion-segment
-    class="tab-segment"
-    [value]="activeTab"
-    (ionChange)="activeTab = $any($event).detail.value"
-  >
-    <ion-segment-button value="overview">
-      <ion-label>Overview</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="expenses">
-      <ion-label>Expenses</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="balance">
-      <ion-label>Balance</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-content>
+    <!-- Overview header -->
+    <app-group-overview-header [members]="members" [group]="group" />
 
-  <div [class.ion-padding]="activeTab !== 'expenses'">
-    @switch (activeTab) {
-      @case ('overview') {
-        <app-group-details />
-      }
-      @case ('expenses') {
-        <app-expense-list />
-      }
-      @case ('balance') {
-        <app-group-balance />
-      }
-    }
-  </div>
+    <!-- Tab Segment -->
+    <ion-segment
+      class="tab-segment"
+      [value]="activeTab"
+      (ionChange)="activeTab = $any($event).detail.value"
+    >
+      <ion-segment-button value="overview">
+        <ion-label>Overview</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="expenses">
+        <ion-label>Expenses</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="balance">
+        <ion-label>Balance</ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-  <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
-    <ion-icon name="add-outline" />
-    <span>Add expense</span>
-  </ion-button>
-</ion-content>
+    <div [class.ion-padding]="activeTab !== 'expenses'">
+      @switch (activeTab) {
+        @case ('overview') {
+          <app-group-details />
+        }
+        @case ('expenses') {
+          <app-expense-list />
+        }
+        @case ('balance') {
+          <app-group-balance />
+        }
+      }
+    </div>
+
+    <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
+      <ion-icon name="add-outline" />
+      <span>Add expense</span>
+    </ion-button>
+  </ion-content>
+}

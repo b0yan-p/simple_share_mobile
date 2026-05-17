@@ -10,8 +10,10 @@
         [title]="group.name"
         [showChevron]="true"
         [id]="group.id"
-        [description]="'you owe to $14.45'"
-        descriptionColor="success"
+        [description]="group.netBalanceMessage"
+        [descriptionColor]="
+          group.netBalance === 0 ? 'default' : group.netBalance < 0 ? 'error' : 'success'
+        "
         (click)="navigateToGroupDetails(group.id)"
       />
     }

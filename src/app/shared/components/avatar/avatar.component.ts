@@ -24,7 +24,7 @@ export class AvatarComponent implements OnChanges {
   @Input() name: string = '';
   @Input({ required: true }) src: string | null | undefined = null;
 
-  @Input() size: number = 40;
+  @Input() size: number = 42;
   @Input() round: boolean = true;
   @Input() maxInitials: number = 2;
   @Input() colorKey: string | number | null | undefined = null;

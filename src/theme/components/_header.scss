@@ -1,0 +1,21 @@
+@use '../variables' as c;
+
+ion-header ion-toolbar {
+  --background: transparent;
+
+  ion-title {
+    color: var(--ion-text-color);
+
+    &.small {
+      font-size: 16px;
+    }
+
+    &.medium {
+      font-size: 20px;
+    }
+
+    &.large {
+      font-size: 28px;
+    }
+  }
+}

@@ -6,6 +6,8 @@ export class GroupListItem {
   simplifyDebts!: boolean;
   createdAt!: Date;
   deletedAt?: Date | null;
+  netBalance: number = 0;
+  netBalanceMessage: string = 'Settled Up';
 }
 
 export class Group implements BaseModel {
