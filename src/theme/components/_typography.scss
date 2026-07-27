@@ -43,12 +43,13 @@ small {
 
 .card-title {
   display: block;
-  color: var(--ss-text-heading);
+  // color: var(--ss-text-heading);
+  color: var(--ss-text-light);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
-  text-transform: uppercase;
+  // text-transform: uppercase;
   margin-bottom: 6px;
 }
 

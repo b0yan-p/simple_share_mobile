@@ -82,7 +82,7 @@
         } @else if (myNet() > 0) {
           <div class="status-chip status-chip--success">
             <ion-icon name="wallet-outline" />
-            <span>You get back {{ myNet() | number: '1.2-2' }} {{ currency }}</span>
+            <span>You get {{ myNet() | number: '1.2-2' }} {{ currency }}</span>
           </div>
         } @else {
           <div class="status-chip status-chip--neutral">
@@ -139,9 +139,9 @@
         </div>
       }
 
-      <!-- ─── Log ─── -->
+      <!-- ─── Activity ─── -->
       <div class="bdd-flex bdd-flex-col">
-        <div class="card-title font-14">Log</div>
+        <div class="card-title font-14">Activity</div>
         <div class="meta-card">
           <div class="meta-row">
             <ion-icon name="person-circle-outline" />
