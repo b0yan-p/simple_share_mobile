@@ -4,33 +4,15 @@
   </div>
 } @else if (balance(); as data) {
   <div class="balance-page">
-
-    <!-- Summary bar -->
-    <div class="summary-bar surface-card bdd-mb-2">
-      <div class="summary-item">
-        <span class="summary-label">Members</span>
-        <span class="summary-value">{{ data.members.length }}</span>
-      </div>
-      <div class="summary-divider"></div>
-      <div class="summary-item">
-        <span class="summary-label">Pending debts</span>
-        <span class="summary-value" [ngClass]="{ 'c-primary': data.debts.length > 0 }">
-          {{ data.debts.length }}
-        </span>
-      </div>
-    </div>
-
     <!-- Members heading -->
-    <div class="section-title bdd-mb-2" style="--width: 90px">Members</div>
+    <div class="card-title font-14" style="--width: 90px">Balance Breakdown</div>
 
     <!-- Member cards -->
     <div class="members-list">
       @for (member of data.members; track member.memberId) {
         <div class="member-card" [class.is-expanded]="expandedMemberId() === member.memberId">
-
           <!-- Clickable header row -->
           <div class="member-row" (click)="toggle(member.memberId)">
-
             <!-- Initials avatar -->
             <div
               class="member-avatar"
@@ -88,8 +70,7 @@
               } @else {
                 <div class="debt-label">Debt flows</div>
                 @for (edge of getEdgesForMember(member.memberId); track edge) {
-                  <div class="debt-edge">
-
+                  <div class="debt-edge" (click)="openSettleUp(edge, $event)">
                     <!-- Debtor -->
                     <div
                       class="edge-side"
@@ -123,21 +104,11 @@
                       </div>
                       <span class="edge-name">{{ edge.creditorDisplayName }}</span>
                     </div>
-
-                    <!-- Settle up button -->
-                    <button
-                      class="settle-btn"
-                      (click)="openSettleUp(edge, $event)"
-                    >
-                      <ion-icon name="swap-horizontal-outline" />
-                    </button>
-
                   </div>
                 }
               }
             </div>
           }
-
         </div>
       }
     </div>
