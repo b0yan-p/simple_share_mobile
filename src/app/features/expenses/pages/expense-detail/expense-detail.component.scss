@@ -12,59 +12,43 @@
 
   .expense-hero {
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    padding: 32px 20px 28px;
-    border-radius: 16px;
+    padding: 24px 20px 20px;
+    border-radius: 24px;
     text-align: center;
-
-    // ── Liquid glass base ──
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(24px) saturate(1.8);
-    -webkit-backdrop-filter: blur(24px) saturate(1.8);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-top-color: rgba(255, 255, 255, 0.22);
+    background: c.$surface;
     box-shadow:
-      0 8px 40px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+      0 18px 42px rgba(c.$primary, 0.1),
+      0 4px 12px rgba(c.$primary, 0.06);
 
-    // ── Internal warm glow (light through coloured glass) ──
-    &::before {
-      content: '';
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 75%;
-      height: 130px;
-      background: radial-gradient(ellipse, rgba(c.$primary, 0.22) 0%, transparent 70%);
-      filter: blur(14px);
-      pointer-events: none;
-      z-index: 0;
+    &__body {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
     }
 
-    // ── Top surface reflection ──
-    &::after {
-      content: '';
+    // Category icon tile — pinned to the top-left of the card
+    .icon-tile {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 100%);
-      border-radius: 16px 16px 0 0;
-      pointer-events: none;
-      z-index: 0;
-    }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: rgba(c.$primary, 0.12);
 
-    // Keep content above pseudo-elements
-    > * {
-      position: relative;
-      z-index: 1;
+      ion-icon {
+        font-size: 24px;
+        color: c.$primary;
+      }
     }
 
     &__amount {
@@ -99,25 +83,45 @@
         font-size: 14px;
       }
     }
+
+    &__divider {
+      width: 100%;
+      height: 1px;
+      background: c.$borders;
+      margin: 18px 0;
+    }
   }
 
-  .settle-badge {
-    display: flex;
+  // ─── Personal status chip (in the hero divider area) ───
+  .status-chip {
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba(c.$success, 0.12);
-    border: 1px solid rgba(c.$success, 0.3);
-    color: c.$success;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    gap: 8px;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
 
     ion-icon {
-      font-size: 13px;
+      font-size: 18px;
+    }
+
+    &--error {
+      background: rgba(c.$error, 0.08);
+      border: 1px solid rgba(c.$error, 0.25);
+      color: c.$error;
+    }
+
+    &--success {
+      background: rgba(c.$success, 0.1);
+      border: 1px solid rgba(c.$success, 0.28);
+      color: c.$success;
+    }
+
+    &--neutral {
+      background: rgba(c.$text, 0.06);
+      border: 1px solid rgba(c.$text, 0.2);
+      color: c.$text;
     }
   }
 
@@ -131,7 +135,9 @@
     padding: 10px 14px;
     border-radius: 12px;
     background: c.$surface;
-    border: 1px solid c.$borders;
+    box-shadow:
+      0 18px 42px rgba(c.$primary, 0.1),
+      0 4px 12px rgba(c.$primary, 0.06);
   }
 
   .row-amount {
@@ -149,7 +155,9 @@
     padding: 2px 14px;
     border-radius: 12px;
     background: c.$surface;
-    border: 1px solid c.$borders;
+    box-shadow:
+      0 18px 42px rgba(c.$primary, 0.1),
+      0 4px 12px rgba(c.$primary, 0.06);
   }
 
   .member-row-inner {
@@ -169,7 +177,9 @@
     padding: 14px 16px;
     border-radius: 12px;
     background: c.$surface;
-    border: 1px solid c.$borders;
+    box-shadow:
+      0 18px 42px rgba(c.$primary, 0.1),
+      0 4px 12px rgba(c.$primary, 0.06);
   }
 
   .meta-row {
@@ -193,5 +203,17 @@
   .meta-divider {
     height: 1px;
     background: c.$borders;
+  }
+}
+
+.expense-menu {
+  ion-item {
+    --min-height: 44px;
+
+    ion-icon {
+      font-size: 18px;
+      margin-inline-end: 12px;
+      color: c.$text;
+    }
   }
 }
