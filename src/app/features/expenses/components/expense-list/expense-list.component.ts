@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -13,12 +13,17 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
+import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
+import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
+import {
+  ExpenseFilter,
+  ExpensesFilterComponent,
+} from '../expenses-filter/expenses-filter.component';
 import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
-import { AvatarDarkComponent } from 'src/app/shared/components/avatar-dark/avatar-dark.component';
 
 @Component({
   selector: 'app-expense-list',
@@ -35,8 +40,8 @@ import { AvatarDarkComponent } from 'src/app/shared/components/avatar-dark/avata
     IonItemOption,
     IonIcon,
     IonAlert,
-    AvatarDarkComponent,
     PaginatorComponent,
+    ExpensesFilterComponent,
   ],
 })
 export class ExpenseListComponent implements OnInit {
@@ -46,10 +51,33 @@ export class ExpenseListComponent implements OnInit {
   toastService = inject(ToastService);
   paginator = inject(ExpensePaginatorService);
   private readonly modalController = inject(ModalController);
+  private readonly tokenStorage = inject(TokenStorageService);
 
   pendingDeleteId = '';
   isDeleteAlertOpen = false;
   pendingCount = signal(0);
+
+  /** Local UI-only filter state. Data-level filtering can be wired later. */
+  readonly activeFilter = signal<ExpenseFilter>('all');
+
+  /** Expense groups filtered by the currently active pill. */
+  readonly filteredGroups = computed<ExpenseListItem[]>(() => {
+    const groups = this.facade.store.expenses();
+    const filter = this.activeFilter();
+
+    if (filter === 'all') return groups;
+
+    return groups
+      .map((group) => ({
+        ...group,
+        expenses: group.expenses.filter((e) =>
+          filter === 'settled' ? this.isSettled(e) : !this.isSettled(e),
+        ),
+      }))
+      .filter((group) => group.expenses.length > 0);
+  });
+
+  readonly hasExpenses = computed(() => this.facade.store.expenses().length > 0);
 
   routeParams$?: Observable<string>;
 
@@ -64,8 +92,6 @@ export class ExpenseListComponent implements OnInit {
   ];
 
   constructor() {
-    console.log('EXPENSE COMPONENT');
-
     this.routeParams$ = this.route.params.pipe(
       map((p) => p['id']),
       takeUntilDestroyed(),
@@ -73,10 +99,53 @@ export class ExpenseListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Ensure the current user signal is populated so "Paid by you" can resolve.
+    if (!this.tokenStorage.user()) {
+      this.tokenStorage.getUser().subscribe();
+    }
+
     this.routeParams$?.subscribe((groupId) => {
       this.facade.loadExpenses(groupId);
       this.loadPendingCount(groupId);
     });
+  }
+
+  /**
+   * Renders the payer subtitle. If the sole payer's display name matches the
+   * logged-in user, shows "you"; otherwise the member name or a count.
+   */
+  paidByLabel(expense: ExpenseListItemDetails): string {
+    if (expense.paidByMembers.length > 1) {
+      return `${expense.paidByMembers.length} people`;
+    }
+
+    const payer = expense.paidByMembers[0] ?? '';
+    return this.isCurrentUser(payer) ? 'you' : payer;
+  }
+
+  private isCurrentUser(displayName: string): boolean {
+    const me = this.tokenStorage.user();
+    if (!me || !displayName) return false;
+
+    const target = displayName.trim().toLowerCase();
+    return [me.fullName, `${me.firstName} ${me.lastName}`]
+      .filter(Boolean)
+      .some((name) => name.trim().toLowerCase() === target);
+  }
+
+  /** An expense is settled when the current user has no open balance on it. */
+  isSettled(expense: ExpenseListItemDetails): boolean {
+    return expense.isSettleUp || expense.net === 0;
+  }
+
+  /** Pastel icon-tile tone derived from the user's personal status. */
+  toneOf(expense: ExpenseListItemDetails): 'success' | 'error' | 'primary' {
+    if (this.isSettled(expense)) return 'primary';
+    return expense.net > 0 ? 'success' : 'error';
+  }
+
+  iconOf(expense: ExpenseListItemDetails): string {
+    return expense.isSettleUp ? 'swap-horizontal-outline' : 'receipt-outline';
   }
 
   private loadPendingCount(groupId: string): void {
@@ -112,6 +181,11 @@ export class ExpenseListComponent implements OnInit {
   navigateToEdit(expenseId: string): void {
     const groupId = this.route.snapshot.params['id'];
     this.router.navigate(['groups', groupId, 'expenses', expenseId]);
+  }
+
+  navigateToNew(): void {
+    const groupId = this.route.snapshot.params['id'];
+    this.router.navigate(['groups', groupId, 'expenses', 'new']);
   }
 
   openDeleteAlert(expenseId: string): void {

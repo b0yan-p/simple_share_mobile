@@ -1,0 +1,28 @@
+<div class="filter-row">
+  <button
+    class="filter-pill"
+    [class.filter-pill--active]="value() === 'all'"
+    (click)="select('all')"
+  >
+    All
+  </button>
+  <button
+    class="filter-pill"
+    [class.filter-pill--active]="value() === 'unsettled'"
+    (click)="select('unsettled')"
+  >
+    Unsettled
+  </button>
+  <button
+    class="filter-pill"
+    [class.filter-pill--active]="value() === 'settled'"
+    (click)="select('settled')"
+  >
+    Settled
+  </button>
+  <button class="filter-pill filter-pill--month">
+    <ion-icon name="calendar-outline" />
+    <span>All months</span>
+    <ion-icon name="chevron-down-outline" />
+  </button>
+</div>

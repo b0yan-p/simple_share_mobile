@@ -25,6 +25,141 @@ small {
   line-height: 18px;
 }
 
+// ─── Semantic heading styles ──────────────────────────────────────────────────
+.screen-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  color: var(--ss-text-heading);
+}
+
+.screen-subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--ss-text-heading);
+}
+
+.card-title {
+  display: block;
+  color: var(--ss-text-heading);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.card-meta {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ss-text);
+}
+
+// ─── Amount / numeric display ─────────────────────────────────────────────────
+// font-variant-numeric: tabular-nums ensures numbers are same width —
+// prevents layout shifts when balance values change.
+
+.amount-hero {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 48px;
+  letter-spacing: -0.02em;
+  color: var(--ss-text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-large {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.01em;
+  color: var(--ss-text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-positive {
+  color: var(--ss-positive);
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-negative {
+  color: var(--ss-negative);
+  font-variant-numeric: tabular-nums;
+}
+
+// ─── Section title ────────────────────────────────────────────────────────────
+// Heading with a short purple accent underline.
+// --width controls the accent line length (default 120px, override inline).
+.section-title {
+  --width: 120px;
+
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: 0.01em;
+  color: var(--ss-text-heading);
+
+  border-bottom: 1px solid var(--ss-border);
+  position: relative;
+  padding-inline: 8px;
+  padding-bottom: 6px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--width);
+    height: 2px;
+    background: var(--ss-primary);
+    border-radius: 12px;
+    box-shadow:
+      0 0 6px rgba(c.$primary, 0.5),
+      0 0 12px rgba(c.$primary, 0.3);
+  }
+}
+
+// ─── Form labels ──────────────────────────────────────────────────────────────
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--ss-text);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field-error {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--ss-negative);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// ─── Captions & timestamps ────────────────────────────────────────────────────
+.caption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ss-text);
+}
+
+.timestamp {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ss-text);
+  font-variant-numeric: tabular-nums;
+}
+
 // ─── Type scale utilities ─────────────────────────────────────────────────────
 .text-xs {
   font-size: 12px;
@@ -160,139 +295,4 @@ small {
 }
 .c-error {
   color: var(--ss-negative);
-}
-
-// ─── Semantic heading styles ──────────────────────────────────────────────────
-.screen-title {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 32px;
-  letter-spacing: -0.01em;
-  color: var(--ss-text-heading);
-}
-
-.screen-subtitle {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 28px;
-  color: var(--ss-text-heading);
-}
-
-.card-title {
-  display: block;
-  color: var(--ss-text-heading);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.card-meta {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  color: var(--ss-text);
-}
-
-// ─── Amount / numeric display ─────────────────────────────────────────────────
-// font-variant-numeric: tabular-nums ensures numbers are same width —
-// prevents layout shifts when balance values change.
-
-.amount-hero {
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 48px;
-  letter-spacing: -0.02em;
-  color: var(--ss-text-heading);
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-large {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 40px;
-  letter-spacing: -0.01em;
-  color: var(--ss-text-heading);
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-positive {
-  color: var(--ss-positive);
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-negative {
-  color: var(--ss-negative);
-  font-variant-numeric: tabular-nums;
-}
-
-// ─── Section title ────────────────────────────────────────────────────────────
-// Heading with a short purple accent underline.
-// --width controls the accent line length (default 120px, override inline).
-.section-title {
-  --width: 120px;
-
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 26px;
-  letter-spacing: 0.01em;
-  color: var(--ss-text-heading);
-
-  border-bottom: 1px solid var(--ss-border);
-  position: relative;
-  padding-inline: 8px;
-  padding-bottom: 6px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: var(--width);
-    height: 2px;
-    background: var(--ss-primary);
-    border-radius: 12px;
-    box-shadow:
-      0 0 6px rgba(c.$primary, 0.5),
-      0 0 12px rgba(c.$primary, 0.3);
-  }
-}
-
-// ─── Form labels ──────────────────────────────────────────────────────────────
-.field-label {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  color: var(--ss-text);
-  margin-bottom: 6px;
-  display: block;
-}
-
-.field-error {
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 18px;
-  color: var(--ss-negative);
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-// ─── Captions & timestamps ────────────────────────────────────────────────────
-.caption {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-  color: var(--ss-text);
-}
-
-.timestamp {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-  color: var(--ss-text);
-  font-variant-numeric: tabular-nums;
 }
