@@ -34,7 +34,7 @@ import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
 import { AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
 import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
-import { AvatarDarkComponent } from 'src/app/shared/components/avatar-dark/avatar-dark.component';
+import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 
 interface MemberEntry extends GroupMember {
   selected: boolean;
@@ -49,7 +49,7 @@ interface MemberEntry extends GroupMember {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
-    AvatarDarkComponent,
+    AvatarComponent,
     IonHeader,
     IonToolbar,
     IonButtons,

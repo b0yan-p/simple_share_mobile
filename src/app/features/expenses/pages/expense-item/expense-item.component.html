@@ -2,11 +2,15 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       @if (currentStep > 1) {
-        <ion-button (click)="prevStep()">
-          <ion-icon name="chevron-back-outline" slot="icon-only" />
+        <ion-button fill="clear" size="small" color="primary" (click)="prevStep()">
+          <ion-icon name="arrow-back-sharp" slot="icon-only" />
         </ion-button>
       } @else {
-        <ion-back-button [defaultHref]="'groups/' + groupId + '/details'"></ion-back-button>
+        <ion-back-button
+          [defaultHref]="'groups/' + groupId + '/details'"
+          size="small"
+          color="primary"
+        />
       }
     </ion-buttons>
 
@@ -132,7 +136,12 @@
             >
               <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
                 <div class="avatar-wrap">
-                  <app-avatar-dark icon="plain" [alt]="entry.displayName" [width]="38" />
+                  <app-avatar
+                    [src]="null"
+                    [name]="entry.displayName"
+                    [colorKey]="entry.memberId"
+                    [size]="38"
+                  />
                   @if (entry.selected) {
                     <ion-icon name="checkmark-circle" class="avatar-check" />
                   }
@@ -224,7 +233,12 @@
             >
               <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
                 <div class="avatar-wrap">
-                  <app-avatar-dark icon="plain" [alt]="entry.displayName" [width]="38" />
+                  <app-avatar
+                    [src]="null"
+                    [name]="entry.displayName"
+                    [colorKey]="entry.memberId"
+                    [size]="38"
+                  />
                   @if (entry.selected) {
                     <ion-icon name="checkmark-circle" class="avatar-check" />
                   }
