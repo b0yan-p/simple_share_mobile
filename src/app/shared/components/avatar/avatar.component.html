@@ -1,4 +1,9 @@
-<div class="avatar" [ngStyle]="avatarStyles" [attr.aria-label]="name || 'Avatar'">
+<div
+  class="avatar"
+  [ngClass]="{ borders: showBorders }"
+  [ngStyle]="avatarStyles"
+  [attr.aria-label]="name || 'Avatar'"
+>
   @if (shouldShowImage) {
     <img class="avatar-image" [src]="src" [alt]="name || 'Avatar'" (error)="onImageError()" />
   } @else {

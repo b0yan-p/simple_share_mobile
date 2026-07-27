@@ -60,22 +60,6 @@ ion-tab-button {
   }
 }
 
-// Dark mode: border instead of shadow
-@media (prefers-color-scheme: dark) {
-  ion-tab-bar {
-    // border: 1px solid var(--ss-border);
-    box-shadow:
-      0 8px 24px rgba(83, 74, 183, 0.08),
-      0 2px 6px rgba(83, 74, 183, 0.04);
-  }
-}
-
-[data-theme='dark'] ion-tab-bar {
-  box-shadow:
-    0 8px 24px rgba(83, 74, 183, 0.08),
-    0 2px 6px rgba(83, 74, 183, 0.04);
-}
-
 // ─── Scroll content padding ───────────────────────────────────────────────────
 // Prevents last content items from being hidden behind the floating tab bar.
 ion-content {

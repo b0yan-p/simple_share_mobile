@@ -6,31 +6,30 @@
 //   - All component SCSS via: @use './...../theme/variables.scss' as c;
 //
 // Exports:
-//   - CSS custom properties (via _theme.light + _theme.dark)
+//   - CSS custom properties (via _theme.light)
 //   - SCSS compile-time aliases (c.$primary, c.$success, etc.)
 // ─────────────────────────────────────────────────────────────────────────────
 @use 'palette' as p;
 @use 'theme.light' as light;
-@use 'theme.dark' as dark;
 
 // ─── SCSS semantic aliases ────────────────────────────────────────────────────
 // These are compile-time values (light theme as default).
 // Used in component SCSS for rgba(c.$primary, 0.12) etc.
 // Runtime theming (light/dark switch) happens via CSS custom properties above.
 
-$primary:         p.$lp-purple-600;   // #534ab7
-$success:         p.$lp-teal-400;     // #1d9e75
-$error:           p.$lp-coral-600;    // #993c1d
-$warn:            p.$lp-warning;      // #facc15
-$info:            p.$dp-info;         // #38bdf8
+$primary: p.$lp-purple-600; // #534ab7
+$success: p.$lp-teal-400; // #1d9e75
+$error: p.$lp-coral-600; // #993c1d
+$warn: p.$lp-warning; // #facc15
+$info: p.$lp-info; // #38bdf8
 
-$bg:              p.$lp-bg;           // #f0eef9
-$surface:         p.$lp-surface;      // #ffffff
-$surface-borders: p.$lp-purple-50;    // #eeedfe
-$text:            p.$lp-text-body;    // #6b6993
-$text-light:      p.$lp-text-heading; // #1a1640
-$borders:         p.$lp-border-card;  // #e8e4f8
+$bg: p.$lp-bg; // #f0eef9
+$surface: p.$lp-surface; // #ffffff
+$surface-borders: p.$lp-purple-50; // #eeedfe
+$text: p.$lp-text-body; // #6b6993
+$text-light: p.$lp-text-heading; // #1a1640
+$borders: p.$lp-border-card; // #e8e4f8
 
 // Kept for backward compatibility with any remaining references
-$secondary:       transparent;
-$accent:          p.$lp-text-on-dark;
+$secondary: transparent;
+$accent: p.$lp-text-on-dark;

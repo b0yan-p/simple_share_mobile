@@ -1,5 +1,3 @@
-<div class="surface-title bdd-mt-1 bdd-mb-1" style="--width: 152px">Balance details</div>
-
 <ion-list>
   @for (item of data().debtEdges; track item) {
     <div class="container" [attr.color]="item.signedAmount > 0 ? 'success' : 'primary'">

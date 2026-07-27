@@ -1,21 +1,38 @@
 @use '../variables' as c;
 
-ion-header ion-toolbar {
-  --background: transparent;
+ion-header {
+  -webkit-box-shadow: none !important;
+  box-shadow: none;
+  border-bottom: none;
 
-  ion-title {
-    color: var(--ion-text-color);
+  ion-toolbar {
+    --background: transparent;
+    --border-width: 0;
+    --box-shadow: none;
 
-    &.small {
-      font-size: 16px;
+    ion-buttons ion-back-button {
+      --color: var(--ss-primary);
     }
 
-    &.medium {
-      font-size: 20px;
-    }
+    ion-title {
+      color: var(--ion-text-color);
+      color: var(--ss-primary);
 
-    &.large {
-      font-size: 28px;
+      &.small {
+        font-size: 16px;
+      }
+
+      &.medium {
+        font-size: 20px;
+      }
+
+      &.large {
+        font-size: 28px;
+      }
     }
   }
+}
+
+ion-header:has(ion-back-button) ion-title {
+  padding-left: 0;
 }

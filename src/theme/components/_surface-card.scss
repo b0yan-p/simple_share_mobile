@@ -1,0 +1,30 @@
+.surface-card {
+  background-color: var(--ion-card-background);
+  border-radius: var(--ss-radius-xl);
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+
+  box-shadow:
+    0 8px 24px rgba(83, 74, 183, 0.08),
+    0 2px 6px rgba(83, 74, 183, 0.04);
+  //   padding: 16px 20px;
+}
+
+//   background: var(--ss-surface);
+//   border-radius: var(--ss-radius-xl);   // 16px
+//   box-shadow: var(--ss-shadow-sm);
+
+//   // Dark mode: border instead of shadow
+//   @media (prefers-color-scheme: dark) {
+//     box-shadow: none;
+//     border: 1px solid var(--ss-border);
+//   }
+
+//   &-title {
+//     font-size: 16px;
+//     font-weight: 500;
+//     color: var(--ss-text-heading);
+//   }

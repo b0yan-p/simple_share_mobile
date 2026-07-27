@@ -16,6 +16,7 @@
 @use './theme/components/tab-bar';
 @use './theme/components/header';
 @use './theme/components/input';
+@use './theme/components/surface-card';
 
 /* Core CSS required for Ionic components to work properly */
 @import '@ionic/angular/css/core.css';
@@ -55,12 +56,6 @@
 
 // Typography styles moved to theme/components/_typography.scss
 
-// Header
-// ion-header ion-toolbar {
-//   --background: var(--ion-color-dark);
-//   --color: var(--ion-color-dark-contrast);
-// }
-
 // Tab bar styles moved to theme/components/_tab-bar.scss
 
 // List container
@@ -69,80 +64,6 @@
   flex-direction: column;
   gap: 12px;
 }
-
-// List & list item
-// ion-item-sliding.rounded-options {
-//   & > ion-item-options {
-//     margin-bottom: 8px;
-//     & > ion-item-option {
-//       margin-bottom: 8px;
-//       border-radius: 60px;
-//       --border-radius: 60px;
-//       width: 48px;
-//       height: 48px;
-//       margin-block: auto;
-
-//       font-size: 20px;
-
-//       &:first-child {
-//         margin-left: 4px;
-//         margin-right: 4px;
-//       }
-//     }
-//   }
-// }
-
-// ion-item-sliding.list-item {
-//   & > ion-item-options {
-//     margin-bottom: 8px;
-
-//     & > ion-item-option {
-//       margin-bottom: 8px;
-//       border-radius: 60px;
-//       --border-radius: 60px;
-//       width: 48px;
-//       height: 48px;
-//       margin-block: auto;
-
-//       font-size: 24px;
-
-//       &:first-child {
-//         margin-left: 4px;
-//         margin-right: 4px;
-//       }
-//     }
-//   }
-
-//   & > ion-item {
-//     --background: #{c.$surface} !important;
-//     --border-radius: 6px;
-//     margin-bottom: 8px;
-
-//     & > div.list-item-info {
-//       padding-left: 12px;
-
-//       & > h5 {
-//         color: c.$text-light;
-//       }
-
-//       & > p[color|='primary'] {
-//         color: c.$primary;
-//       }
-
-//       & > p[color|='success'] {
-//         color: c.$success;
-//       }
-
-//       & > p[color|='accent'] {
-//         color: c.$accent;
-//       }
-
-//       & > small {
-//         font-size: 14px;
-//       }
-//     }
-//   }
-// }
 
 // Button styles moved to theme/components/_button.scss
 // !List & list item

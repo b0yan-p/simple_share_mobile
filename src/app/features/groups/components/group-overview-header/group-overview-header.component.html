@@ -1,0 +1,79 @@
+<div class="surface-card">
+  <!-- avatar & name -->
+  <div class="bdd-flex bdd-gap-1 bdd-ai-center bdd-pb-2 border-bottom">
+    <app-avatar [name]="group().name" [src]="null" [round]="false" [size]="48" />
+    <div class="min-width">
+      <h4 class="text-one-line">
+        {{ group().name }}
+      </h4>
+      <small class="c-text">
+        {{ members()?.length }} member{{
+          !!members()?.length && members()!.length > 1 ? 's' : ''
+        }}
+      </small>
+    </div>
+  </div>
+
+  <!-- members -->
+  <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-gap-1">
+    <div>
+      @for (member of reducedMembers(); track member.memberId) {
+        <app-avatar
+          [name]="member.displayName"
+          [src]="null"
+          [colorKey]="member.memberId"
+          [size]="36"
+          [showBorders]="true"
+          [ngClass]="{ 'avatar-negative-margin': !$first }"
+        />
+      }
+    </div>
+    <ion-button fill="outline" class="btn-sm" size="small">Add members</ion-button>
+  </div>
+</div>
+
+<!-- stats -->
+<!-- <section class="stats-section" aria-label="Your group balance">
+  <div class="stats-section__header">
+    <small class="stats-section__eyebrow">Your share</small>
+    <p class="stats-section__subtitle">Overview of your balance and spending in this group.</p>
+  </div>
+
+  <div class="surface-card stats">
+    <div class="stats-card stats-card--paid">
+      <div class="stats-card__heading">
+        <span class="stats-card__icon" aria-hidden="true">
+          <ion-icon name="wallet-outline" />
+        </span>
+        <span class="stats-card__label">Balance</span>
+      </div>
+      <div class="stats-card__amount">
+        {{ totalBalance() }} <span class="stats-card__currency">BAM</span>
+      </div>
+    </div>
+
+    <div class="stats-card stats-card--positive">
+      <div class="stats-card__heading">
+        <span class="stats-card__icon" aria-hidden="true">
+          <ion-icon name="arrow-down-outline" />
+        </span>
+        <span class="stats-card__label">Paid</span>
+      </div>
+      <div class="stats-card__amount">
+        {{ totalPaid() }} <span class="stats-card__currency">BAM</span>
+      </div>
+    </div>
+
+    <div class="stats-card stats-card--negative">
+      <div class="stats-card__heading">
+        <span class="stats-card__icon" aria-hidden="true">
+          <ion-icon name="arrow-up-outline" />
+        </span>
+        <span class="stats-card__label">Owed</span>
+      </div>
+      <div class="stats-card__amount">
+        {{ totalOwed() }} <span class="stats-card__currency">BAM</span>
+      </div>
+    </div>
+  </div>
+</section> -->

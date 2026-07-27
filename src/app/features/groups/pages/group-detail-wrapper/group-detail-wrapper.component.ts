@@ -20,7 +20,7 @@ import { ExpenseListComponent } from 'src/app/features/expenses/components/expen
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
-import { GroupMemberIdbService } from '../../services/group-member-idb.service';
+import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupService } from '../../services/group.service';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
@@ -52,7 +52,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
 export class GroupDetailWrapperComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private service = inject(GroupService);
-  private groupMemberIdb = inject(GroupMemberIdbService);
+  private groupMemberFacade = inject(GroupMemberFacade);
 
   title = 'Group';
   activeTab = 'overview';
@@ -62,10 +62,7 @@ export class GroupDetailWrapperComponent implements OnInit {
 
   members$ = this.route.params.pipe(
     switchMap((p) =>
-      this.service.getGroupMembers(p['id']).pipe(
-        switchMap((members) => this.groupMemberIdb.getGroupMembers(p['id'])),
-        catchError(() => of(void 0)),
-      ),
+      this.groupMemberFacade.getGroupMembers(p['id']).pipe(catchError(() => of([] as GroupMember[]))),
     ),
     takeUntilDestroyed(),
   );

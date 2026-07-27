@@ -2,20 +2,22 @@
   <ion-header>
     <ion-toolbar>
       <ion-buttons slot="start">
-        <ion-back-button defaultHref="groups"></ion-back-button>
+        <ion-back-button defaultHref="groups" size="small" color="primary" />
       </ion-buttons>
-      <ion-title>{{ group.name }}</ion-title>
-      <ion-buttons slot="end">
-        <ion-button [routerLink]="['..', 'expenses', 'new']">
-          <ion-icon name="add-outline" slot="icon-only" />
-        </ion-button>
-      </ion-buttons>
+      <ion-title class="small">Groups</ion-title>
+      <ion-buttons slot="end"> </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
   <ion-content>
     <!-- Overview header -->
-    <app-group-overview-header [members]="members" [group]="group" />
+    <app-group-overview-header
+      [members]="members"
+      [group]="group"
+      [totalPaid]="group.myDebtSummary.paidTotal"
+      [totalOwed]="group.myDebtSummary.owedTotal"
+      [totalBalance]="group.myDebtSummary.net"
+    />
 
     <!-- Tab Segment -->
     <ion-segment

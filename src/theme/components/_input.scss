@@ -89,16 +89,7 @@ ion-item {
 // ─── ion-datetime ─────────────────────────────────────────────────────────────
 ion-datetime {
   --background:     var(--ss-surface);
-  --background-rgb: 255, 255, 255;  // Light mode: white
-
-  @media (prefers-color-scheme: dark) {
-    --background-rgb: 45, 46, 50;   // Dark mode: #2d2e32
-  }
-}
-
-[data-theme='dark'] ion-datetime {
-  --background:     var(--ss-surface);
-  --background-rgb: 45, 46, 50;
+  --background-rgb: 255, 255, 255;  // white
 }
 
 ion-datetime-button.custom-date-picker {

@@ -1,11 +1,12 @@
 <ion-grid>
   @if (group$ | async; as group) {
     <!-- Debt overview card -->
+    <!-- <div class="surface-card-title">Your balance</div> -->
+    <small class="card-title">Your share</small>
     <ion-row class="surface-card balance-overview" style="position: relative">
-      <div class="bdd-flex bdd-flex-col bdd-gap-1">
+      <div class="bdd-flex bdd-jc-space-between bdd-ai-center bdd-gap-1">
         @let net = group.myDebtSummary.net;
 
-        <div class="surface-card-title">Your balance</div>
         <div class="amount" [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }">
           @if (net > 0) {
             <span class="plus-sign">+</span>
@@ -18,63 +19,68 @@
             BAM
           </span>
         </div>
+
         @if (net >= 0) {
-          <app-chip title="Owed to you" severity="success" />
+          <app-chip title="You get" severity="success" />
         } @else if (net < 0) {
           <app-chip title="You are owe" severity="error" />
         } @else {
           <app-chip title="Settled up" severity="success" />
         }
-
-        <!-- Share arrow  -->
-        <!-- <img
-          [src]="
-            group.myDebtSummary.net >= 0
-              ? 'assets/icons/svg/stonks-up.svg'
-              : 'assets/icons/svg/stonks-down.svg'
-          "
-          alt="Total net chart"
-          style="position: absolute; left: 48px; bottom: -6px; width: 120px"
-        /> -->
       </div>
 
-      <div class="bdd-flex bdd-flex-col bdd-gap-2 bdd-jc-center">
-        <div class="bdd-flex bdd-gap-1">
-          <div class="donut-chart" id="donut" style="--get: 200; --owe: 160">
-            <div class="seg-green"></div>
-            <div class="seg-red"></div>
-          </div>
-          <div class="legends">
-            <div class="legend">
-              <div class="green"></div>
-              <div class="font-14">
-                You get
-                <span class="c-success">{{
-                  group.myDebtSummary.paidTotal | number: '1.2-2'
-                }}</span>
-              </div>
+      <div
+        class="user-net-status bdd-flex bdd-gap-1 bdd-ai-cenetr bdd-jc-space-between bdd-ai-center"
+        [ngClass]="{
+          'user-net-status--positive': net > 0,
+          'user-net-status--negative': net < 0,
+        }"
+      >
+        <!-- I Get -->
+        <div class="bdd-flex bdd-gap-1 bdd-ai-center">
+          <span class="balance-sub-card balance-sub-card--positive" aria-hidden="true">
+            <ion-icon name="arrow-down-outline" />
+          </span>
+          <div class="bdd-flex bdd-flex-col">
+            <small>You paid</small>
+            <div class="c-success">
+              <span class="font-18 font-w-500">
+                {{ group.myDebtSummary.paidTotal }}
+              </span>
+              <span class="font-14">BAM</span>
             </div>
-            <div class="legend">
-              <div class="warn"></div>
-              <div class="font-14">
-                You
-                <span [class]="group.myDebtSummary.owedTotal != 0 ? 'c-error' : ''">
-                  owe {{ group.myDebtSummary.owedTotal }}
-                </span>
-              </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- I Owe -->
+        <div class="bdd-flex bdd-gap-1 bdd-ai-center">
+          <span class="balance-sub-card balance-sub-card--negative" aria-hidden="true">
+            <ion-icon name="arrow-up-outline" />
+          </span>
+          <div class="bdd-flex bdd-flex-col">
+            <small>You owe</small>
+            <div class="c-error">
+              <span class="font-18 font-w-500">
+                {{ group.myDebtSummary.owedTotal }}
+              </span>
+              <span class="font-14">BAM</span>
             </div>
           </div>
         </div>
       </div>
     </ion-row>
 
-    <ion-row>
+    <!-- TODO show this option on show more -->
+    <!-- <ion-row>
       <app-group-balance-overview
         [data]="group.myDebtSummary"
         [groupId]="group.id"
         [currentMemberId]="group.currentMemberId"
         (settled)="refresh()"
       />
-    </ion-row>
+    </ion-row> -->
   }
 </ion-grid>

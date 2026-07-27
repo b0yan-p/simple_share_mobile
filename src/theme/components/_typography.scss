@@ -26,57 +26,141 @@ small {
 }
 
 // ─── Type scale utilities ─────────────────────────────────────────────────────
-.text-xs   { font-size: 12px; line-height: 16px; }
-.text-sm   { font-size: 14px; line-height: 20px; }
-.text-base { font-size: 16px; line-height: 24px; }
-.text-lg   { font-size: 18px; line-height: 26px; }
-.text-xl   { font-size: 20px; line-height: 28px; }
-.text-2xl  { font-size: 24px; line-height: 32px; }
-.text-3xl  { font-size: 32px; line-height: 40px; }
-.text-4xl  { font-size: 40px; line-height: 48px; }
+.text-xs {
+  font-size: 12px;
+  line-height: 16px;
+}
+.text-sm {
+  font-size: 14px;
+  line-height: 20px;
+}
+.text-base {
+  font-size: 16px;
+  line-height: 24px;
+}
+.text-lg {
+  font-size: 18px;
+  line-height: 26px;
+}
+.text-xl {
+  font-size: 20px;
+  line-height: 28px;
+}
+.text-2xl {
+  font-size: 24px;
+  line-height: 32px;
+}
+.text-3xl {
+  font-size: 32px;
+  line-height: 40px;
+}
+.text-4xl {
+  font-size: 40px;
+  line-height: 48px;
+}
 
 // Backward compat aliases
-.font-14 { font-size: 14px; }
-.font-16 { font-size: 16px; }
-.font-18 { font-size: 18px; }
-.font-20 { font-size: 20px; }
-.font-24 { font-size: 24px; }
+.font-14 {
+  font-size: 14px;
+}
+.font-16 {
+  font-size: 16px;
+}
+.font-18 {
+  font-size: 18px;
+}
+.font-20 {
+  font-size: 20px;
+}
+.font-24 {
+  font-size: 24px;
+}
 
 // ─── Font weight utilities ────────────────────────────────────────────────────
-.font-regular  { font-weight: 400; }
-.font-medium   { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold     { font-weight: 700; }
+.font-regular {
+  font-weight: 400;
+}
+.font-medium {
+  font-weight: 500;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.font-bold {
+  font-weight: 700;
+}
 
 // Backward compat aliases
-.font-w-400 { font-weight: 400; }
-.font-w-500 { font-weight: 500; }
-.font-w-600 { font-weight: 600; }
-.font-w-700 { font-weight: 700; }
-.font-w-900 { font-weight: 900; }
+.font-w-400 {
+  font-weight: 400;
+}
+.font-w-500 {
+  font-weight: 500;
+}
+.font-w-600 {
+  font-weight: 600;
+}
+.font-w-700 {
+  font-weight: 700;
+}
+.font-w-900 {
+  font-weight: 900;
+}
 
 // ─── Text alignment ───────────────────────────────────────────────────────────
-.text-start  { text-align: start; }
-.text-center { text-align: center; }
-.text-end    { text-align: end; }
+.text-start {
+  text-align: start;
+}
+.text-center {
+  text-align: center;
+}
+.text-end {
+  text-align: end;
+}
 
 // ─── Text color utilities ─────────────────────────────────────────────────────
 // Semantic classes — use CSS vars so dark mode works at runtime.
-.text-heading    { color: var(--ss-text-heading); }
-.text-body       { color: var(--ss-text); }
-.text-primary    { color: var(--ss-primary); }
-.text-positive   { color: var(--ss-positive); }
-.text-negative   { color: var(--ss-negative); }
-.text-warning    { color: var(--ss-warning-text); }
-.text-on-primary { color: var(--ss-text-on-primary); }
-.text-disabled   { color: var(--ss-text-disabled); }
+.text-heading {
+  color: var(--ss-text-heading);
+}
+.text-body {
+  color: var(--ss-text);
+}
+.text-primary {
+  color: var(--ss-primary);
+}
+.text-positive {
+  color: var(--ss-success);
+}
+.text-negative {
+  color: var(--ss-negative);
+}
+.text-warning {
+  color: var(--ss-warning-text);
+}
+.text-on-primary {
+  color: var(--ss-text-on-primary);
+}
+.text-disabled {
+  color: var(--ss-text-disabled);
+}
 
 // Backward compat aliases
-.c-light   { color: var(--ss-text-heading); }
-.c-text    { color: var(--ss-text); }
-.c-primary { color: var(--ss-primary); }
-.c-success { color: var(--ss-positive); }
-.c-error   { color: var(--ss-negative); }
+.c-light {
+  color: var(--ss-text-heading);
+}
+.c-text {
+  color: var(--ss-text);
+}
+.c-primary {
+  color: var(--ss-primary);
+}
+.c-success {
+  color: var(--ss-success);
+}
+.c-error {
+  color: var(--ss-negative);
+}
 
 // ─── Semantic heading styles ──────────────────────────────────────────────────
 .screen-title {
@@ -95,10 +179,14 @@ small {
 }
 
 .card-title {
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 26px;
+  display: block;
   color: var(--ss-text-heading);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
 .card-meta {

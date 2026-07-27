@@ -2,7 +2,7 @@ import { AsyncPipe, DecimalPipe, NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { IonGrid, IonRow } from '@ionic/angular/standalone';
+import { IonGrid, IonRow, IonIcon } from '@ionic/angular/standalone';
 import { BehaviorSubject, first, switchMap } from 'rxjs';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { GroupBalanceOverviewComponent } from '../../components/group-balance-overview/group-balance-overview.component';
@@ -14,6 +14,7 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./group-details.component.scss'],
   standalone: true,
   imports: [
+    IonIcon,
     NgClass,
     AsyncPipe,
     DecimalPipe,

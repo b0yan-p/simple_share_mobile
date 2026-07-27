@@ -1,14 +1,60 @@
 @use './../../../../../theme/variables.scss' as c;
 
 :host {
-  // ─── Overview card ───
+  .divider {
+    width: 2px;
+    height: 32px;
+    border-right: 1px solid var(--ss-border);
+  }
 
+  // ─── Overview card ───
   .balance-overview {
     display: flex;
     gap: 16px;
     justify-content: space-between;
 
-    background: url('./../../../../../assets/icons/svg/grid.svg');
+    // background: url('./../../../../../assets/icons/svg/grid.svg');
+
+    .user-net-status {
+      padding: 8px 12px;
+      border-radius: var(--ss-radius-md);
+      border: 1px solid var(--ss-border);
+
+      &--positive {
+        // background-color: color-mix(in srgb, var(--ss-positive) 10%, transparent);
+      }
+
+      &--negative {
+        // background-color: color-mix(in srgb, var(--ss-negative) 10%, transparent);
+      }
+    }
+
+    .balance-sub-card {
+      display: grid;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+
+      color: var(--stats-color);
+      background: var(--stats-icon-background);
+      border-radius: var(--ss-radius-md);
+
+      ion-icon {
+        font-size: 15px;
+        stroke-width: 2px;
+      }
+
+      &--positive {
+        --stats-color: var(--ss-positive);
+        --stats-icon-background: color-mix(in srgb, var(--ss-positive) 28%, transparent);
+      }
+
+      &--negative {
+        --stats-color: var(--ss-negative);
+        --stats-icon-background: color-mix(in srgb, var(--ss-negative) 28%, transparent);
+      }
+    }
   }
 
   .amount {

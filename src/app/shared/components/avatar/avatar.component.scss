@@ -21,6 +21,10 @@
   display: block;
 }
 
+.avatar.borders {
+  border: 3px solid var(--ss-surface);
+}
+
 .avatar-initials {
   display: inline-flex;
   align-items: center;

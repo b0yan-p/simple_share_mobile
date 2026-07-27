@@ -52,8 +52,10 @@ $lp-tint-pink: #fbeaf0;
 $lp-warning: #facc15;
 $lp-warning-text: #993c1d; // Darkened for WCAG AA on warning-bg
 
-$lp-success: #22c55e;
-$lp-success-text: #22c55e;
+// $lp-success: #22c55e;
+// $lp-success-text: #22c55e;
+$lp-success: #1d9e75;
+$lp-success-text: #1d9e75;
 
 $lp-error: #ef4444;
 $lp-error-text: #ef4444;
@@ -62,19 +64,19 @@ $lp-info: #38bdf8;
 $lp-info-text: #38bdf8;
 
 // ─── Dark palette — existing theme, preserved ────────────────────────────────
-$dp-primary: #e0690e;
-$dp-primary-shade: #c85c0c;
-$dp-primary-tint: #c85c0c;
+// $dp-primary: #e0690e;
+// $dp-primary-shade: #c85c0c;
+// $dp-primary-tint: #c85c0c;
 
-$dp-bg: #191a1f;
-$dp-surface: #2d2e32;
-$dp-surf-bord: #494d53;
+// $dp-bg: #191a1f;
+// $dp-surface: #2d2e32;
+// $dp-surf-bord: #494d53;
 
-$dp-text: #9e9fa1;
-$dp-text-light: #ffffff;
-$dp-borders: #393b3e;
+// $dp-text: #9e9fa1;
+// $dp-text-light: #ffffff;
+// $dp-borders: #393b3e;
 
-$dp-success: #22c55e;
-$dp-error: #ef4444;
-$dp-warning: #facc15;
-$dp-info: #38bdf8;
+// $dp-success: #22c55e;
+// $dp-error: #ef4444;
+// $dp-warning: #facc15;
+// $dp-info: #38bdf8;

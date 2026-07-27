@@ -1,4 +1,4 @@
-import { NgStyle } from '@angular/common';
+import { NgStyle, NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -15,7 +15,7 @@ export type AvatarColor = {
 @Component({
   selector: 'app-avatar',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, NgClass],
   templateUrl: './avatar.component.html',
   styleUrl: './avatar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +28,7 @@ export class AvatarComponent implements OnChanges {
   @Input() round: boolean = true;
   @Input() maxInitials: number = 2;
   @Input() colorKey: string | number | null | undefined = null;
+  @Input() showBorders: boolean = false;
 
   @Input() colors: AvatarColor[] = [
     { bg: '#E1F6EF', text: '#386F61' },
