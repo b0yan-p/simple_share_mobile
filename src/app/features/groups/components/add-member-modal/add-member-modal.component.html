@@ -1,0 +1,97 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()">
+        <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="modal-body">
+    <!-- Title -->
+    <div class="modal-title">Add members</div>
+    <p class="modal-subtitle c-text">Add a friend or create a new member</p>
+
+    <!-- Tabs -->
+    <ion-segment
+      class="tab-segment"
+      [value]="activeTab()"
+      (ionChange)="setTab($any($event).detail.value)"
+    >
+      <ion-segment-button value="friends">
+        <ion-label>Friends</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="new">
+        <ion-label>New</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Error message -->
+    @if (error()) {
+      <div class="error-banner">
+        <ion-icon name="alert-circle-outline" />
+        <span>Something went wrong. Please try again.</span>
+      </div>
+    }
+
+    <!-- Friends tab -->
+    @if (activeTab() === 'friends') {
+      @if (connectionsLoading()) {
+        <div class="state-msg">
+          <ion-spinner name="crescent" />
+        </div>
+      } @else if (availableConnections().length === 0) {
+        <div class="state-msg c-text">No friends available to add.</div>
+      } @else {
+        <div class="friend-list">
+          @for (c of availableConnections(); track c.id) {
+            <button
+              class="friend-row"
+              type="button"
+              [disabled]="submitting()"
+              (click)="addExisting(c.id)"
+            >
+              <app-avatar [name]="c.displayName" [src]="null" [colorKey]="c.id" [size]="40" />
+              <span class="friend-name">{{ c.displayName }}</span>
+              <ion-icon name="add-circle-outline" class="friend-add-icon" />
+            </button>
+          }
+        </div>
+      }
+    }
+
+    <!-- New member tab -->
+    @if (activeTab() === 'new') {
+      <div class="field-group">
+        <label class="field-label">Name</label>
+        <ion-input
+          type="text"
+          [formControl]="displayName"
+          fill="solid"
+          placeholder="e.g. Marko"
+          autocapitalize="words"
+        />
+      </div>
+
+      <div class="form-actions">
+        <ion-button
+          expand="block"
+          color="primary"
+          (click)="submitNew()"
+          [disabled]="displayName.invalid || submitting()"
+          class="confirm-btn"
+        >
+          @if (submitting()) {
+            <ion-spinner name="crescent" slot="start" />
+            Adding...
+          } @else {
+            <ion-icon name="checkmark-circle-outline" slot="start" />
+            Add member
+          }
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

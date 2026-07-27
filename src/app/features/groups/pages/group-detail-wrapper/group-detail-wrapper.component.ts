@@ -14,9 +14,11 @@ import {
   IonSegmentButton,
   IonTitle,
   IonToolbar,
+  ModalController,
 } from '@ionic/angular/standalone';
-import { catchError, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, of, switchMap } from 'rxjs';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
+import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
@@ -53,6 +55,9 @@ export class GroupDetailWrapperComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private service = inject(GroupService);
   private groupMemberFacade = inject(GroupMemberFacade);
+  private modalController = inject(ModalController);
+
+  private refresh$ = new BehaviorSubject<void>(undefined);
 
   title = 'Group';
   activeTab = 'overview';
@@ -60,8 +65,8 @@ export class GroupDetailWrapperComponent implements OnInit {
 
   group$ = this.route.params.pipe(switchMap((p) => this.service.groupOverview(p['id'])));
 
-  members$ = this.route.params.pipe(
-    switchMap((p) =>
+  members$ = combineLatest([this.route.params, this.refresh$]).pipe(
+    switchMap(([p]) =>
       this.groupMemberFacade.getGroupMembers(p['id']).pipe(catchError(() => of([] as GroupMember[]))),
     ),
     takeUntilDestroyed(),
@@ -69,5 +74,26 @@ export class GroupDetailWrapperComponent implements OnInit {
 
   ngOnInit(): void {
     this.members$.subscribe((e) => (this.members = e ?? []));
+  }
+
+  async openAddMembers(): Promise<void> {
+    const groupId = this.route.snapshot.params['id'];
+
+    const modal = await this.modalController.create({
+      component: AddMemberModalComponent,
+      componentProps: {
+        groupId,
+        existingMemberIds: this.members.map((m) => m.memberId),
+      },
+      breakpoints: [0, 0.85],
+      initialBreakpoint: 0.85,
+    });
+
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      this.refresh$.next();
+    }
   }
 }

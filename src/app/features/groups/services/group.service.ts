@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { first, Observable } from 'rxjs';
 import { BaseService } from 'src/app/core/services/base.service';
 import { environment } from 'src/environments/environment';
+import {
+  AddGroupMembersRequest,
+  AddGroupMembersResponse,
+} from '../models/add-group-members.model';
 import { BalanceResponse } from '../models/balance-response.model';
 import { GroupMember } from '../models/group-member.model';
 import { GroupOverview } from '../models/group-overview.model';
@@ -39,6 +43,18 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
   public getGroupMembers(groupId: string): Observable<GroupMember[]> {
     return this.httpClient
       .get<GroupMember[]>(`${environment.baseAPIUrl}/groupmember/${groupId}/members`)
+      .pipe(first());
+  }
+
+  public addGroupMembers(
+    groupId: string,
+    payload: AddGroupMembersRequest,
+  ): Observable<AddGroupMembersResponse> {
+    return this.httpClient
+      .post<AddGroupMembersResponse>(
+        `${environment.baseAPIUrl}/groupmember/${groupId}/members/bulk`,
+        payload,
+      )
       .pipe(first());
   }
 

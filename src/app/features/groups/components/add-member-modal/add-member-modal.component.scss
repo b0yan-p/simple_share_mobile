@@ -1,0 +1,147 @@
+@use '../../../../../theme/variables.scss' as c;
+
+// ─── Shell ────────────────────────────────────────────────────────────────────
+ion-header ion-toolbar {
+  --background: #{c.$bg};
+  --border-width: 0;
+  --padding-top: 0;
+}
+
+ion-content {
+  --background: #{c.$bg};
+}
+
+.close-icon {
+  color: c.$text;
+  font-size: 22px;
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.modal-body {
+  padding: 0 24px 40px;
+}
+
+.modal-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: c.$text-light;
+  letter-spacing: -0.4px;
+  margin-bottom: 4px;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.tab-segment {
+  margin-bottom: 20px;
+}
+
+// ─── Error ────────────────────────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(c.$error, 0.1);
+  border: 1px solid rgba(c.$error, 0.25);
+  border-radius: 10px;
+  color: c.$error;
+  font-size: 13px;
+  margin-bottom: 16px;
+
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Friend list ────────────────────────────────────────────────────────────────
+.state-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
+  font-size: 14px;
+}
+
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.friend-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+  color: c.$text-light;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friend-add-icon {
+  color: c.$primary;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+// ─── Form fields ──────────────────────────────────────────────────────────────
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: c.$text;
+  padding-left: 2px;
+}
+
+ion-input {
+  --background: #{c.$surface} !important;
+  --color: #{c.$text-light};
+  --placeholder-color: #{c.$text};
+  --border-radius: 12px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  border: 1px solid c.$borders;
+  border-radius: 12px;
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.confirm-btn {
+  --border-radius: 14px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+}
