@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular/standalone';
 import { LoginInput } from '../../models/login-input.model';
 
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TokenStorageService } from '../../services/token-storage.service';
 
@@ -16,7 +16,7 @@ import { TokenStorageService } from '../../services/token-storage.service';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonButton, IonInput, IonContent, ReactiveFormsModule, IonInputPasswordToggle],
+  imports: [IonButton, IonInput, IonContent, ReactiveFormsModule, IonInputPasswordToggle, RouterLink],
 })
 export class LoginComponent {
   auth = inject(AuthService);

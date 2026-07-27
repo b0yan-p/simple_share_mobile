@@ -23,5 +23,9 @@
     </ion-input>
 
     <ion-button [disabled]="form.invalid || loading" (click)="login()"> Login </ion-button>
+
+    <ion-button fill="clear" [routerLink]="['/register']">
+      Don't have an account? Register
+    </ion-button>
   </form>
 </ion-content>

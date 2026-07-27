@@ -6,6 +6,7 @@ import { catchError, first, Observable, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginInput } from '../models/login-input.model';
 import { LoginUser } from '../models/login-user.model';
+import { RegisterInput } from '../models/register-input.model';
 import { TokenStorageService } from './token-storage.service';
 
 @Injectable({
@@ -17,9 +18,22 @@ export class AuthService {
   private router = inject(Router);
 
   private loginAPI = `${environment.baseAPIUrl}/auth/login`;
+  private registerAPI = `${environment.baseAPIUrl}/auth/register`;
 
   public login(input: LoginInput): Observable<boolean> {
     return this.http.post<LoginUser>(this.loginAPI, input).pipe(
+      first(),
+      switchMap((res) => this.tokenStorage.setUser(res)),
+      switchMap((res) => this.tokenStorage.setAccessToken(res.token)),
+      catchError((err) => {
+        console.error(err);
+        throw err;
+      }),
+    );
+  }
+
+  public register(input: RegisterInput): Observable<boolean> {
+    return this.http.post<LoginUser>(this.registerAPI, input).pipe(
       first(),
       switchMap((res) => this.tokenStorage.setUser(res)),
       switchMap((res) => this.tokenStorage.setAccessToken(res.token)),
