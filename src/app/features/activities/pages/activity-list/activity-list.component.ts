@@ -7,6 +7,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { UiService } from 'src/app/core/services/ui.service';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 import { ActivityService } from '../../services/activity.service';
@@ -22,12 +24,14 @@ import { ActivityService } from '../../services/activity.service';
     IonHeader,
     IonContent,
     ListItemComponent,
+    EmptyStateComponent,
     DatePipe,
     PaginatorComponent,
   ],
 })
 export class ActivityListComponent {
   service = inject(ActivityService);
+  ui = inject(UiService);
 
   constructor() {
     this.service.getAll();

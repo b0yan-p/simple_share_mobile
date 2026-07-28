@@ -86,17 +86,13 @@
 
   <app-paginator [service]="paginator" />
 } @else {
-  <!-- Empty state -->
-  <div class="empty-state">
-    <div class="empty-state__icon">
-      <ion-icon name="receipt-outline" />
-    </div>
-    <span class="empty-state__title">No expenses yet</span>
-    <small class="empty-state__subtitle">
-      Add your first expense to start tracking this group.
-    </small>
-    <button class="empty-state__action" (click)="navigateToNew()">Add expense</button>
-  </div>
+  <app-empty-state
+    icon="receipt-outline"
+    title="No expenses yet"
+    subtitle="Add your first expense to start tracking this group."
+    actionLabel="Add expense"
+    (action)="navigateToNew()"
+  />
 }
 
 <ion-alert

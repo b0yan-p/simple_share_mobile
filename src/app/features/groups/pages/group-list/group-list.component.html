@@ -5,21 +5,31 @@
 </ion-header>
 
 <ion-content class="ion-paddinga">
-  <ion-list [inset]="true">
-    @for (group of service.items(); track group.id) {
-      <app-list-item
-        [navigatePath]="['groups', group.id, 'details']"
-        [title]="group.name"
-        [description]="group.netBalanceMessage"
-        [descriptionColor]="
-          group.netBalance > 0 ? 'success' : group.netBalance < 0 ? 'error' : 'default'
-        "
-        (onUpdate)="router.navigate(['groups', group.id])"
-        (onDelete)="onDelete(group.id)"
-      />
-    }
-    <app-paginator [service]="service" />
-  </ion-list>
+  @if (service.items().length > 0) {
+    <ion-list [inset]="true">
+      @for (group of service.items(); track group.id) {
+        <app-list-item
+          [navigatePath]="['groups', group.id, 'details']"
+          [title]="group.name"
+          [description]="group.netBalanceMessage"
+          [descriptionColor]="
+            group.netBalance > 0 ? 'success' : group.netBalance < 0 ? 'error' : 'default'
+          "
+          (onUpdate)="router.navigate(['groups', group.id])"
+          (onDelete)="onDelete(group.id)"
+        />
+      }
+      <app-paginator [service]="service" />
+    </ion-list>
+  } @else if (!ui.listLoading()) {
+    <app-empty-state
+      icon="people-outline"
+      title="No groups yet"
+      subtitle="Create your first group to start sharing expenses."
+      actionLabel="Create group"
+      (action)="router.navigate(['groups', 'new'])"
+    />
+  }
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
     <ion-fab-button>

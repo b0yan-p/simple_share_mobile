@@ -11,6 +11,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { UiService } from 'src/app/core/services/ui.service';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 import { GroupService } from '../../services/group.service';
@@ -30,6 +32,7 @@ import { GroupService } from '../../services/group.service';
     IonTitle,
     IonContent,
     ListItemComponent,
+    EmptyStateComponent,
     PaginatorComponent,
   ],
 })
@@ -37,6 +40,7 @@ export class GroupListComponent implements OnInit {
   router = inject(Router);
   service = inject(GroupService);
   toastService = inject(ToastService);
+  ui = inject(UiService);
 
   ngOnInit(): void {
     this.service.getAll();

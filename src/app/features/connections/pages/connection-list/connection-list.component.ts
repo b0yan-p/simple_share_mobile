@@ -2,12 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import {
   IonContent,
   IonHeader,
-  IonIcon,
   IonList,
   IonSpinner,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { ConnectionService } from '../../services/connection.service';
 
@@ -21,9 +21,9 @@ import { ConnectionService } from '../../services/connection.service';
     IonToolbar,
     IonTitle,
     IonList,
-    IonIcon,
     IonSpinner,
     ListItemComponent,
+    EmptyStateComponent,
   ],
 })
 export class ConnectionListComponent implements OnInit {

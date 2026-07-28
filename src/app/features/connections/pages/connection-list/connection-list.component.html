@@ -10,11 +10,11 @@
       <ion-spinner name="crescent" />
     </div>
   } @else if (service.items().length === 0) {
-    <div class="empty-state">
-      <ion-icon name="people-outline" class="empty-icon" />
-      <p class="empty-title">No connections yet</p>
-      <p class="empty-subtitle">Connections are created automatically when you share a group with someone</p>
-    </div>
+    <app-empty-state
+      icon="people-outline"
+      title="No connections yet"
+      subtitle="Connections are created automatically when you share a group with someone."
+    />
   } @else {
     <ion-list [inset]="true">
       @for (connection of service.items(); track connection.id) {

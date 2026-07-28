@@ -15,6 +15,7 @@ import {
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
 import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
@@ -42,6 +43,7 @@ import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending
     IonAlert,
     PaginatorComponent,
     ExpensesFilterComponent,
+    EmptyStateComponent,
   ],
 })
 export class ExpenseListComponent implements OnInit {
