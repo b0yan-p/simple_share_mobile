@@ -4,18 +4,28 @@
 </div>
 
 <div class="list-container">
-  <ion-list>
-    @for (group of groups; track group.id) {
-      <app-list-item
-        [title]="group.name"
-        [showChevron]="true"
-        [id]="group.id"
-        [description]="group.netBalanceMessage"
-        [descriptionColor]="
-          group.netBalance === 0 ? 'default' : group.netBalance < 0 ? 'error' : 'success'
-        "
-        (click)="navigateToGroupDetails(group.id)"
-      />
-    }
-  </ion-list>
+  @if (groups().length > 0) {
+    <ion-list>
+      @for (group of groups(); track group.id) {
+        <app-list-item
+          [title]="group.name"
+          [showChevron]="true"
+          [id]="group.id"
+          [description]="group.netBalanceMessage"
+          [descriptionColor]="
+            group.netBalance === 0 ? 'default' : group.netBalance < 0 ? 'error' : 'success'
+          "
+          (click)="navigateToGroupDetails(group.id)"
+        />
+      }
+    </ion-list>
+  } @else if (loaded()) {
+    <app-empty-state
+      icon="people-outline"
+      title="No groups yet"
+      subtitle="Create your first group to start sharing expenses."
+      actionLabel="Create group"
+      (action)="router.navigate(['groups', 'new'])"
+    />
+  }
 </div>

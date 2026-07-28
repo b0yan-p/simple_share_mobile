@@ -8,42 +8,31 @@ export class ToastService {
   private toastController = inject(ToastController);
 
   private currentToast: HTMLIonToastElement | null = null;
-  protected position: ToastPosition = 'bottom';
+  protected position: ToastPosition = 'top';
   protected toastDuration = 5000;
 
-  public async successToast(
-    message: string,
-    duration: number = this.toastDuration,
-    color = 'success',
-  ) {
-    await this.showToast(message, duration, color);
+  public async successToast(message: string, duration: number = this.toastDuration) {
+    await this.showToast(message, duration, 'toast-success', 'checkmark');
   }
 
-  public async errorToast(
-    message: string,
-    duration: number = this.toastDuration,
-    color = 'danger',
-  ) {
-    await this.showToast(message, duration, color);
+  public async errorToast(message: string, duration: number = this.toastDuration) {
+    await this.showToast(message, duration, 'toast-error', 'close');
   }
 
-  public async warnToast(
-    message: string,
-    duration: number = this.toastDuration,
-    color = 'warning',
-  ) {
-    await this.showToast(message, duration, color);
+  public async warnToast(message: string, duration: number = this.toastDuration) {
+    await this.showToast(message, duration, 'toast-warning', 'alert');
   }
 
-  public async infoToast(
-    message: string,
-    duration: number = this.toastDuration,
-    color = 'tertiary',
-  ) {
-    await this.showToast(message, duration, color);
+  public async infoToast(message: string, duration: number = this.toastDuration) {
+    await this.showToast(message, duration, 'toast-info', 'information');
   }
 
-  protected async showToast(message: string, duration = this.toastDuration, color?: string) {
+  protected async showToast(
+    message: string,
+    duration = this.toastDuration,
+    stateClass = 'toast-info',
+    icon = 'information',
+  ) {
     if (!!this.currentToast) {
       await this.currentToast.dismiss();
     }
@@ -51,11 +40,11 @@ export class ToastService {
     const toast = await this.toastController.create({
       message,
       duration,
-      color,
+      icon,
       position: this.position,
       animated: true,
       swipeGesture: 'vertical',
-      cssClass: 'custom-toast',
+      cssClass: `custom-toast ${stateClass}`,
     });
 
     await toast.present();

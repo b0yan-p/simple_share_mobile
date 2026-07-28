@@ -13,9 +13,8 @@
   --ion-color-primary-shade: #{p.$lp-purple-800};
   --ion-color-primary-tint: #{p.$lp-purple-200};
 
-  // --ion-color-success: #{p.$lp-teal-600};
-  --ion-color-success: #{p.$lp-bg};
-  --ion-color-success-rgb: 15, 110, 86;
+  --ion-color-success: #{p.$lp-purple-600};
+  --ion-color-success-rgb: 83, 74, 183;
   --ion-color-success-contrast: #{p.$lp-text-on-dark};
   --ion-color-warning: #{p.$lp-warning};
   --ion-color-warning-rgb: 250, 204, 21;

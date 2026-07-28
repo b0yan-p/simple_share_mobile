@@ -1,7 +1,6 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <!-- TODO Implement user name greeting -->
-    <ion-title class="small">Hi, Alex</ion-title>
+    <ion-title class="small">{{ firstName() ? 'Hi, ' + firstName() : 'Hi' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 

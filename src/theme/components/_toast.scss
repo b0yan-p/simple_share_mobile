@@ -1,0 +1,78 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Toast
+// Covers: ion-toast.custom-toast with success / error / warning / info states.
+// Positioned at the top of the screen; circular icon badge + tinted card.
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../palette' as p;
+
+ion-toast.custom-toast {
+  transform: translateY(60px);
+
+  --border-radius: 16px;
+  --border-width: 1px;
+  --border-style: solid;
+  --box-shadow: 0 6px 16px rgba(26, 22, 64, 0.08);
+  --min-height: 56px;
+  font-weight: 600;
+
+  &::part(container) {
+    padding: 8px 14px;
+  }
+
+  &::part(message) {
+    font-size: 14px;
+  }
+
+  &::part(icon) {
+    width: 26px;
+    height: 26px;
+    margin-inline-end: 12px;
+    padding: 5px;
+    border-radius: 50%;
+    color: #fff;
+  }
+
+  // Success — teal
+  &.toast-success {
+    --background: #{p.$lp-tint-teal};
+    --color: #{p.$lp-teal-600};
+    --border-color: #{p.$lp-teal-400};
+
+    &::part(icon) {
+      background: #{p.$lp-teal-400};
+    }
+  }
+
+  // Error — coral
+  &.toast-error {
+    --background: #{p.$lp-tint-coral};
+    --color: #{p.$lp-coral-600};
+    --border-color: #{p.$lp-coral-200};
+
+    &::part(icon) {
+      background: #{p.$lp-coral-600};
+    }
+  }
+
+  // Warning — amber
+  &.toast-warning {
+    --background: #{p.$lp-tint-amber};
+    --color: #{p.$lp-warning-text};
+    --border-color: #{p.$lp-warning};
+
+    &::part(icon) {
+      background: #{p.$lp-warning-text};
+    }
+  }
+
+  // Info — neutral surface
+  &.toast-info {
+    --background: #{p.$lp-surface};
+    --color: #{p.$lp-text-body};
+    --border-color: #{p.$lp-border-card};
+
+    &::part(icon) {
+      background: #{p.$lp-purple-600};
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { first, Observable } from 'rxjs';
+import { first, map, Observable } from 'rxjs';
 import { BaseService } from 'src/app/core/services/base.service';
 import { environment } from 'src/environments/environment';
 import {
@@ -34,6 +34,15 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
             ? `You are Owed BAM ${item.netBalance.toFixed(2)}`
             : `You Owe BAM ${Math.abs(item.netBalance).toFixed(2)}`,
     }));
+  }
+
+  public getRecentGroups(take = 3): Observable<GroupListItem[]> {
+    return this.httpClient
+      .get<GroupListItem[]>(`${this.baseApi}/recent`, { params: { take } })
+      .pipe(
+        first(),
+        map((groups) => this.customListMap(groups)),
+      );
   }
 
   public groupOverview(id: string): Observable<GroupOverview> {

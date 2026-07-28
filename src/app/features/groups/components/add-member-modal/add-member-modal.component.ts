@@ -15,6 +15,7 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { ConnectionService } from 'src/app/features/connections/services/connection.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { AddGroupMemberItem } from '../../models/add-group-members.model';
 import { GroupService } from '../../services/group.service';
@@ -47,6 +48,7 @@ export class AddMemberModalComponent implements OnInit {
   private modalController = inject(ModalController);
   private groupService = inject(GroupService);
   private connectionService = inject(ConnectionService);
+  private toastService = inject(ToastService);
 
   activeTab = signal<'friends' | 'new'>('friends');
   submitting = signal(false);
@@ -101,6 +103,9 @@ export class AddMemberModalComponent implements OnInit {
           this.error.set(true);
           return;
         }
+        this.toastService.successToast(
+          members.length > 1 ? 'Members added to group' : 'Member added to group',
+        );
         this.modalController.dismiss({ success: true }, 'confirm');
       },
       error: () => {

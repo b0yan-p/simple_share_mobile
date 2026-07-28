@@ -17,6 +17,7 @@
 @use './theme/components/header';
 @use './theme/components/input';
 @use './theme/components/surface-card';
+@use './theme/components/toast';
 
 /* Core CSS required for Ionic components to work properly */
 @import '@ionic/angular/css/core.css';
@@ -70,10 +71,6 @@
 
 // Surface styles moved to theme/components/_card.scss
 
-// Toast - bottom
-// Move toast above tabs
-ion-toast.custom-toast {
-  transform: translateY(-68px);
-}
+// Toast styles moved to theme/components/_toast.scss
 
 // Input / toggle / datetime styles moved to theme/components/_input.scss
