@@ -95,20 +95,27 @@
       <!-- ─── Paid by ─── -->
       <div class="bdd-flex bdd-flex-col">
         <div class="card-title font-14">Paid by</div>
-        @for (payer of exp.paidBy; track payer.memberId) {
-          <div class="member-row">
-            <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
-              <app-avatar
-                [src]="null"
-                [name]="payer.memberName"
-                [colorKey]="payer.memberId"
-                [size]="36"
-              />
-              <span class="c-light font-w-500">{{ payer.memberName }}</span>
+        <div class="members-card">
+          @for (payer of exp.paidBy; track payer.memberId) {
+            <div class="member-row-inner">
+              <div class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+                <app-avatar
+                  [src]="null"
+                  [name]="payer.memberName"
+                  [colorKey]="payer.memberId"
+                  [size]="36"
+                />
+                <span class="c-light font-w-500">{{ payer.memberName }}</span>
+              </div>
+              <span class="row-amount"
+                >{{ payer.amount | number: '1.2-2' }} {{ currency }}</span
+              >
             </div>
-            <span class="row-amount">{{ payer.amount | number: '1.2-2' }} {{ currency }}</span>
-          </div>
-        }
+            @if (!$last) {
+              <div class="meta-divider"></div>
+            }
+          }
+        </div>
       </div>
 
       <!-- ─── Split between ─── -->
