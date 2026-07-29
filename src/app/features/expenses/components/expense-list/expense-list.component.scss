@@ -2,9 +2,11 @@
 
 :host {
   display: block;
-  padding: 16px 16px 140px;
-  background: c.$bg;
-  min-height: 100%;
+  // Side/top spacing only. The floating tab bar + FAB clearance is already
+  // handled by the global `ion-content { --padding-bottom }`, so a small
+  // bottom pad here is enough — a large one (plus min-height) created a big
+  // empty, scrollable dead zone under the list.
+  padding: 16px 16px 32px;
 }
 
 .pending-banner {

@@ -8,6 +8,7 @@ import {
   IonButtons,
   IonContent,
   IonDatetime,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
@@ -20,6 +21,7 @@ import {
   IonTitle,
   IonToolbar,
   ViewWillEnter,
+  ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { of, switchMap, tap, throwError } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
@@ -57,6 +59,7 @@ interface MemberEntry extends GroupMember {
     IonButton,
     IonTitle,
     IonContent,
+    IonFooter,
     IonList,
     IonItem,
     IonInput,
@@ -68,7 +71,7 @@ interface MemberEntry extends GroupMember {
     IonLabel,
   ],
 })
-export class ExpenseItemComponent implements ViewWillEnter {
+export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private groupService = inject(GroupService);
@@ -132,6 +135,9 @@ export class ExpenseItemComponent implements ViewWillEnter {
   }
 
   ionViewWillEnter(): void {
+    // Focused wizard: hide the bottom tab bar so only the pinned CTA shows.
+    this.uiService.tabBarVisible.set(false);
+
     this.currentStep = 1;
     this.editMode = false;
     this.expenseId = '';
@@ -153,6 +159,11 @@ export class ExpenseItemComponent implements ViewWillEnter {
       this.pendingTempId = pendingId;
     }
     this.loadMembers();
+  }
+
+  ionViewWillLeave(): void {
+    // Restore the tab bar for the rest of the app.
+    this.uiService.tabBarVisible.set(true);
   }
 
   private loadMembers(): void {

@@ -16,12 +16,30 @@ ion-tab-bar {
   box-shadow: var(--ss-shadow-md);
 
   margin-inline: 16px;
-  margin-bottom: 16px;
 
-  // Safe area on phones with home indicator
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  // Center the pill and cap its width so the five items don't spread out
+  // edge-to-edge on wider screens.
+  max-width: 480px;
+  margin-inline: auto;
+  width: calc(100% - 32px);
+
+  // Keep the pill a fixed height and push it above the home indicator by
+  // adding the safe-area inset to the outer margin. Ionic's default injects
+  // `padding-bottom: var(--ion-safe-area-bottom)` *inside* the bar, which
+  // inflates its height and pushes the icons up — zero it out here.
+  margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
 
   height: 64px;
+  min-height: 64px;
+  contain: layout style;
+
+  // Hidden during focused flows (e.g. the expense wizard).
+  &.tab-bar--hidden {
+    display: none;
+  }
 }
 
 ion-tab-button {

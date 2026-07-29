@@ -1,5 +1,5 @@
 <ion-tabs #tabs>
-  <ion-tab-bar slot="bottom">
+  <ion-tab-bar slot="bottom" [class.tab-bar--hidden]="!uiService.tabBarVisible()">
     @for (item of tabItems; track item.name) {
       <ion-tab-button [tab]="item.name" [routerLink]="item.routerLink">
         @if (tabs.tabBar?.selectedTab === item.name) {

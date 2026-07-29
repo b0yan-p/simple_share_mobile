@@ -5,6 +5,11 @@ import {
   IonContent,
   IonInput,
   IonInputPasswordToggle,
+  IonButtons,
+  IonHeader,
+  IonBackButton,
+  IonToolbar,
+  IonTitle,
 } from '@ionic/angular/standalone';
 import { LoginInput } from '../../models/login-input.model';
 
@@ -16,7 +21,14 @@ import { TokenStorageService } from '../../services/token-storage.service';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonButton, IonInput, IonContent, ReactiveFormsModule, IonInputPasswordToggle, RouterLink],
+  imports: [
+    IonButton,
+    IonInput,
+    IonContent,
+    ReactiveFormsModule,
+    IonInputPasswordToggle,
+    RouterLink,
+  ],
 })
 export class LoginComponent {
   auth = inject(AuthService);
@@ -26,7 +38,7 @@ export class LoginComponent {
   loading = false;
 
   form = new FormGroup({
-    email: new FormControl<string | null>('pera@zdera', [
+    email: new FormControl<string | null>('pero@peric.com', [
       Validators.required,
       Validators.email,
     ]),

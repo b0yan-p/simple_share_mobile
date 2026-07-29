@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseAPIUrl: 'https://localhost:7148/api',
+  baseAPIUrl: 'https://simpleshare-api.choxster.com/api',
 };

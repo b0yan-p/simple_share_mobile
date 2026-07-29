@@ -44,8 +44,8 @@ small {
 .card-title {
   display: block;
   // color: var(--ss-text-heading);
-  color: var(--ss-text-light);
-  font-size: 14px;
+  color: var(--ss-text);
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -118,9 +118,7 @@ small {
     height: 2px;
     background: var(--ss-primary);
     border-radius: 12px;
-    box-shadow:
-      0 0 6px rgba(c.$primary, 0.5),
-      0 0 12px rgba(c.$primary, 0.3);
+    box-shadow: 0 0 6px rgba(c.$primary, 0.5), 0 0 12px rgba(c.$primary, 0.3);
   }
 }
 

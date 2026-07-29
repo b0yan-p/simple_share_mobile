@@ -112,7 +112,7 @@
 
     <!-- ─── Step 2: Paid By ─── -->
     @if (currentStep === 2) {
-      <div class="bdd-flex bdd-flex-col bdd-gap-3" style="padding-bottom: 80px">
+      <div class="bdd-flex bdd-flex-col bdd-gap-3">
         <div class="section-title" style="--width: 90px">Who paid?</div>
 
         <ion-segment
@@ -212,7 +212,7 @@
 
     <!-- ─── Step 3: Split Between ─── -->
     @if (currentStep === 3) {
-      <div class="bdd-flex bdd-flex-col bdd-gap-3" style="padding-bottom: 80px">
+      <div class="bdd-flex bdd-flex-col bdd-gap-3">
         <div class="section-title" style="--width: 120px">Split between</div>
 
         <ion-segment [value]="splitMode" (ionChange)="setSplitMode($any($event).detail.value)">
@@ -306,25 +306,28 @@
       </div>
     }
 
-    <!-- ─── CTA ─── -->
-    @if (currentStep < stepsCount) {
-      <ion-button
-        color="primary"
-        class="step-button"
-        [disabled]="(currentStep === 1 && form.invalid) || (currentStep === 2 && !paidByValid)"
-        (click)="nextStep()"
-      >
-        Continue
-      </ion-button>
-    } @else {
-      <ion-button
-        color="primary"
-        class="step-button"
-        [disabled]="!splitValid || uiService.itemLoading()"
-        (click)="submit()"
-      >
-        {{ pendingMode ? 'Update Pending' : editMode ? 'Update Expense' : 'Save Expense' }}
-      </ion-button>
-    }
   </form>
 </ion-content>
+
+<!-- ─── Pinned CTA footer (sits above the tab bar, content scrolls above) ─── -->
+<ion-footer class="step-footer">
+  @if (currentStep < stepsCount) {
+    <ion-button
+      color="primary"
+      class="step-button"
+      [disabled]="(currentStep === 1 && form.invalid) || (currentStep === 2 && !paidByValid)"
+      (click)="nextStep()"
+    >
+      Continue
+    </ion-button>
+  } @else {
+    <ion-button
+      color="primary"
+      class="step-button"
+      [disabled]="!splitValid || uiService.itemLoading()"
+      (click)="submit()"
+    >
+      {{ pendingMode ? 'Update Pending' : editMode ? 'Update Expense' : 'Save Expense' }}
+    </ion-button>
+  }
+</ion-footer>
