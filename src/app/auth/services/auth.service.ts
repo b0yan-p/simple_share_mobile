@@ -45,6 +45,6 @@ export class AuthService {
   }
 
   public logout() {
-    this.tokenStorage.clearAll().subscribe(() => this.router.navigate(['']));
+    this.tokenStorage.clearAll().subscribe(() => this.router.navigate(['login']));
   }
 }

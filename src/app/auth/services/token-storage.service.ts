@@ -58,6 +58,12 @@ export class TokenStorageService {
     );
   }
 
+  /** True when a token is loaded in memory and still valid. */
+  isAuthenticated(): boolean {
+    const token = this.token() ?? this.user()?.token ?? null;
+    return !!token && !this.isTokenExpired(token);
+  }
+
   isTokenExpired(token: string, skewSeconds = 30): boolean {
     const payload = this.decodeJwtPayload(token);
 

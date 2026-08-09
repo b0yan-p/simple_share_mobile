@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { TokenStorageService } from './token-storage.service';
-import { catchError, forkJoin, map, Observable, of, switchMap, take } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, switchMap, take, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +33,7 @@ export class AuthBootstrapService {
       }),
       map(() => void 0),
       catchError(() => of(void 0)),
+      tap(() => (this._ready = true)),
       take(1),
     );
   }
