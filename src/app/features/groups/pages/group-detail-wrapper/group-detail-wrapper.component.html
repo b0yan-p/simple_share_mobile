@@ -40,7 +40,7 @@
     <div [class.ion-padding]="activeTab !== 'expenses'">
       @switch (activeTab) {
         @case ('overview') {
-          <app-group-details />
+          <app-group-details (openBalance)="activeTab = 'balance'" />
         }
         @case ('expenses') {
           <app-expense-list />

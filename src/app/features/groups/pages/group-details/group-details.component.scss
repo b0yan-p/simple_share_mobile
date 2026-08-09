@@ -12,6 +12,11 @@
     display: flex;
     gap: 16px;
     justify-content: space-between;
+    cursor: pointer;
+
+    &:active {
+      opacity: 0.75;
+    }
 
     // background: url('./../../../../../assets/icons/svg/grid.svg');
 

@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonGrid, IonIcon, IonRow } from '@ionic/angular/standalone';
@@ -18,12 +18,14 @@ export class GroupDetailsComponent {
   private service = inject(GroupService);
   private route = inject(ActivatedRoute);
 
+  openBalance = output<void>();
+
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
   group$ = this.refresh$.pipe(
     switchMap(() => this.route.params.pipe(first())),
     switchMap((p) => this.service.groupOverview(p['id'])),
-    takeUntilDestroyed(),
+    takeUntilDestroyed()
   );
 
   refresh(): void {

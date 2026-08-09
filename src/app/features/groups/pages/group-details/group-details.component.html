@@ -3,7 +3,11 @@
   <!-- Debt overview card -->
   <!-- <div class="surface-card-title">Your balance</div> -->
   <small class="card-title">Your share</small>
-  <ion-row class="surface-card balance-overview" style="position: relative">
+  <ion-row
+    class="surface-card balance-overview"
+    style="position: relative"
+    (click)="openBalance.emit()"
+  >
     <div class="bdd-flex bdd-jc-space-between bdd-ai-center bdd-gap-1">
       @let net = group.myDebtSummary.net;
 

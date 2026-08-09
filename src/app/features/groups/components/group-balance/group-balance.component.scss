@@ -210,6 +210,11 @@
 
   &:active {
     background: rgba(c.$primary, 0.08);
+
+    .settle-cta {
+      background: rgba(c.$primary, 0.18);
+      border-color: rgba(c.$primary, 0.35);
+    }
   }
 }
 
@@ -276,39 +281,44 @@
 .edge-amount {
   font-size: 12px;
   font-weight: 600;
+  color: c.$text-light;
 }
 
 .arrow-track {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 0;
-}
-
-.arrow-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(c.$text, 0.5);
-  flex-shrink: 0;
+  padding: 0 6px;
 }
 
 .arrow-line {
   flex: 1;
   height: 1.5px;
-  background: linear-gradient(
-    90deg,
-    rgba(c.$text, 0.5) 0%,
-    rgba(c.$text, 0.12) 50%,
-    rgba(c.$text, 0.5) 100%
-  );
+  background: rgba(c.$primary, 0.35);
 }
 
 .arrow-head {
-  color: rgba(c.$text, 0.5);
-  font-size: 15px;
   flex-shrink: 0;
-  margin-left: -2px;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid rgba(c.$primary, 0.55);
+}
+
+// Tap affordance so it's obvious the row opens the settle-up dialog
+.settle-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(c.$primary, 0.1);
+  border: 1px solid rgba(c.$primary, 0.2);
+  color: c.$primary;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 // ─── Empty state ──────────────────────────────────────────────────────────────
