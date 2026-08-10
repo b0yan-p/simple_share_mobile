@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonHeader,
@@ -11,6 +11,7 @@ import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
+import { ActivityListItem } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
 
 @Component({
@@ -25,19 +26,19 @@ import { ActivityService } from '../../services/activity.service';
     IonContent,
     ListItemComponent,
     EmptyStateComponent,
-    DatePipe,
     PaginatorComponent,
   ],
 })
 export class ActivityListComponent {
   service = inject(ActivityService);
   ui = inject(UiService);
+  private router = inject(Router);
 
   constructor() {
     this.service.getAll();
   }
 
-  openDetails() {
-    console.log('show bottom sheet details');
+  openDetails(item: ActivityListItem) {
+    this.router.navigate(this.service.resolveNavigation(item.details));
   }
 }

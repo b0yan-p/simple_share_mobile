@@ -10,14 +10,19 @@
       <app-avatar [src]="null" [name]="title()" [colorKey]="id()" />
 
       <div class="bdd-flex bdd-flex-col bdd-flex-1">
-        <span class="c-light font-w-500">{{ title() }}</span>
+        <span
+          class="c-light"
+          [class.font-w-500]="titleWeight() === 'bold'"
+          [class.font-w-400]="titleWeight() === 'regular'"
+          >{{ title() }}</span
+        >
         @if (description()) {
-          <small [class]="descriptionColor()">{{ description() }}</small>
+        <small [class]="descriptionColor()">{{ description() }}</small>
         }
       </div>
 
       @if (meta()) {
-        <span class="list-item-meta c-text">{{ meta() }}</span>
+      <span class="list-item-meta c-text">{{ meta() }}</span>
       }
     </div>
   </ion-item>

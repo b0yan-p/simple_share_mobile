@@ -23,6 +23,7 @@ import { ExpenseDetail } from '../../models/expense.model';
 import { ExpenseService } from '../../services/expense.service';
 import { CURRENCY } from '../../utils/expense.constants';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-expense-detail',
@@ -32,6 +33,7 @@ import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.compone
     DatePipe,
     DecimalPipe,
     AvatarComponent,
+    EmptyStateComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -50,7 +52,7 @@ import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.compone
 })
 export class ExpenseDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  router = inject(Router);
   private expenseService = inject(ExpenseService);
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
@@ -58,6 +60,7 @@ export class ExpenseDetailComponent implements OnInit {
   readonly currency = CURRENCY;
   expense = signal<ExpenseDetail | null>(null);
   loading = signal(true);
+  notFound = signal(false);
 
   /** The logged-in user's net on this expense: what they paid minus their share. */
   readonly myNet = computed(() => {
@@ -65,7 +68,9 @@ export class ExpenseDetailComponent implements OnInit {
     if (!exp) return 0;
 
     const sum = (rows: { memberName: string; amount: number }[]) =>
-      rows.filter((r) => this.isCurrentUser(r.memberName)).reduce((acc, r) => acc + r.amount, 0);
+      rows
+        .filter((r) => this.isCurrentUser(r.memberName))
+        .reduce((acc, r) => acc + r.amount, 0);
 
     return Math.round((sum(exp.paidBy) - sum(exp.splittedBy)) * 100) / 100;
   });
@@ -125,6 +130,7 @@ export class ExpenseDetailComponent implements OnInit {
       error: () => {
         this.toastService.errorToast('Failed to load expense');
         this.loading.set(false);
+        this.notFound.set(true);
       },
     });
   }

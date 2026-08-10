@@ -34,8 +34,9 @@ export class ListItemComponent {
   description = input<string>();
   meta = input<string>();
   showChevron = input<boolean>(true);
+  titleWeight = input<'bold' | 'regular'>('bold');
   descriptionColor = input<'default' | 'primary' | 'accent' | 'success' | 'warning' | 'error'>(
-    'default',
+    'default'
   );
 
   // actions

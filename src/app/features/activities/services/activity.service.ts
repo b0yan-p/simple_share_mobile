@@ -36,6 +36,29 @@ export class ActivityService extends BaseService<ActivityListItem> {
     }));
   }
 
+  /** Resolves the in-app route to open when an activity row is tapped. */
+  public resolveNavigation(item: Activity): string[] {
+    const groupDetailsPath = ['groups', item.groupId, 'details'];
+
+    switch (item.entityType) {
+      case ActivityEntityType.Expense:
+        // A deleted expense is filtered out by the backend, so its detail page would 404.
+        return item.type === ActivityType.ExpenseDeleted
+          ? groupDetailsPath
+          : ['groups', item.groupId, 'expenses', item.entityId, 'details'];
+
+      case ActivityEntityType.SettleUp:
+        // A settle up is stored as an expense row, so it shares the expense detail route.
+        return ['groups', item.groupId, 'expenses', item.entityId, 'details'];
+
+      case ActivityEntityType.Member:
+        return groupDetailsPath;
+
+      default:
+        return groupDetailsPath;
+    }
+  }
+
   private createTitle(item: Activity): string {
     switch (item.entityType) {
       case ActivityEntityType.Expense:
@@ -59,7 +82,9 @@ export class ActivityService extends BaseService<ActivityListItem> {
       case ActivityType.ExpenseUpdated: {
         const data: ActivityExpenseUpdateData = item.data as any;
 
-        return `${item.actorName} updated ${data.changedFields.join(' and ')} in "${item.groupName}"`;
+        return `${item.actorName} updated ${data.changedFields.join(' and ')} in "${
+          item.groupName
+        }"`;
       }
 
       case ActivityType.ExpenseDeleted:
