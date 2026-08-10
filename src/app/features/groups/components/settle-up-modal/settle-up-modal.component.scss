@@ -117,33 +117,27 @@ ion-content {
   font-weight: 600;
 }
 
-.flow-arrow {
+// Matches the arrow used in the balance breakdown debt flows
+.arrow-track {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 0;
+  padding: 0 6px;
 }
 
-.flow-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: c.$primary;
-  box-shadow: 0 0 6px rgba(c.$primary, 0.6);
-  flex-shrink: 0;
-}
-
-.flow-line {
+.arrow-line {
   flex: 1;
   height: 1.5px;
-  background: linear-gradient(90deg, c.$primary 0%, rgba(c.$primary, 0.25) 100%);
+  background: rgba(c.$primary, 0.35);
 }
 
-.flow-arrow-head {
-  color: c.$primary;
-  font-size: 17px;
+.arrow-head {
   flex-shrink: 0;
-  margin-left: -2px;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid rgba(c.$primary, 0.55);
 }
 
 // ─── Error ────────────────────────────────────────────────────────────────────
