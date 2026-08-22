@@ -8,17 +8,13 @@ export function splitEqually(total: number, count: number): number[] {
   if (count <= 0) return [];
   const base = Math.floor((total / count) * 100) / 100;
   const remainder = Math.round((total - base * count) * 100) / 100;
-  return Array.from({ length: count }, (_, i) =>
-    i === count - 1 ? base + remainder : base,
-  );
+  return Array.from({ length: count }, (_, i) => (i === count - 1 ? base + remainder : base));
 }
 
 /**
  * Returns the sum of amounts for all selected entries.
  */
-export function sumSelectedAmounts(
-  entries: { selected: boolean; amount: number }[],
-): number {
+export function sumSelectedAmounts(entries: { selected: boolean; amount: number }[]): number {
   return entries.filter((e) => e.selected).reduce((sum, e) => sum + (e.amount || 0), 0);
 }
 

@@ -67,7 +67,9 @@ export class GroupDetailWrapperComponent implements OnInit {
 
   members$ = combineLatest([this.route.params, this.refresh$]).pipe(
     switchMap(([p]) =>
-      this.groupMemberFacade.getGroupMembers(p['id']).pipe(catchError(() => of([] as GroupMember[]))),
+      this.groupMemberFacade
+        .getGroupMembers(p['id'])
+        .pipe(catchError(() => of([] as GroupMember[]))),
     ),
     takeUntilDestroyed(),
   );

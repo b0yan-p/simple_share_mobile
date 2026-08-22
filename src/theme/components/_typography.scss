@@ -118,7 +118,9 @@ small {
     height: 2px;
     background: var(--ss-primary);
     border-radius: 12px;
-    box-shadow: 0 0 6px rgba(c.$primary, 0.5), 0 0 12px rgba(c.$primary, 0.3);
+    box-shadow:
+      0 0 6px rgba(c.$primary, 0.5),
+      0 0 12px rgba(c.$primary, 0.3);
   }
 }
 

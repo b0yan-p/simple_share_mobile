@@ -9,10 +9,7 @@ export interface Activity {
   entityType: ActivityEntityType;
   entityId: string;
   data:
-    | ActivityExpenseData
-    | ActivityExpenseUpdateData
-    | ActivitySettleUpData
-    | ActivityMemberData;
+    ActivityExpenseData | ActivityExpenseUpdateData | ActivitySettleUpData | ActivityMemberData;
 }
 
 export interface ActivityListItem {

@@ -6,23 +6,23 @@
 
 <ion-content>
   @if (service.items().length > 0) {
-  <ion-list [inset]="true">
-    @for (item of service.items(); track item.id) {
-    <app-list-item
-      [disableSwipeActions]="true"
-      [title]="item.title"
-      [description]="item.description"
-      descriptionColor="primary"
-      (onClick)="openDetails(item)"
-    />
-    }
-    <app-paginator [service]="service" />
-  </ion-list>
+    <ion-list [inset]="true">
+      @for (item of service.items(); track item.id) {
+        <app-list-item
+          [disableSwipeActions]="true"
+          [title]="item.title"
+          [description]="item.description"
+          descriptionColor="primary"
+          (onClick)="openDetails(item)"
+        />
+      }
+      <app-paginator [service]="service" />
+    </ion-list>
   } @else if (!ui.listLoading()) {
-  <app-empty-state
-    icon="pulse-outline"
-    title="No activity yet"
-    subtitle="Your recent actions will show up here."
-  />
+    <app-empty-state
+      icon="pulse-outline"
+      title="No activity yet"
+      subtitle="Your recent actions will show up here."
+    />
   }
 </ion-content>

@@ -25,7 +25,7 @@ export class GroupDetailsComponent {
   group$ = this.refresh$.pipe(
     switchMap(() => this.route.params.pipe(first())),
     switchMap((p) => this.service.groupOverview(p['id'])),
-    takeUntilDestroyed()
+    takeUntilDestroyed(),
   );
 
   refresh(): void {

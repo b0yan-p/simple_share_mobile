@@ -2,11 +2,24 @@
   "semi": true,
   "singleQuote": true,
   "printWidth": 96,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
   "overrides": [
     {
-      "files": "*.html",
+      "files": "*.component.html",
       "options": {
         "parser": "angular"
+      }
+    },
+    {
+      "files": "*.html",
+      "excludeFiles": "*.component.html",
+      "options": {
+        "parser": "html"
       }
     }
   ]

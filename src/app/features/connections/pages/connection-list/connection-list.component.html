@@ -18,10 +18,7 @@
   } @else {
     <ion-list [inset]="true">
       @for (connection of service.items(); track connection.id) {
-        <app-list-item
-          [title]="connection.displayName"
-          [disableSwipeActions]="true"
-        />
+        <app-list-item [title]="connection.displayName" [disableSwipeActions]="true" />
       }
     </ion-list>
   }

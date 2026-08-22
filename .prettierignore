@@ -1,0 +1,18 @@
+# build & tooling output
+/www
+/.angular
+/node_modules
+/coverage
+/dist
+
+# native platforms (generated / managed by Capacitor & Gradle)
+/android
+/ios
+
+# lockfiles & generated assets
+package-lock.json
+/assets/**/*.svg
+/src/assets
+
+# docs that rely on manual formatting
+TECH-DEBT.md
