@@ -4,17 +4,17 @@ import { distinctUntilChanged } from 'rxjs';
 import { PageQueryParams } from '../models/base-query-params';
 
 export abstract class PaginatorService {
-  readonly pageSize = signal<number>(5);
+  readonly pageSize = signal<number>(20);
   protected pageRequest = signal<PageQueryParams>({ skip: 0, take: this.pageSize() });
   public pageLoading = signal<boolean>(false);
 
   totalCount = signal<number>(0);
   hasMoreData = computed(
-    () => this.pageRequest().skip + this.pageRequest().take < this.totalCount()
+    () => this.pageRequest().skip + this.pageRequest().take < this.totalCount(),
   );
 
   readonly pageRequest$ = toObservable(this.pageRequest).pipe(
-    distinctUntilChanged((a, b) => a.skip === b.skip && a.take === b.take)
+    distinctUntilChanged((a, b) => a.skip === b.skip && a.take === b.take),
   );
 
   public setPagination(skip: number = 0, take: number = this.pageSize()) {

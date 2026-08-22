@@ -19,7 +19,6 @@
           (onDelete)="onDelete(group.id)"
         />
       }
-      <app-paginator [service]="service" />
     </ion-list>
   } @else if (!ui.listLoading()) {
     <app-empty-state
@@ -30,6 +29,10 @@
       (action)="router.navigate(['groups', 'new'])"
     />
   }
+
+  <ion-infinite-scroll [appPaginate]="service">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
     <ion-fab-button>

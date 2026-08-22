@@ -83,8 +83,8 @@
       }
     </ion-list>
   }
-
-  <app-paginator [service]="paginator" />
+} @else if (ui.listLoading()) {
+  <div class="list-loading"><ion-spinner name="crescent" /></div>
 } @else {
   <app-empty-state
     icon="receipt-outline"
@@ -94,6 +94,9 @@
     (action)="navigateToNew()"
   />
 }
+<ion-infinite-scroll [appPaginate]="paginator">
+  <ion-infinite-scroll-content />
+</ion-infinite-scroll>
 
 <ion-alert
   [isOpen]="isDeleteAlertOpen"

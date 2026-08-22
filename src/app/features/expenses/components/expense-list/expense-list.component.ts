@@ -5,18 +5,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonAlert,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonItem,
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
   IonList,
+  IonSpinner,
   ModalController,
 } from '@ionic/angular/standalone';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
-import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
+import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
@@ -41,9 +45,12 @@ import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending
     IonItemOption,
     IonIcon,
     IonAlert,
-    PaginatorComponent,
+    IonSpinner,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     ExpensesFilterComponent,
     EmptyStateComponent,
+    PaginateDirective,
   ],
 })
 export class ExpenseListComponent implements OnInit {
@@ -52,6 +59,7 @@ export class ExpenseListComponent implements OnInit {
   facade = inject(ExpenseFacade);
   toastService = inject(ToastService);
   paginator = inject(ExpensePaginatorService);
+  ui = inject(UiService);
   private readonly modalController = inject(ModalController);
   private readonly tokenStorage = inject(TokenStorageService);
 

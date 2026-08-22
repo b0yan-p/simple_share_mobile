@@ -6,6 +6,8 @@ import {
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
   IonList,
   IonTitle,
   IonToolbar,
@@ -14,7 +16,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
-import { PaginatorComponent } from 'src/app/shared/components/paginator/paginator.component';
+import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -31,9 +33,11 @@ import { GroupService } from '../../services/group.service';
     IonToolbar,
     IonTitle,
     IonContent,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
     ListItemComponent,
     EmptyStateComponent,
-    PaginatorComponent,
+    PaginateDirective,
   ],
 })
 export class GroupListComponent implements OnInit {

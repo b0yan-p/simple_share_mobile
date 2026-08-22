@@ -16,7 +16,6 @@
           (onClick)="openDetails(item)"
         />
       }
-      <app-paginator [service]="service" />
     </ion-list>
   } @else if (!ui.listLoading()) {
     <app-empty-state
@@ -25,4 +24,8 @@
       subtitle="Your recent actions will show up here."
     />
   }
+
+  <ion-infinite-scroll [appPaginate]="service">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
 </ion-content>
