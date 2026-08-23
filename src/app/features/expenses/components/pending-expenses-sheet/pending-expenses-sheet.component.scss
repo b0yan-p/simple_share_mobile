@@ -1,12 +1,12 @@
 @use '../../../../../theme/variables.scss' as c;
 
 ion-header ion-toolbar {
-  --background: #{c.$bg};
+  // --background: #{c.$bg};
   --border-width: 0;
 }
 
 ion-content {
-  --background: #{c.$bg};
+  // --background: #{c.$bg};
 }
 
 .close-icon {

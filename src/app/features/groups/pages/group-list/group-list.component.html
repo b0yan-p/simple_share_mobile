@@ -5,9 +5,9 @@
 </ion-header>
 
 <ion-content class="ion-paddinga">
-  @if (service.items().length > 0) {
+  @if (facade.store.items().length > 0) {
     <ion-list [inset]="true">
-      @for (group of service.items(); track group.id) {
+      @for (group of facade.store.items(); track group.id) {
         <app-list-item
           [navigatePath]="['groups', group.id, 'details']"
           [title]="group.name"
@@ -20,7 +20,13 @@
         />
       }
     </ion-list>
-  } @else if (!ui.listLoading()) {
+  } @else if (offlineAndEmpty()) {
+    <app-empty-state
+      icon="cloud-offline-outline"
+      title="You're offline"
+      subtitle="No saved groups on this device yet. Reconnect to load them."
+    />
+  } @else if (!loading()) {
     <app-empty-state
       icon="people-outline"
       title="No groups yet"
@@ -30,13 +36,15 @@
     />
   }
 
-  <ion-infinite-scroll [appPaginate]="service">
+  <ion-infinite-scroll [appPaginate]="paginator">
     <ion-infinite-scroll-content />
   </ion-infinite-scroll>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
-    <ion-fab-button>
-      <ion-icon name="add" />
-    </ion-fab-button>
-  </ion-fab>
+  @if (network.isOnline()) {
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">
+      <ion-fab-button>
+        <ion-icon name="add" />
+      </ion-fab-button>
+    </ion-fab>
+  }
 </ion-content>

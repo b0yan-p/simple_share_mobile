@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  AlertController,
   IonButton,
   IonButtons,
   IonContent,
@@ -32,6 +33,7 @@ export class PendingExpensesSheetComponent implements OnInit {
   @Input({ required: true }) groupId!: string;
 
   private readonly modalController = inject(ModalController);
+  private readonly alertController = inject(AlertController);
   private readonly expenseFacade = inject(ExpenseFacade);
   private readonly router = inject(Router);
 
@@ -52,7 +54,29 @@ export class PendingExpensesSheetComponent implements OnInit {
     this.router.navigate(['groups', this.groupId, 'expenses', 'pending', item.tempId]);
   }
 
-  onDelete(item: PendingExpense): void {
+  /**
+   * Presented through AlertController rather than an inline <ion-alert>. An inline
+   * overlay stays where it sits in the DOM, and ion-alert's host is
+   * `position: absolute; inset: 0; contain: strict; --max-height: 90%`. Inside this
+   * sheet modal the nearest positioned ancestor is the modal wrapper, so the alert
+   * is sized and clipped to the sheet instead of the viewport — which silently cut
+   * the button row off the bottom. AlertController appends to ion-app instead.
+   */
+  async onDelete(item: PendingExpense): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Delete Expense',
+      message: "This expense hasn't synced yet. Are you sure you want to delete it?",
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Delete', role: 'confirm', cssClass: 'delete-confirmation' },
+      ],
+    });
+
+    await alert.present();
+    const { role } = await alert.onWillDismiss();
+
+    if (role !== 'confirm') return;
+
     this.expenseFacade.removePendingExpense(item.tempId).subscribe(() => {
       this.pendingExpenses = this.pendingExpenses.filter((e) => e.tempId !== item.tempId);
       if (this.pendingExpenses.length === 0) {

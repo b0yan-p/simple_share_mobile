@@ -17,6 +17,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { CreateGroup } from '../../models/create-group.model';
 import { UpdateGroup } from '../../models/update-group.model';
+import { GroupFacade } from '../../services/group-facade.service';
 import { GroupService } from '../../services/group.service';
 
 @Component({
@@ -40,6 +41,7 @@ import { GroupService } from '../../services/group.service';
 export class GroupItemComponent implements OnInit {
   route = inject(ActivatedRoute);
   service = inject(GroupService);
+  facade = inject(GroupFacade);
   uiService = inject(UiService);
   toastService = inject(ToastService);
   router = inject(Router);
@@ -73,27 +75,27 @@ export class GroupItemComponent implements OnInit {
   }
 
   protected create() {
-    this.service.create(this.form.value as CreateGroup).subscribe({
+    this.facade.createGroup(this.form.value as CreateGroup).subscribe({
       next: (res) => {
-        this.toastService.successToast('Group updated successfully!');
+        this.toastService.successToast('Group created successfully!');
         this.router.navigate(['groups', res.id, 'details']);
       },
       error: (err) => {
         console.error('ERROR: ', err);
-        this.toastService.errorToast(err);
+        this.toastService.errorToast(err.message);
       },
     });
   }
 
   protected update() {
-    this.service.update(this.form.value as UpdateGroup).subscribe({
+    this.facade.updateGroup(this.form.value as UpdateGroup).subscribe({
       next: (res) => {
         this.toastService.successToast('Group updated successfully!');
         this.router.navigate(['groups', res.id, 'details']);
       },
       error: (err) => {
         console.error('ERROR: ', err);
-        this.toastService.errorToast(err);
+        this.toastService.errorToast(err.message);
       },
     });
   }

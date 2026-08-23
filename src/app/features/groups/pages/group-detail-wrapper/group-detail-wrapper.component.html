@@ -1,16 +1,20 @@
-@if (group$ | async; as group) {
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="groups" size="small" color="primary" />
-      </ion-buttons>
-      <ion-title class="small">Groups</ion-title>
-      <ion-buttons slot="end"> </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="groups" size="small" color="primary" />
+    </ion-buttons>
+    <ion-title class="small">Groups</ion-title>
+    <ion-buttons slot="end"> </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-content>
-    <!-- Overview header -->
+<ion-content>
+  @let group = group$ | async;
+
+  <!-- Overview header. Guarded because GroupOverviewHeaderComponent.group is
+       input.required and the bindings read group.myDebtSummary — offline with no
+       cached overview the header is simply omitted, the tabs still render. -->
+  @if (group) {
     <app-group-overview-header
       [members]="members"
       [group]="group"
@@ -19,41 +23,41 @@
       [totalBalance]="group.myDebtSummary.net"
       (addMembers)="openAddMembers()"
     />
+  }
 
-    <!-- Tab Segment -->
-    <ion-segment
-      class="tab-segment"
-      [value]="store.activeTab()"
-      (ionChange)="selectTab($any($event).detail.value)"
-    >
-      <ion-segment-button value="overview">
-        <ion-label>Overview</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="expenses">
-        <ion-label>Expenses</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="balance">
-        <ion-label>Balance</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+  <!-- Tab Segment -->
+  <ion-segment
+    class="tab-segment"
+    [value]="store.activeTab()"
+    (ionChange)="selectTab($any($event).detail.value)"
+  >
+    <ion-segment-button value="overview">
+      <ion-label>Overview</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="expenses">
+      <ion-label>Expenses</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="balance">
+      <ion-label>Balance</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-    <div [class.ion-padding]="store.activeTab() !== 'expenses'">
-      @switch (store.activeTab()) {
-        @case ('overview') {
-          <app-group-details (openBalance)="selectTab('balance')" />
-        }
-        @case ('expenses') {
-          <app-expense-list />
-        }
-        @case ('balance') {
-          <app-group-balance />
-        }
+  <div [class.ion-padding]="store.activeTab() !== 'expenses'">
+    @switch (store.activeTab()) {
+      @case ('overview') {
+        <app-group-details [group]="group" (openBalance)="selectTab('balance')" />
       }
-    </div>
+      @case ('expenses') {
+        <app-expense-list />
+      }
+      @case ('balance') {
+        <app-group-balance />
+      }
+    }
+  </div>
 
-    <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
-      <ion-icon name="add-outline" />
-      <span>Add expense</span>
-    </ion-button>
-  </ion-content>
-}
+  <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
+    <ion-icon name="add-outline" />
+    <span>Add expense</span>
+  </ion-button>
+</ion-content>

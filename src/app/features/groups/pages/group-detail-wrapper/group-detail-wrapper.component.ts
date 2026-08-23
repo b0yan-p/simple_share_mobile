@@ -25,8 +25,8 @@ import { GroupBalanceComponent } from '../../components/group-balance/group-bala
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupDetailStore, GroupDetailTab } from '../../services/group-detail-store';
+import { GroupFacade } from '../../services/group-facade.service';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
-import { GroupService } from '../../services/group.service';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
 @Component({
@@ -56,7 +56,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
   private route = inject(ActivatedRoute);
-  private service = inject(GroupService);
+  private groupFacade = inject(GroupFacade);
   private groupMemberFacade = inject(GroupMemberFacade);
   private modalController = inject(ModalController);
   readonly store = inject(GroupDetailStore);
@@ -69,7 +69,15 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   title = 'Group';
   members: GroupMember[] = [];
 
-  group$ = this.route.params.pipe(switchMap((p) => this.service.groupOverview(p['id'])));
+  /**
+   * Emits null instead of erroring when the overview is unavailable. The screen
+   * shell no longer depends on this, and it must not: an errored observable never
+   * emits again, which is what used to leave the whole page blank offline.
+   */
+  group$ = this.route.params.pipe(
+    switchMap((p) => this.groupFacade.loadGroupOverview(p['id'])),
+    catchError(() => of(null)),
+  );
 
   private groupId$ = this.route.params.pipe(
     map((p) => p['id'] as string),
@@ -86,9 +94,8 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   );
 
   constructor() {
-    // ion-content sits inside @if (group$ | async), so on a fresh instance it
-    // only exists once the overview call resolves — after ionViewWillEnter has
-    // already run. Grab the scroll element and restore the moment it shows up.
+    // The view query only resolves after the first render, which is later than
+    // ionViewWillEnter. Grab the scroll element and restore the moment it shows up.
     effect(() => {
       const content = this.content();
       if (!content) return;

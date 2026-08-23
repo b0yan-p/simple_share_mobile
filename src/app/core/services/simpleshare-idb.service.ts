@@ -13,11 +13,13 @@ export class SimpleShareIdbService {
     if (this.db) return of(void 0);
 
     return from(
-      openDB<SimpleShareDB>('simpleshare-db', 1, {
+      openDB<SimpleShareDB>('simpleshare-db', 3, {
         upgrade(db) {
           db.createObjectStore('expenses');
           db.createObjectStore('pending_expenses', { keyPath: 'tempId' });
           db.createObjectStore('group_members');
+          db.createObjectStore('groups');
+          db.createObjectStore('group_overview');
         },
       }),
     ).pipe(

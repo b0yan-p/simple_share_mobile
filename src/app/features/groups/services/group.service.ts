@@ -11,6 +11,7 @@ import { GroupMember } from '../models/group-member.model';
 import { GroupOverview } from '../models/group-overview.model';
 import { Group, GroupListItem } from '../models/group.model';
 import { UpdateGroup } from '../models/update-group.model';
+import { mapGroupListItems } from '../utils/group-list.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -25,15 +26,7 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
   }
 
   protected override customListMap(items: GroupListItem[]): GroupListItem[] {
-    return items.map((item) => ({
-      ...item,
-      netBalanceMessage:
-        item.netBalance === 0
-          ? 'Settled Up'
-          : item.netBalance > 0
-            ? `You are Owed BAM ${item.netBalance.toFixed(2)}`
-            : `You Owe BAM ${Math.abs(item.netBalance).toFixed(2)}`,
-    }));
+    return mapGroupListItems(items);
   }
 
   public getRecentGroups(take = 3): Observable<GroupListItem[]> {

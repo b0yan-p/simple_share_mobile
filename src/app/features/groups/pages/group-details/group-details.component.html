@@ -1,5 +1,5 @@
 <ion-grid>
-  @if (group$ | async; as group) {
+  @if (group(); as group) {
     <!-- Debt overview card -->
     <!-- <div class="surface-card-title">Your balance</div> -->
     <small class="card-title">Your share</small>
@@ -77,13 +77,14 @@
       </div>
     </ion-row>
 
-    <!-- TODO show this option on show more -->
+    <!-- TODO show this option on show more. Note: reloading the overview is the
+         wrapper's job now, so re-enabling this needs a new output up to it —
+         the local refresh() this used to call is gone. -->
     <!-- <ion-row>
       <app-group-balance-overview
         [data]="group.myDebtSummary"
         [groupId]="group.id"
         [currentMemberId]="group.currentMemberId"
-        (settled)="refresh()"
       />
     </ion-row> -->
   }
