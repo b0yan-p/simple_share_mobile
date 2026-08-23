@@ -7,8 +7,6 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
 import { PaginatorService } from '../../core/services/paginator.service';
 
 /**
@@ -39,20 +37,20 @@ export class PaginateDirective {
   );
 
   constructor() {
+    // complete() and the disabled write have to happen in this order, in one
+    // effect. complete() resets didFire, which is what re-arms the scroll, and
+    // Ionic guards it with `if (!this.isLoading) return` — while
+    // disabledChanged() clears isLoading without touching didFire. Run them as
+    // two separate reactions and the disabled write lands first on the last
+    // page, complete() no-ops, and didFire stays true forever: the scroll then
+    // stays dead even after a reload grows totalCount and re-enables it.
     effect(() => {
-      this.el.nativeElement.disabled = this.disabled();
-    });
+      const settled = !this.paginator().pageLoading();
+      const disabled = this.disabled();
 
-    // complete() resets didFire, which is what re-arms the scroll, and it ends
-    // the window during which Ionic shows its loading indicator. Ionic guards
-    // it with `if (!this.isLoading) return`, so calling it whenever a page
-    // settles is a no-op unless one was actually in flight.
-    toObservable(computed(() => this.paginator().pageLoading()))
-      .pipe(
-        filter((loading) => !loading),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => this.el.nativeElement.complete());
+      if (settled) void this.el.nativeElement.complete();
+      this.el.nativeElement.disabled = disabled;
+    });
   }
 
   @HostListener('ionInfinite')

@@ -24,10 +24,7 @@ import { PaginateDirective } from 'src/app/shared/directives/paginate.directive'
 import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
-import {
-  ExpenseFilter,
-  ExpensesFilterComponent,
-} from '../expenses-filter/expenses-filter.component';
+import { ExpensesFilterComponent } from '../expenses-filter/expenses-filter.component';
 import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
 
 @Component({
@@ -67,12 +64,16 @@ export class ExpenseListComponent implements OnInit {
   isDeleteAlertOpen = false;
   pendingCount = signal(0);
 
-  /** Local UI-only filter state. Data-level filtering can be wired later. */
-  readonly activeFilter = signal<ExpenseFilter>('all');
+  /**
+   * UI-only filter state. It lives on the store rather than here so it survives
+   * the component being destroyed by the group screen's tab @switch.
+   * Data-level filtering can be wired later.
+   */
+  readonly activeFilter = this.facade.store.activeFilter;
 
   /** Expense groups filtered by the currently active pill. */
   readonly filteredGroups = computed<ExpenseListItem[]>(() => {
-    const groups = this.facade.store.expenses();
+    const groups = this.facade.store.items();
     const filter = this.activeFilter();
 
     if (filter === 'all') return groups;
@@ -87,7 +88,7 @@ export class ExpenseListComponent implements OnInit {
       .filter((group) => group.expenses.length > 0);
   });
 
-  readonly hasExpenses = computed(() => this.facade.store.expenses().length > 0);
+  readonly hasExpenses = computed(() => this.facade.store.items().length > 0);
 
   routeParams$?: Observable<string>;
 
@@ -207,9 +208,9 @@ export class ExpenseListComponent implements OnInit {
     const groupId = this.route.snapshot.params['id'];
     this.facade.deleteExpense(groupId, this.pendingDeleteId).subscribe({
       next: () => {
+        // TODO instead of reloading the whole list (facade.deleteExpense does that
+        // for us now) we should just drop the deleted expense from state and cache
         this.toastService.successToast('Expense deleted');
-        // TODO instead of reloading the whole list we should just remove the deleted expense from the state and from database
-        this.facade.loadExpenses(groupId);
       },
       error: () => this.toastService.errorToast('Failed to delete expense'),
     });

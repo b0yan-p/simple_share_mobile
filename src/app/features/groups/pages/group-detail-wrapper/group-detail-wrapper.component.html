@@ -23,8 +23,8 @@
     <!-- Tab Segment -->
     <ion-segment
       class="tab-segment"
-      [value]="activeTab"
-      (ionChange)="activeTab = $any($event).detail.value"
+      [value]="store.activeTab()"
+      (ionChange)="selectTab($any($event).detail.value)"
     >
       <ion-segment-button value="overview">
         <ion-label>Overview</ion-label>
@@ -37,10 +37,10 @@
       </ion-segment-button>
     </ion-segment>
 
-    <div [class.ion-padding]="activeTab !== 'expenses'">
-      @switch (activeTab) {
+    <div [class.ion-padding]="store.activeTab() !== 'expenses'">
+      @switch (store.activeTab()) {
         @case ('overview') {
-          <app-group-details (openBalance)="activeTab = 'balance'" />
+          <app-group-details (openBalance)="selectTab('balance')" />
         }
         @case ('expenses') {
           <app-expense-list />

@@ -4,7 +4,7 @@ import { distinctUntilChanged } from 'rxjs';
 import { PageQueryParams } from '../models/base-query-params';
 
 export abstract class PaginatorService {
-  readonly pageSize = signal<number>(20);
+  readonly pageSize = signal<number>(10);
   protected pageRequest = signal<PageQueryParams>({ skip: 0, take: this.pageSize() });
   public pageLoading = signal<boolean>(false);
 

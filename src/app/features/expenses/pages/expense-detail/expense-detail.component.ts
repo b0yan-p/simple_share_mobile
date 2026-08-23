@@ -1,7 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import {
   IonAlert,
   IonBackButton,
@@ -18,12 +17,15 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { concatMap } from 'rxjs';
+import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
-import { ExpenseDetail } from '../../models/expense.model';
-import { ExpenseService } from '../../services/expense.service';
-import { CURRENCY } from '../../utils/expense.constants';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
+import { ExpenseDetail } from '../../models/expense.model';
+import { ExpenseFacade } from '../../services/expense-facade.service';
+import { ExpenseService } from '../../services/expense.service';
+import { CURRENCY } from '../../utils/expense.constants';
 
 @Component({
   selector: 'app-expense-detail',
@@ -54,6 +56,7 @@ export class ExpenseDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   router = inject(Router);
   private expenseService = inject(ExpenseService);
+  private expenseFacade = inject(ExpenseFacade);
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
 
@@ -112,13 +115,16 @@ export class ExpenseDetailComponent implements OnInit {
   }
 
   private confirmDelete(): void {
-    this.expenseService.deleteExpense(this.groupId, this.expenseId).subscribe({
-      next: () => {
-        this.toastService.successToast('Expense deleted');
-        this.router.navigate(['groups', this.groupId, 'details']);
-      },
-      error: () => this.toastService.errorToast('Failed to delete expense'),
-    });
+    this.expenseService
+      .deleteExpense(this.groupId, this.expenseId)
+      .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
+      .subscribe({
+        next: () => {
+          this.toastService.successToast('Expense deleted');
+          this.router.navigate(['groups', this.groupId, 'details']);
+        },
+        error: () => this.toastService.errorToast('Failed to delete expense'),
+      });
   }
 
   private loadExpense(expenseId: string): void {

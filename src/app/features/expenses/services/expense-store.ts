@@ -1,33 +1,18 @@
 import { Injectable, signal } from '@angular/core';
-import { ExpenseListItem } from '../models/expense-list-item.model';
+import { CachedListStore } from 'src/app/core/store/cached-list-store';
+import { ExpenseFilter, ExpenseListItem } from '../models/expense-list-item.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ExpenseStore {
-  readonly expenses = signal<ExpenseListItem[]>([]);
-  readonly loading = signal(false);
-  readonly error = signal<null | string>(null);
+export class ExpenseStore extends CachedListStore<ExpenseListItem> {
+  /** Pill filter — view state that has to survive leaving and re-entering the list. */
+  readonly activeFilter = signal<ExpenseFilter>('all');
 
-  setExpenses(items: ExpenseListItem[]): void {
-    this.expenses.set(items);
-  }
-
-  appendExpenses(items: ExpenseListItem[]): void {
-    this.expenses.update((current) => [...current, ...items]);
-  }
-
-  setLoading(value: boolean): void {
-    this.loading.set(value);
-  }
-
-  setError(message: string | null): void {
-    this.error.set(message);
-  }
-
-  clear(): void {
-    this.expenses.set([]);
-    this.loading.set(false);
-    this.error.set(null);
+  override reset(key: string): void {
+    // A forced refetch of the same group (after a mutation, say) keeps the pill
+    // the user chose; only moving to another group clears it.
+    if (this.key() !== key) this.activeFilter.set('all');
+    super.reset(key);
   }
 }

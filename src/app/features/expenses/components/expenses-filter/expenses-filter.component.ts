@@ -1,7 +1,6 @@
 import { Component, model } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-
-export type ExpenseFilter = 'all' | 'unsettled' | 'settled';
+import { ExpenseFilter } from '../../models/expense-list-item.model';
 
 @Component({
   selector: 'app-expenses-filter',

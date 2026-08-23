@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import {
@@ -15,13 +15,16 @@ import {
   IonTitle,
   IonToolbar,
   ModalController,
+  ViewWillEnter,
+  ViewWillLeave,
 } from '@ionic/angular/standalone';
-import { BehaviorSubject, catchError, combineLatest, of, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, of, switchMap } from 'rxjs';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
+import { GroupDetailStore, GroupDetailTab } from '../../services/group-detail-store';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupService } from '../../services/group.service';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
@@ -51,19 +54,27 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     GroupOverviewHeaderComponent,
   ],
 })
-export class GroupDetailWrapperComponent implements OnInit {
+export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
   private route = inject(ActivatedRoute);
   private service = inject(GroupService);
   private groupMemberFacade = inject(GroupMemberFacade);
   private modalController = inject(ModalController);
+  readonly store = inject(GroupDetailStore);
+
+  private readonly content = viewChild(IonContent);
+  private scrollEl?: HTMLElement;
 
   private refresh$ = new BehaviorSubject<void>(undefined);
 
   title = 'Group';
-  activeTab = 'overview';
   members: GroupMember[] = [];
 
   group$ = this.route.params.pipe(switchMap((p) => this.service.groupOverview(p['id'])));
+
+  private groupId$ = this.route.params.pipe(
+    map((p) => p['id'] as string),
+    takeUntilDestroyed(),
+  );
 
   members$ = combineLatest([this.route.params, this.refresh$]).pipe(
     switchMap(([p]) =>
@@ -74,8 +85,53 @@ export class GroupDetailWrapperComponent implements OnInit {
     takeUntilDestroyed(),
   );
 
+  constructor() {
+    // ion-content sits inside @if (group$ | async), so on a fresh instance it
+    // only exists once the overview call resolves — after ionViewWillEnter has
+    // already run. Grab the scroll element and restore the moment it shows up.
+    effect(() => {
+      const content = this.content();
+      if (!content) return;
+
+      void content.getScrollElement().then((el) => {
+        this.scrollEl = el;
+        this.restoreScroll(untracked(() => this.store.activeTab()));
+      });
+    });
+  }
+
   ngOnInit(): void {
+    this.groupId$.subscribe((groupId) => this.store.enter(groupId));
     this.members$.subscribe((e) => (this.members = e ?? []));
+  }
+
+  /** Re-entering from a pushed page (expense detail) — go back to where we were. */
+  ionViewWillEnter(): void {
+    this.restoreScroll(this.store.activeTab());
+  }
+
+  ionViewWillLeave(): void {
+    this.saveScroll(this.store.activeTab());
+  }
+
+  selectTab(tab: GroupDetailTab): void {
+    const previous = this.store.activeTab();
+    if (previous === tab) return;
+
+    this.saveScroll(previous);
+    this.store.activeTab.set(tab);
+    this.restoreScroll(tab);
+  }
+
+  /** Synchronous on purpose: it has to read scrollTop before @switch re-renders. */
+  private saveScroll(tab: GroupDetailTab): void {
+    if (this.scrollEl) this.store.setScrollTop(tab, this.scrollEl.scrollTop);
+  }
+
+  /** Deferred: @switch has to render the incoming tab before it has any height. */
+  private restoreScroll(tab: GroupDetailTab): void {
+    const target = this.store.scrollTopFor(tab);
+    requestAnimationFrame(() => void this.content()?.scrollToPoint(0, target, 0));
   }
 
   async openAddMembers(): Promise<void> {

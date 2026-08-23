@@ -23,7 +23,7 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
-import { of, switchMap, tap, throwError } from 'rxjs';
+import { concatMap, of, switchMap, tap, throwError } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -31,12 +31,12 @@ import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
 import { GroupMemberIdbService } from 'src/app/features/groups/services/group-member-idb.service';
 import { GroupService } from 'src/app/features/groups/services/group.service';
+import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
 import { AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
 import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
-import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 
 interface MemberEntry extends GroupMember {
   selected: boolean;
@@ -394,8 +394,11 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
         this.toastService.successToast('Expense updated!');
         this.router.navigate(['groups', this.groupId, 'expenses', this.expenseId, 'details']);
       };
+      // The legacy service does not touch the cache, so drop it explicitly —
+      // otherwise the list would keep serving the pre-edit rows.
       this.expenseService
         .updateExpense(this.groupId, { ...basePayload, id: this.expenseId })
+        .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
         .subscribe({ next: onSuccess, error: onError });
     } else {
       this.expenseFacade.createExpense(this.groupId, basePayload).subscribe({

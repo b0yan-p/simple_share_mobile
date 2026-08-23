@@ -13,7 +13,8 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { startWith } from 'rxjs';
+import { concatMap, startWith } from 'rxjs';
+import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { ExpenseService } from 'src/app/features/expenses/services/expense.service';
 
 @Component({
@@ -46,6 +47,7 @@ export class SettleUpModalComponent implements OnInit {
 
   private modalController = inject(ModalController);
   private expenseService = inject(ExpenseService);
+  private expenseFacade = inject(ExpenseFacade);
 
   submitting = false;
   error = false;
@@ -96,6 +98,7 @@ export class SettleUpModalComponent implements OnInit {
         amount: amount!,
         date: new Date(date!).toISOString(),
       })
+      .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
       .subscribe({
         next: () => {
           this.submitting = false;

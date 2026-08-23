@@ -42,9 +42,20 @@ export class ExpenseFacade {
   $loadExpenses?: Subscription;
 
   // #region load methods
-  loadExpenses(groupId: string): void {
+  /**
+   * Loads the first page for a group, or does nothing when the store already
+   * holds fresh data for it. The early return is what keeps the list intact
+   * across tab switches and detail navigation: $loadExpenses lives on this root
+   * facade rather than on the component, so leaving it subscribed leaves the
+   * pageRequest$ pipeline — and therefore the infinite scroll offset — exactly
+   * where the user left it.
+   */
+  loadExpenses(groupId: string, opts: { force?: boolean } = {}): void {
+    if (!opts.force && this.$loadExpenses && this.store.isFreshFor(groupId)) return;
+
     this.$loadExpenses?.unsubscribe();
-    this.store.clear();
+    this.store.reset(groupId);
+    this.store.setLoading();
     this.paginator.resetPagination();
     this.paginator.totalCount.set(0);
 
@@ -86,7 +97,8 @@ export class ExpenseFacade {
             `[IDB HIT] group=${groupId}, items=${cached.items.length}, totalCount=${cached.totalCount}`,
           );
           this.paginator.totalCount.set(cached.totalCount);
-          this.store.setExpenses(mapExpenses(cached.items));
+          this.store.setItems(mapExpenses(cached.items));
+          this.store.setReady();
         }
 
         if (!this.networkService.isOnline()) {
@@ -110,7 +122,8 @@ export class ExpenseFacade {
               this.ui.listLoading.set(false);
               this.paginator.pageLoading.set(false);
               if (!cached) {
-                this.store.setExpenses([]);
+                this.store.setItems([]);
+                this.store.setReady();
                 this.paginator.totalCount.set(0);
               } else if (res.totalCount > 0) {
                 this.toastService.warnToast('Could not refresh expenses. Showing cached data.');
@@ -122,7 +135,8 @@ export class ExpenseFacade {
               tap(() => {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
-                this.store.setExpenses(mapExpenses(items));
+                this.store.setItems(mapExpenses(items));
+                this.store.setReady();
               }),
               switchMap(() => of([] as ExpenseListItem[])),
             );
@@ -164,7 +178,8 @@ export class ExpenseFacade {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
                 // Re-map entire list so cross-page month boundaries merge correctly
-                this.store.setExpenses(mapExpenses(allItems));
+                this.store.setItems(mapExpenses(allItems));
+                this.store.setReady();
               }),
               switchMap(() => of([] as ExpenseListItem[])),
             );
@@ -203,7 +218,7 @@ export class ExpenseFacade {
     }
 
     return this.expenseApi.createExpense(groupId, payload).pipe(
-      tap(() => this.idb.deleteExpenses(groupId)),
+      concatMap((res) => this.refreshExpenses(groupId).pipe(map(() => res))),
       map((res) => ({ ...res, queued: false })),
     );
   }
@@ -211,13 +226,13 @@ export class ExpenseFacade {
   updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<void> {
     return this.expenseApi
       .updateExpense(groupId, payload)
-      .pipe(tap(() => this.idb.deleteExpenses(groupId)));
+      .pipe(concatMap(() => this.refreshExpenses(groupId)));
   }
 
   deleteExpense(groupId: string, expenseId: string): Observable<void> {
     return this.expenseApi
       .deleteExpense(groupId, expenseId)
-      .pipe(tap(() => this.idb.deleteExpenses(groupId)));
+      .pipe(concatMap(() => this.refreshExpenses(groupId)));
   }
   // #endregion
 
@@ -249,9 +264,17 @@ export class ExpenseFacade {
   // #endregion
 
   // #region sync/refresh methods
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  refreshExpenses(_groupId: string): Observable<ExpenseListItem[]> {
-    return of();
+  /**
+   * Drops the cached pages and reloads the first one. Call this after every
+   * mutation, including the ones made through the legacy ExpenseService: Ionic
+   * keeps the group screen alive while an expense page is pushed on top of it,
+   * so ExpenseListComponent.ngOnInit does not reliably run again on the way
+   * back and cannot be relied on to notice that the data went stale.
+   */
+  refreshExpenses(groupId: string): Observable<void> {
+    return this.invalidateExpenses(groupId).pipe(
+      tap(() => this.loadExpenses(groupId, { force: true })),
+    );
   }
 
   syncPendingExpenses(): Observable<void> {
@@ -265,7 +288,7 @@ export class ExpenseFacade {
               switchMap(() =>
                 forkJoin([
                   this.idb.deletePendingExpense(item.tempId),
-                  this.idb.deleteExpenses(item.groupId),
+                  this.invalidateExpenses(item.groupId),
                 ]),
               ),
               map(() => true),
@@ -298,7 +321,15 @@ export class ExpenseFacade {
   // #endregion
 
   // #region util methods
-  clearExpensesState() {}
+  /**
+   * Call after any mutation, including ones made through the legacy
+   * ExpenseService: drops the cached page data and marks the store stale so the
+   * next visit to the list refetches instead of serving what it already holds.
+   */
+  invalidateExpenses(groupId: string): Observable<void> {
+    this.store.invalidate();
+    return this.idb.deleteExpenses(groupId);
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   selectExpense(_expenseId: string) {}

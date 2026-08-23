@@ -14,3 +14,6 @@ export interface ExpenseListItemDetails {
   isSettleUp: boolean;
   paidByMembers: string[];
 }
+
+/** Client-side pill filter applied over the pages loaded so far. */
+export type ExpenseFilter = 'all' | 'unsettled' | 'settled';
