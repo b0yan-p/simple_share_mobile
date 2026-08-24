@@ -9,7 +9,7 @@
   <section class="home-greetings">
     <div class="bdd-flex bdd-ai-center bdd-jc-space-between">
       <h1>Good to see you!</h1>
-      @if (networkService.isOnline()) {
+      @if (!networkService.isOnline()) {
         <app-offline-warning mode="indicator" />
       }
     </div>
@@ -18,7 +18,7 @@
 
   <!-- Total net worth across all groups -->
   <section class="total-debt-card">
-    @if (!networkService.isOnline()) {
+    @if (networkService.isOnline()) {
       <div>
         <img [src]="'/assets/images/logo.png'" alt="logo" class="logo" />
         <div class="shadow"></div>
