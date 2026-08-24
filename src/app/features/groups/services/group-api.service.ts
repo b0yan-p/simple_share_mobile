@@ -27,6 +27,17 @@ export class GroupApiService {
     return this.http.get<PageData<GroupListItem>>(this.baseUrl, { params }).pipe(first());
   }
 
+  /**
+   * Returns a flat array, not PageData — the /recent endpoint has no paging.
+   * The items stay raw: netBalanceMessage is derived on every read so the cache
+   * can never hold a stale derived string.
+   */
+  getRecentGroups(take = 3): Observable<GroupListItem[]> {
+    const params = new HttpParams().set('take', take);
+
+    return this.http.get<GroupListItem[]>(`${this.baseUrl}/recent`, { params }).pipe(first());
+  }
+
   createGroup(payload: CreateGroup): Observable<Group> {
     return this.http.post<Group>(this.baseUrl, payload).pipe(first());
   }

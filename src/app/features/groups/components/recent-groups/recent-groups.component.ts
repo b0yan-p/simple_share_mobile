@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonButton, IonList } from '@ionic/angular/standalone';
+import { LoadStatus } from 'src/app/core/store/models/list-state.model';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
-import { GroupListItem } from '../../models/group.model';
-import { GroupService } from '../../services/group.service';
+import { GroupFacade } from '../../services/group-facade.service';
 
 @Component({
   selector: 'app-recent-groups',
@@ -12,19 +12,11 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./recent-groups.component.scss'],
   imports: [IonList, IonButton, ListItemComponent, EmptyStateComponent],
 })
-export class RecentGroupsComponent implements OnInit {
+export class RecentGroupsComponent {
   router = inject(Router);
-  private groupService = inject(GroupService);
+  facade = inject(GroupFacade);
 
-  groups = signal<GroupListItem[]>([]);
-  loaded = signal(false);
-
-  ngOnInit() {
-    this.groupService.getRecentGroups().subscribe((groups) => {
-      this.groups.set(groups);
-      this.loaded.set(true);
-    });
-  }
+  readonly loading = computed(() => this.facade.recentStore.status() === LoadStatus.Loading);
 
   navigateToGroups() {
     this.router.navigate(['groups']);

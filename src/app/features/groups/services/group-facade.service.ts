@@ -19,10 +19,11 @@ import { CreateGroup } from '../models/create-group.model';
 import { GroupOverview } from '../models/group-overview.model';
 import { Group, GroupListItem } from '../models/group.model';
 import { UpdateGroup } from '../models/update-group.model';
+import { GroupListStore } from '../store/group-list-store';
+import { RecentGroupsStore } from '../store/recent-groups-store';
 import { mapGroupListItems } from '../utils/group-list.utils';
 import { GroupApiService } from './group-api.service';
 import { GroupIdbService } from './group-idb.service';
-import { GroupListStore } from './group-list-store';
 import { GroupPaginatorService } from './group-paginator.service';
 import { GroupService } from './group.service';
 
@@ -35,6 +36,7 @@ export class GroupFacade {
   private readonly groupApi = inject(GroupApiService);
   private readonly paginator = inject(GroupPaginatorService);
   readonly store = inject(GroupListStore);
+  readonly recentStore = inject(RecentGroupsStore);
   private readonly toastService = inject(ToastService);
   private readonly ui = inject(UiService);
   private readonly networkService = inject(NetworkService);
@@ -42,6 +44,7 @@ export class GroupFacade {
   private readonly groupService = inject(GroupService);
 
   $loadGroups?: Subscription;
+  $loadRecentGroups?: Subscription;
 
   // #region load methods
   /**
@@ -194,6 +197,77 @@ export class GroupFacade {
     return of([] as GroupListItem[]);
   }
   /**
+   * Same cache-first-then-network shape as loadFirstPage, minus the paginator:
+   * /group/recent has no paging. No freshness guard by design — every entry to
+   * the home screen refetches, and the previous items stay on screen while the
+   * reload runs so the cache paint replaces them rather than blanking the list.
+   */
+  loadRecentGroups(): void {
+    this.$loadRecentGroups?.unsubscribe();
+    this.recentStore.setLoading();
+
+    const ref$ = this.idb.getRecentGroups().pipe(
+      switchMap((cached) => {
+        if (cached) {
+          console.log(`[IDB HIT] recentGroups=${cached.length}`);
+          this.recentStore.setItems(mapGroupListItems(cached));
+          this.recentStore.setReady();
+        }
+
+        if (!this.networkService.isOnline() && !cached) {
+          this.recentStore.setItems([]);
+          this.recentStore.setReady();
+        }
+
+        if (!this.networkService.isOnline()) {
+          return of([] as GroupListItem[]);
+        }
+
+        return this.groupApi.getRecentGroups().pipe(
+          switchMap((res) => {
+            const items = res ?? [];
+            console.log(`[API] recentGroups=${items.length}`);
+
+            if (!items.length) {
+              if (!cached) {
+                this.recentStore.setItems([]);
+                this.recentStore.setReady();
+              } else {
+                this.toastService.warnToast(
+                  'Could not refresh recent groups. Showing cached data.',
+                );
+              }
+              return of([] as GroupListItem[]);
+            }
+
+            return this.idb.saveRecentGroups(items).pipe(
+              tap(() => {
+                this.recentStore.setItems(mapGroupListItems(items));
+                this.recentStore.setReady();
+              }),
+              switchMap(() => of([] as GroupListItem[])),
+            );
+          }),
+          catchError((err) => this.handleRecentError(err)),
+        );
+      }),
+    );
+
+    this.$loadRecentGroups = ref$.subscribe({
+      error: (err) => console.log('error in group facade: ', err),
+    });
+  }
+
+  /** Swallows the error the way handleError does, so a cache paint survives it. */
+  private handleRecentError(err: { message?: string }) {
+    console.warn('[API ERROR] recent groups', err);
+    const message = err?.message ?? 'Failed to load recent groups';
+    this.recentStore.setError(message);
+    this.toastService.errorToast(message);
+    return of([] as GroupListItem[]);
+  }
+
+  /**
    * Network-first with a cache fallback, and **null instead of an error** on a
    * total miss: the group screen renders its shell around this, so an error here
    * used to take the whole page down with it.
@@ -215,7 +289,7 @@ export class GroupFacade {
     this.ui.itemLoading.set(true);
     return this.groupApi.createGroup(payload).pipe(
       finalize(() => this.ui.itemLoading.set(false)),
-      tap(() => this.loadGroups()),
+      tap(() => this.reloadGroupLists()),
     );
   }
 
@@ -225,14 +299,23 @@ export class GroupFacade {
     this.ui.itemLoading.set(true);
     return this.groupApi.updateGroup(payload).pipe(
       finalize(() => this.ui.itemLoading.set(false)),
-      tap(() => this.loadGroups()),
+      tap(() => this.reloadGroupLists()),
     );
   }
 
   deleteGroup(id: string): Observable<void> {
     if (!this.networkService.isOnline()) return this.offlineMutation();
 
-    return this.groupApi.deleteGroup(id).pipe(tap(() => this.loadGroups()));
+    return this.groupApi.deleteGroup(id).pipe(tap(() => this.reloadGroupLists()));
+  }
+
+  /**
+   * A mutation changes both lists, and the home tab stays alive, so its
+   * ionViewWillEnter cannot be relied on to pick the change up.
+   */
+  private reloadGroupLists(): void {
+    this.loadGroups();
+    this.loadRecentGroups();
   }
 
   /**

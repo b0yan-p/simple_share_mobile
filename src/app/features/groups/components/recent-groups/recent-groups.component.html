@@ -4,9 +4,9 @@
 </div>
 
 <div class="list-container">
-  @if (groups().length > 0) {
+  @if (facade.recentStore.items().length > 0) {
     <ion-list>
-      @for (group of groups(); track group.id) {
+      @for (group of facade.recentStore.items(); track group.id) {
         <app-list-item
           [title]="group.name"
           [showChevron]="true"
@@ -19,7 +19,7 @@
         />
       }
     </ion-list>
-  } @else if (loaded()) {
+  } @else if (!loading()) {
     <app-empty-state
       icon="people-outline"
       title="No groups yet"

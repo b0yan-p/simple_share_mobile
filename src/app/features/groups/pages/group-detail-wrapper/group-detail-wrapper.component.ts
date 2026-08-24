@@ -26,9 +26,9 @@ import { AddMemberModalComponent } from '../../components/add-member-modal/add-m
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
-import { GroupDetailStore, GroupDetailTab } from '../../services/group-detail-store';
 import { GroupFacade } from '../../services/group-facade.service';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
+import { GroupDetailStore, GroupDetailTab } from '../../store/group-detail-store';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
 @Component({

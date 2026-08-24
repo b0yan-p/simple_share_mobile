@@ -7,6 +7,9 @@ import { GroupListItem } from '../models/group.model';
 /** The group list is not scoped to anything, so the whole cache is one record. */
 export const GROUPS_CACHE_KEY = 'all';
 
+/** Recent groups share the 'groups' store with the full list, but as their own record. */
+export const RECENT_GROUPS_CACHE_KEY = 'recent';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,6 +31,26 @@ export class GroupIdbService {
   getGroups(): Observable<{ items: GroupListItem[]; totalCount: number } | null> {
     return from(this.idb.db.get(this.storeName, GROUPS_CACHE_KEY)).pipe(
       map((entry) => (entry ? { items: entry.items, totalCount: entry.totalCount } : null)),
+    );
+  }
+
+  /**
+   * `/group/recent` returns a flat array with no server-side totalCount, so the
+   * entry's totalCount is just the item count — nothing reads it back.
+   */
+  saveRecentGroups(items: GroupListItem[]): Observable<void> {
+    return from(
+      this.idb.db.put(
+        this.storeName,
+        { items, totalCount: items.length, cachedAt: new Date().toISOString() },
+        RECENT_GROUPS_CACHE_KEY,
+      ),
+    ).pipe(map(() => void 0));
+  }
+
+  getRecentGroups(): Observable<GroupListItem[] | null> {
+    return from(this.idb.db.get(this.storeName, RECENT_GROUPS_CACHE_KEY)).pipe(
+      map((entry) => entry?.items ?? null),
     );
   }
 
