@@ -1,7 +1,7 @@
 @if (!networkService.isOnline()) {
   <div class="pending-banner" (click)="openPendingSheet()">
     <div class="pending-banner__info">
-      <ion-icon name="time-outline" />
+      <ion-icon [icon]="timeOutline" />
       <span>{{ pendingCount() }} expense(s) pending sync</span>
     </div>
     <ion-icon name="chevron-forward-outline" />

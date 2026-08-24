@@ -9,7 +9,7 @@
   <section class="home-greetings">
     <div class="bdd-flex bdd-ai-center bdd-jc-space-between">
       <h1>Good to see you!</h1>
-      @if (!networkService.isOnline()) {
+      @if (networkService.isOnline()) {
         <app-offline-warning mode="indicator" />
       }
     </div>
@@ -18,15 +18,31 @@
 
   <!-- Total net worth across all groups -->
   <section class="total-debt-card">
-    <div class="">
-      <p>You are owed</p>
-      <p class="amount">$48.56</p>
-      <p>across 3 groups</p>
-    </div>
-    <div>
-      <img src="/assets/images/logo.png" alt="logo" />
-      <div class="shadow"></div>
-    </div>
+    @if (!networkService.isOnline()) {
+      <div>
+        <img [src]="'/assets/images/logo.png'" alt="logo" class="logo" />
+        <div class="shadow"></div>
+      </div>
+      <div class="bdd-mx-a">
+        <p>You are owed</p>
+        <p class="amount">$48.56</p>
+        <p>across 3 groups</p>
+      </div>
+    } @else {
+      <div>
+        <img
+          [src]="'/assets/images/logo-offline.png'"
+          alt="logo-offline"
+          class="offline-logo"
+        />
+        <div class="shadow-offline"></div>
+      </div>
+      <div class="offline-info">
+        <p class="amount">You're offline</p>
+        <p>But don't worry,</p>
+        <p>You can still add expense</p>
+      </div>
+    }
   </section>
 
   <!-- Recent groups -->

@@ -15,6 +15,8 @@ import {
   IonSpinner,
   ModalController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { timeOutline } from 'ionicons/icons';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
@@ -62,6 +64,7 @@ export class ExpenseListComponent implements OnInit {
   private readonly tokenStorage = inject(TokenStorageService);
   protected readonly networkService = inject(NetworkService);
 
+  readonly timeOutline = timeOutline;
   pendingDeleteId = '';
   isDeleteAlertOpen = false;
   pendingCount = signal(0);
@@ -105,6 +108,8 @@ export class ExpenseListComponent implements OnInit {
   ];
 
   constructor() {
+    addIcons({ timeOutline });
+
     this.routeParams$ = this.route.params.pipe(
       map((p) => p['id']),
       takeUntilDestroyed(),
