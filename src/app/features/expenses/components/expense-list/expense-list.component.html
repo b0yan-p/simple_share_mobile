@@ -1,4 +1,4 @@
-@if (pendingCount() > 0) {
+@if (!networkService.isOnline()) {
   <div class="pending-banner" (click)="openPendingSheet()">
     <div class="pending-banner__info">
       <ion-icon name="time-outline" />

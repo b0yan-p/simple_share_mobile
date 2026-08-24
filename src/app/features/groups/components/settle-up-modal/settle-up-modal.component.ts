@@ -10,6 +10,7 @@ import {
   IonIcon,
   IonInput,
   IonSpinner,
+  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -33,6 +34,7 @@ import { ExpenseService } from 'src/app/features/expenses/services/expense.servi
     IonInput,
     IonIcon,
     IonSpinner,
+    IonTitle,
   ],
 })
 export class SettleUpModalComponent implements OnInit {

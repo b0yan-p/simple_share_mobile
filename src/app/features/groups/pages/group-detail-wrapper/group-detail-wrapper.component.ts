@@ -19,7 +19,9 @@ import {
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { BehaviorSubject, catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { NetworkService } from 'src/app/core/services/network.service';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
+import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
@@ -52,6 +54,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     ExpenseListComponent,
     GroupBalanceComponent,
     GroupOverviewHeaderComponent,
+    OfflineWarningComponent,
   ],
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
@@ -60,6 +63,7 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private groupMemberFacade = inject(GroupMemberFacade);
   private modalController = inject(ModalController);
   readonly store = inject(GroupDetailStore);
+  protected networkService = inject(NetworkService);
 
   private readonly content = viewChild(IonContent);
   private scrollEl?: HTMLElement;

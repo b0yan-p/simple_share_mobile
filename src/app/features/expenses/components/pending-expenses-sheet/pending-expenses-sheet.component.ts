@@ -8,6 +8,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -27,6 +28,7 @@ import { PendingExpense } from '../../services/expense-idb.service';
     IonButton,
     IonContent,
     IonIcon,
+    IonTitle,
   ],
 })
 export class PendingExpensesSheetComponent implements OnInit {

@@ -11,6 +11,7 @@ import {
   IonSegment,
   IonSegmentButton,
   IonSpinner,
+  IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -39,6 +40,7 @@ import { GroupService } from '../../services/group.service';
     IonSegment,
     IonSegmentButton,
     IonLabel,
+    IonTitle,
   ],
 })
 export class AddMemberModalComponent implements OnInit {

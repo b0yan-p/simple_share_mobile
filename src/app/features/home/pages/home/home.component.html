@@ -7,7 +7,12 @@
 <ion-content class="ion-padding">
   <!-- Welcome -->
   <section class="home-greetings">
-    <h1>Good to see you!</h1>
+    <div class="bdd-flex bdd-ai-center bdd-jc-space-between">
+      <h1>Good to see you!</h1>
+      @if (!networkService.isOnline()) {
+        <app-offline-warning mode="indicator" />
+      }
+    </div>
     <p>Here's what's happening</p>
   </section>
 

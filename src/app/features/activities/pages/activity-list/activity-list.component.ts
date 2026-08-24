@@ -9,9 +9,11 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
+import { NetworkService } from 'src/app/core/services/network.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
+import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { ActivityListItem } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
@@ -31,11 +33,13 @@ import { ActivityService } from '../../services/activity.service';
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
+    OfflineWarningComponent,
   ],
 })
 export class ActivityListComponent {
   service = inject(ActivityService);
   ui = inject(UiService);
+  protected readonly network = inject(NetworkService);
   private router = inject(Router);
 
   constructor() {

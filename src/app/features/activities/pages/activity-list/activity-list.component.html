@@ -5,6 +5,9 @@
 </ion-header>
 
 <ion-content>
+  @if (!network.isOnline()) {
+    <app-offline-warning />
+  }
   @if (service.items().length > 0) {
     <ion-list [inset]="true">
       @for (item of service.items(); track item.id) {

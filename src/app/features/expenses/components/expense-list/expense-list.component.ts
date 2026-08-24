@@ -17,6 +17,7 @@ import {
 } from '@ionic/angular/standalone';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
+import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
@@ -59,6 +60,7 @@ export class ExpenseListComponent implements OnInit {
   ui = inject(UiService);
   private readonly modalController = inject(ModalController);
   private readonly tokenStorage = inject(TokenStorageService);
+  protected readonly networkService = inject(NetworkService);
 
   pendingDeleteId = '';
   isDeleteAlertOpen = false;

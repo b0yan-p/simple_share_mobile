@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
+import { alert, checkmark, close, information } from 'ionicons/icons';
 
 @Injectable({
   providedIn: 'root',
@@ -12,26 +13,26 @@ export class ToastService {
   protected toastDuration = 5000;
 
   public async successToast(message: string, duration: number = this.toastDuration) {
-    await this.showToast(message, duration, 'toast-success', 'checkmark');
+    await this.showToast(message, duration, 'toast-success', checkmark);
   }
 
   public async errorToast(message: string, duration: number = this.toastDuration) {
-    await this.showToast(message, duration, 'toast-error', 'close');
+    await this.showToast(message, duration, 'toast-error', close);
   }
 
   public async warnToast(message: string, duration: number = this.toastDuration) {
-    await this.showToast(message, duration, 'toast-warning', 'alert');
+    await this.showToast(message, duration, 'toast-warning', alert);
   }
 
   public async infoToast(message: string, duration: number = this.toastDuration) {
-    await this.showToast(message, duration, 'toast-info', 'information');
+    await this.showToast(message, duration, 'toast-info', information);
   }
 
   protected async showToast(
     message: string,
     duration = this.toastDuration,
     stateClass = 'toast-info',
-    icon = 'information',
+    icon = information,
   ) {
     if (!!this.currentToast) {
       await this.currentToast.dismiss();

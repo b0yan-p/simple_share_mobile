@@ -18,6 +18,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { LoadStatus } from 'src/app/core/store/models/list-state.model';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
+import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { GroupFacade } from '../../services/group-facade.service';
 import { GroupPaginatorService } from '../../services/group-paginator.service';
@@ -41,6 +42,7 @@ import { GroupPaginatorService } from '../../services/group-paginator.service';
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
+    OfflineWarningComponent,
   ],
 })
 export class GroupListComponent implements ViewWillEnter {

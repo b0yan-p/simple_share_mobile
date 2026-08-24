@@ -1,0 +1,47 @@
+@use './../../../../theme/variables.scss' as v;
+
+:host {
+  .info-container {
+    margin: 16px;
+    padding: 12px;
+
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    border: 1px solid v.$warn;
+    border-radius: v.$border-radius-xl;
+    background-color: rgba(v.$warn, 0.1);
+
+    ion-icon {
+      color: v.$error;
+      background-color: rgba(v.$warn, 0.2);
+      font-size: 22px;
+      padding: 8px;
+      border-radius: v.$border-radius-m;
+    }
+
+    .title {
+      font-weight: 500;
+      letter-spacing: 0.4px;
+    }
+  }
+
+  .indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    background-color: rgba(v.$warn, 0.2);
+    padding: 8px 12px;
+    border-radius: v.$border-radius-xxl;
+    border: 1px solid v.$warn;
+
+    color: v.$error;
+
+    ion-icon {
+      color: v.$error;
+      font-size: 18px;
+    }
+  }
+}

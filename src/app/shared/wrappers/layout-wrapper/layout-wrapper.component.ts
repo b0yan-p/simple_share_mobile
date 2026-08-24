@@ -2,6 +2,19 @@ import { TitleCasePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+  home,
+  homeOutline,
+  people,
+  peopleOutline,
+  pulse,
+  pulseOutline,
+  settings,
+  settingsOutline,
+  wallet,
+  walletOutline,
+} from 'ionicons/icons';
 import { UiService } from '../../../core/services/ui.service';
 import { TabItem, TabItems } from '../tab-items.model';
 
@@ -14,4 +27,19 @@ import { TabItem, TabItems } from '../tab-items.model';
 export class LayoutWrapperComponent {
   readonly uiService = inject(UiService);
   tabItems: TabItem[] = TabItems;
+
+  constructor() {
+    addIcons({
+      home,
+      homeOutline,
+      wallet,
+      walletOutline,
+      pulse,
+      pulseOutline,
+      people,
+      peopleOutline,
+      settings,
+      settingsOutline,
+    });
+  }
 }

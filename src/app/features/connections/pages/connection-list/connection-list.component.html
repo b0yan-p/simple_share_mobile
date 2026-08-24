@@ -5,6 +5,9 @@
 </ion-header>
 
 <ion-content>
+  @if (!network.isOnline()) {
+    <app-offline-warning />
+  }
   @if (service.loading()) {
     <div class="loading-state">
       <ion-spinner name="crescent" />

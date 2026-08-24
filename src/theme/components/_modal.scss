@@ -1,0 +1,40 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Modal
+// Covers: bottom sheet shell — rounded top corners and the toolbar title that
+//         sits on the same row as the close button.
+// ─────────────────────────────────────────────────────────────────────────────
+@use '../variables' as c;
+
+// ─── Bottom sheet ─────────────────────────────────────────────────────────────
+// Ionic ships `--border-radius: 0` in md mode, so sheets get square corners.
+// Round the top only: `.modal-wrapper` is pinned to `bottom: 0`, so rounding all
+// four would let the backdrop show through the two corners at the screen edge.
+ion-modal.modal-sheet {
+  --border-radius: 32px;
+
+  &::part(content) {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  // The sheet title lives in the toolbar next to the close button, so it needs
+  // the body-heading treatment rather than the purple page title from _header.
+  //
+  // The gutter is owned by the toolbar, not ion-title, so it lines up with
+  // .modal-body / .sheet-body (24px). --padding-top has to clear the sheet drag
+  // handle, which Ionic paints at `top: 5px; height: 5px`.
+  ion-header ion-toolbar {
+    --padding-top: 16px !important;
+    --padding-bottom: 0px;
+    --padding-start: 24px;
+    --padding-end: 8px;
+
+    ion-title {
+      padding-inline: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: c.$text-light;
+    }
+  }
+}

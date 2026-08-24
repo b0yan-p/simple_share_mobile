@@ -5,6 +5,9 @@
 </ion-header>
 
 <ion-content class="ion-paddinga">
+  @if (!network.isOnline()) {
+    <app-offline-warning />
+  }
   @if (facade.store.items().length > 0) {
     <ion-list [inset]="true">
       @for (group of facade.store.items(); track group.id) {

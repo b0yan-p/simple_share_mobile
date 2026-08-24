@@ -1,0 +1,14 @@
+@if (mode() === 'info') {
+  <div class="info-container">
+    <ion-icon [icon]="cloudOfflineOutline" />
+    <div>
+      <div class="title">You're offline</div>
+      <small>Changes will sync when you're back online</small>
+    </div>
+  </div>
+} @else {
+  <div class="indicator">
+    <ion-icon [icon]="cloudOfflineOutline" />
+    <div>Offline</div>
+  </div>
+}

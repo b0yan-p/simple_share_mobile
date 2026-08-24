@@ -11,9 +11,14 @@
 <ion-content>
   @let group = group$ | async;
 
+  @if (!networkService.isOnline()) {
+    <app-offline-warning />
+  }
+
   <!-- Overview header. Guarded because GroupOverviewHeaderComponent.group is
        input.required and the bindings read group.myDebtSummary — offline with no
-       cached overview the header is simply omitted, the tabs still render. -->
+       cached overview the header is simply omitted, the tabs still render. 
+  -->
   @if (group) {
     <app-group-overview-header
       [members]="members"
