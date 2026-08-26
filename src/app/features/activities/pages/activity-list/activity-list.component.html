@@ -6,7 +6,7 @@
 
 <ion-content>
   @if (!network.isOnline()) {
-    <app-offline-warning />
+    <app-offline-empty-state />
   }
   @if (service.items().length > 0) {
     <ion-list [inset]="true">
@@ -20,7 +20,7 @@
         />
       }
     </ion-list>
-  } @else if (!ui.listLoading()) {
+  } @else if (!ui.listLoading() && network.isOnline()) {
     <app-empty-state
       icon="pulse-outline"
       title="No activity yet"
@@ -28,7 +28,9 @@
     />
   }
 
-  <ion-infinite-scroll [appPaginate]="service">
-    <ion-infinite-scroll-content />
-  </ion-infinite-scroll>
+  @if (network.isOnline()) {
+    <ion-infinite-scroll [appPaginate]="service">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
 </ion-content>

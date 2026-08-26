@@ -8,12 +8,13 @@ import {
   IonList,
   IonTitle,
   IonToolbar,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
-import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
+import { OfflineEmptyStateComponent } from 'src/app/shared/components/offline-empty-state/offline-empty-state.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { ActivityListItem } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
@@ -33,16 +34,23 @@ import { ActivityService } from '../../services/activity.service';
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
-    OfflineWarningComponent,
+    OfflineEmptyStateComponent,
   ],
 })
-export class ActivityListComponent {
+export class ActivityListComponent implements ViewWillEnter {
   service = inject(ActivityService);
   ui = inject(UiService);
   protected readonly network = inject(NetworkService);
   private router = inject(Router);
 
-  constructor() {
+  /**
+   * Ionic keeps this tab page alive, so the constructor does not run again on re-entry.
+   * The list has no freshness state, so every entry reloads from here.
+   * Offline we skip the request entirely — the template shows the offline state.
+   */
+  ionViewWillEnter(): void {
+    if (!this.network.isOnline()) return;
+
     this.service.getAll();
   }
 
