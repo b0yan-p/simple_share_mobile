@@ -6,13 +6,13 @@
 
 <ion-content>
   @if (!network.isOnline()) {
-    <app-offline-warning />
+    <app-offline-empty-state />
   }
   @if (service.loading()) {
     <div class="loading-state">
       <ion-spinner name="crescent" />
     </div>
-  } @else if (service.items().length === 0) {
+  } @else if (service.items().length === 0 && network.isOnline()) {
     <app-empty-state
       icon="people-outline"
       title="No connections yet"

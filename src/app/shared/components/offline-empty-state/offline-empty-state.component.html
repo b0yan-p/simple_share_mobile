@@ -1,0 +1,10 @@
+<img src="./../../../../assets/images/logo-offline.png" alt="Image offline indicator" />
+<div class="title">{{ title() }}</div>
+<p class="description">
+  We can't load fresh data at this moment.<br />Check your connection or keep browsing saved
+  data.
+</p>
+
+@if (showNavigation()) {
+  <ion-button fill="clear" (click)="navigate()">{{ navigationLabel() }}</ion-button>
+}

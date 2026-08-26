@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   IonContent,
   IonHeader,
@@ -6,11 +6,12 @@ import {
   IonSpinner,
   IonTitle,
   IonToolbar,
+  ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
-import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
+import { OfflineEmptyStateComponent } from 'src/app/shared/components/offline-empty-state/offline-empty-state.component';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -26,14 +27,23 @@ import { ConnectionService } from '../../services/connection.service';
     IonSpinner,
     ListItemComponent,
     EmptyStateComponent,
-    OfflineWarningComponent,
+    OfflineEmptyStateComponent,
   ],
 })
-export class ConnectionListComponent implements OnInit {
+export class ConnectionListComponent implements ViewWillEnter {
   service = inject(ConnectionService);
   protected readonly network = inject(NetworkService);
 
-  ngOnInit(): void {
+  /**
+   * Ionic keeps this tab page alive, so ngOnInit does not run again on re-entry.
+   * The list has no freshness state, so every entry reloads from here.
+   * Offline we skip the request entirely — the template shows the offline state.
+   */
+  ionViewWillEnter(): void {
+    if (!this.network.isOnline()) {
+      return;
+    }
+
     this.service.getAll();
   }
 }
