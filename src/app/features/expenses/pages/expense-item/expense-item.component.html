@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       @if (currentStep > 1) {
         <ion-button fill="clear" size="small" color="primary" (click)="prevStep()">
-          <ion-icon name="arrow-back-sharp" slot="icon-only" />
+          <ion-icon [icon]="arrowBack" slot="icon-only" />
         </ion-button>
       } @else {
         <ion-back-button

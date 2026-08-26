@@ -23,6 +23,8 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { arrowBackSharp } from 'ionicons/icons';
 import { concatMap, of, switchMap, tap, throwError } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
@@ -84,6 +86,7 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   uiService = inject(UiService);
 
   readonly currency = CURRENCY;
+  readonly arrowBack = arrowBackSharp;
   readonly stepsCount = 3;
   currentStep = 1;
   groupId = '';
@@ -132,6 +135,12 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
 
   get splitValid(): boolean {
     return !this.noneSelectedSplit && amountsMatch(this.splitTotal, this.totalAmount);
+  }
+
+  constructor() {
+    addIcons({
+      arrowBackSharp,
+    });
   }
 
   ionViewWillEnter(): void {
