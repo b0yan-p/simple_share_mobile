@@ -1,7 +1,11 @@
 <div class="empty-state">
-  <div class="empty-state__icon">
-    <ion-icon [name]="icon()" />
-  </div>
+  @if (!!imgSrc()) {
+    <img [ngStyle]="{ width: imgWidth() }" [src]="imgSrc()" alt="Empty state image" />
+  } @else {
+    <div class="empty-state__icon">
+      <ion-icon [name]="icon()" />
+    </div>
+  }
   <span class="empty-state__title">{{ title() }}</span>
   @if (subtitle()) {
     <small class="empty-state__subtitle">{{ subtitle() }}</small>

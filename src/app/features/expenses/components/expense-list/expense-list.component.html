@@ -88,10 +88,9 @@
 } @else {
   <app-empty-state
     icon="receipt-outline"
+    imgSrc="./../../../../../assets/images/loog-expense.png"
     title="No expenses yet"
     subtitle="Add your first expense to start tracking this group."
-    actionLabel="Add expense"
-    (action)="navigateToNew()"
   />
 }
 <ion-infinite-scroll [appPaginate]="paginator">
