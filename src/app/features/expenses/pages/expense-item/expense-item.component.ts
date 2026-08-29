@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -24,16 +24,15 @@ import {
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackSharp } from 'ionicons/icons';
-import { concatMap, of, switchMap, tap, throwError } from 'rxjs';
+import { arrowBackSharp, cloudOfflineOutline } from 'ionicons/icons';
+import { concatMap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
-import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
-import { GroupMemberIdbService } from 'src/app/features/groups/services/group-member-idb.service';
-import { GroupService } from 'src/app/features/groups/services/group.service';
+import { GroupMemberFacade } from 'src/app/features/groups/services/group-member-facade.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
@@ -54,6 +53,7 @@ interface MemberEntry extends GroupMember {
     DecimalPipe,
     ReactiveFormsModule,
     AvatarComponent,
+    EmptyStateComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -76,13 +76,11 @@ interface MemberEntry extends GroupMember {
 export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private groupService = inject(GroupService);
   private expenseService = inject(ExpenseService);
   private expenseFacade = inject(ExpenseFacade);
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
-  private networkService = inject(NetworkService);
-  private groupMemberIdb = inject(GroupMemberIdbService);
+  private groupMemberFacade = inject(GroupMemberFacade);
   uiService = inject(UiService);
 
   readonly currency = CURRENCY;
@@ -94,6 +92,8 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   expenseId = '';
   pendingMode = false;
   pendingTempId = '';
+  /** Members could not be loaded from either the network or the cache. */
+  readonly membersError = signal(false);
 
   form = new FormGroup({
     totalAmount: new FormControl<number | null>(null, [
@@ -140,6 +140,7 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   constructor() {
     addIcons({
       arrowBackSharp,
+      cloudOfflineOutline,
     });
   }
 
@@ -175,23 +176,15 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
     this.uiService.tabBarVisible.set(true);
   }
 
-  private loadMembers(): void {
-    const source$ = this.networkService.isOnline()
-      ? this.groupService
-          .getGroupMembers(this.groupId)
-          .pipe(
-            tap((members) =>
-              this.groupMemberIdb.saveGroupMembers(this.groupId, members).subscribe(),
-            ),
-          )
-      : this.groupMemberIdb.getGroupMembers(this.groupId).pipe(
-          switchMap((members) => {
-            if (!members) return throwError(() => new Error('No cached member data'));
-            return of(members);
-          }),
-        );
+  /**
+   * Public so the empty state can retry. The facade is the single source of truth
+   * here — it is network-first with a cache fallback, which this screen used to
+   * reimplement without the fallback.
+   */
+  loadMembers(): void {
+    this.membersError.set(false);
 
-    source$.subscribe({
+    this.groupMemberFacade.getGroupMembers(this.groupId).subscribe({
       next: (members) => {
         this.paidByEntries = members.map((m) => ({ ...m, selected: false, amount: 0 }));
         this.splitEntries = members.map((m) => ({ ...m, selected: true, amount: 0 }));
@@ -199,10 +192,10 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
         else if (this.editMode) this.loadExpenseData();
         else this.recalculateEqualSplit();
       },
-      error: () => {
-        this.toastService.errorToast('No member data available offline');
-        this.router.navigate(['groups', this.groupId, 'details']);
-      },
+      // An inline state rather than a redirect: router.navigate() from the async
+      // tail of ionViewWillEnter races the Ionic transition and can be dropped,
+      // which left the user on a wizard with no members and no explanation.
+      error: () => this.membersError.set(true),
     });
   }
 
