@@ -1,6 +1,6 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>Add people</ion-title>
+    <ion-title>{{ title() }}</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="dismiss()">
         <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
@@ -11,158 +11,166 @@
 
 <ion-content>
   <div class="modal-body">
-    <p class="modal-subtitle c-text">Invite someone to join, or add them directly.</p>
+    @if (view() === 'people') {
+      <p class="modal-subtitle c-text">Invite someone to join, or add them directly.</p>
 
-    <!-- Invite (not wired up yet — there is no invite endpoint on the backend) -->
-    <div class="invite-card">
-      <h5 class="invite-card__title">Invite people</h5>
-      <p class="invite-card__text">Share a link or let someone scan your QR code.</p>
-      <div class="invite-card__actions">
-        <ion-button color="primary" class="btn-sm" (click)="comingSoon()">
-          <ion-icon name="share-social-outline" slot="start" />
-          Share invite
-        </ion-button>
-        <ion-button fill="outline" class="btn-sm" (click)="comingSoon()">
-          <ion-icon name="qr-code-outline" slot="start" />
-          QR code
-        </ion-button>
+      <!-- Invite — visual only for now; the backend issues no invite tokens yet -->
+      <div class="invite-card">
+        <h5 class="invite-card__title">Invite people</h5>
+        <p class="invite-card__text">Share a link or let someone scan your QR code.</p>
+        <div class="invite-card__actions">
+          <ion-button color="primary" class="btn-sm" (click)="openInvite('link')">
+            <ion-icon name="share-social-outline" slot="start" />
+            Invite link
+          </ion-button>
+          <ion-button fill="outline" class="btn-sm" (click)="openInvite('qr')">
+            <ion-icon name="qr-code-outline" slot="start" />
+            QR code
+          </ion-button>
+        </div>
       </div>
-    </div>
 
-    <!-- Tabs -->
-    <ion-segment
-      class="tab-segment"
-      [value]="activeTab()"
-      (ionChange)="setTab($any($event).detail.value)"
-    >
-      <ion-segment-button value="connections">
-        <ion-label>Connections</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="virtual">
-        <ion-label>Without account</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+      <!-- Tabs -->
+      <ion-segment
+        class="tab-segment"
+        [value]="activeTab()"
+        (ionChange)="setTab($any($event).detail.value)"
+      >
+        <ion-segment-button value="connections">
+          <ion-label>Connections</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="virtual">
+          <ion-label>Without account</ion-label>
+        </ion-segment-button>
+      </ion-segment>
 
-    <!-- Selected strip — spans both tabs, scrolls horizontally -->
-    @if (totalSelected() > 0) {
-      <div class="selected">
-        <small class="selected__count">{{ totalSelected() }} selected</small>
-        <div class="selected-scroll" [class.has-more]="!scrolledToEnd()">
-          <div class="selected-strip" #strip (scroll)="updateStripFade()">
-            @for (chip of selectedChips(); track chip.key) {
-              <button
-                type="button"
-                class="selected-chip"
-                [attr.aria-label]="'Remove ' + chip.label"
-                (click)="removeChip(chip)"
-              >
-                <span class="selected-chip__avatar">
-                  <app-avatar
-                    [name]="chip.label"
-                    [src]="null"
-                    [colorKey]="chip.colorKey"
-                    [size]="48"
-                  />
-                  <span class="selected-chip__remove" aria-hidden="true">
-                    <ion-icon name="close" />
+      <!-- Selected strip — spans both tabs, scrolls horizontally -->
+      @if (totalSelected() > 0) {
+        <div class="selected">
+          <small class="selected__count">{{ totalSelected() }} selected</small>
+          <div class="selected-scroll" [class.has-more]="!scrolledToEnd()">
+            <div class="selected-strip" #strip (scroll)="updateStripFade()">
+              @for (chip of selectedChips(); track chip.key) {
+                <button
+                  type="button"
+                  class="selected-chip"
+                  [attr.aria-label]="'Remove ' + chip.label"
+                  (click)="removeChip(chip)"
+                >
+                  <span class="selected-chip__avatar">
+                    <app-avatar
+                      [name]="chip.label"
+                      [src]="null"
+                      [colorKey]="chip.colorKey"
+                      [size]="48"
+                    />
+                    <span class="selected-chip__remove" aria-hidden="true">
+                      <ion-icon name="close" />
+                    </span>
                   </span>
+                  <span class="selected-chip__name">{{ chip.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Error message -->
+      @if (error()) {
+        <div class="error-banner">
+          <ion-icon name="alert-circle-outline" />
+          <span>Something went wrong. Please try again.</span>
+        </div>
+      }
+
+      <!-- Connections tab -->
+      @if (activeTab() === 'connections') {
+        @if (connectionsLoading()) {
+          <div class="state-msg">
+            <ion-spinner name="crescent" />
+          </div>
+        } @else if (connections().length === 0) {
+          <div class="state-msg c-text">You don't have any connections yet.</div>
+        } @else {
+          <div class="friend-list">
+            @for (c of connections(); track c.id) {
+              <button
+                class="friend-row"
+                type="button"
+                [class.is-taken]="c.alreadyInGroup"
+                [disabled]="c.alreadyInGroup || submitting()"
+                (click)="toggleConnection(c)"
+              >
+                <app-avatar [name]="c.displayName" [src]="null" [colorKey]="c.id" [size]="40" />
+                <span class="friend-text">
+                  <span class="friend-name">{{ c.displayName }}</span>
+                  @if (c.alreadyInGroup) {
+                    <small class="friend-note c-text">Already in group</small>
+                  }
                 </span>
-                <span class="selected-chip__name">{{ chip.label }}</span>
+                @if (c.alreadyInGroup) {
+                  <ion-icon name="checkmark-circle" class="pick-icon pick-icon--taken" />
+                } @else if (c.selected) {
+                  <ion-icon name="checkmark-circle" class="pick-icon pick-icon--on" />
+                } @else {
+                  <ion-icon name="ellipse-outline" class="pick-icon" />
+                }
               </button>
             }
           </div>
-        </div>
-      </div>
-    }
+        }
+      }
 
-    <!-- Error message -->
-    @if (error()) {
-      <div class="error-banner">
-        <ion-icon name="alert-circle-outline" />
-        <span>Something went wrong. Please try again.</span>
-      </div>
-    }
+      <!-- Without-account tab -->
+      @if (activeTab() === 'virtual') {
+        <p class="hint c-text">Add someone who doesn't use SimpleShare.</p>
 
-    <!-- Connections tab -->
-    @if (activeTab() === 'connections') {
-      @if (connectionsLoading()) {
-        <div class="state-msg">
-          <ion-spinner name="crescent" />
-        </div>
-      } @else if (connections().length === 0) {
-        <div class="state-msg c-text">You don't have any connections yet.</div>
-      } @else {
-        <div class="friend-list">
-          @for (c of connections(); track c.id) {
-            <button
-              class="friend-row"
-              type="button"
-              [class.is-taken]="c.alreadyInGroup"
-              [disabled]="c.alreadyInGroup || submitting()"
-              (click)="toggleConnection(c)"
-            >
-              <app-avatar [name]="c.displayName" [src]="null" [colorKey]="c.id" [size]="40" />
-              <span class="friend-text">
-                <span class="friend-name">{{ c.displayName }}</span>
-                @if (c.alreadyInGroup) {
-                  <small class="friend-note c-text">Already in group</small>
-                }
-              </span>
-              @if (c.alreadyInGroup) {
-                <ion-icon name="checkmark-circle" class="pick-icon pick-icon--taken" />
-              } @else if (c.selected) {
-                <ion-icon name="checkmark-circle" class="pick-icon pick-icon--on" />
-              } @else {
-                <ion-icon name="ellipse-outline" class="pick-icon" />
-              }
-            </button>
-          }
+        <div class="name-row">
+          <ion-input
+            type="text"
+            [formControl]="displayName"
+            fill="outline"
+            label="Name"
+            labelPlacement="floating"
+            placeholder="e.g. Nikola"
+            autocapitalize="words"
+            (keyup.enter)="addVirtual()"
+          />
+          <ion-button
+            fill="outline"
+            class="add-btn"
+            [disabled]="submitting()"
+            (click)="addVirtual()"
+          >
+            <ion-icon name="add-outline" slot="start" />
+            Add
+          </ion-button>
         </div>
       }
-    }
 
-    <!-- Without-account tab -->
-    @if (activeTab() === 'virtual') {
-      <p class="hint c-text">Add someone who doesn't use SimpleShare.</p>
-
-      <div class="name-row">
-        <ion-input
-          type="text"
-          [formControl]="displayName"
-          fill="outline"
-          label="Name"
-          labelPlacement="floating"
-          placeholder="e.g. Nikola"
-          autocapitalize="words"
-          (keyup.enter)="addVirtual()"
-        />
+      <div class="form-actions">
         <ion-button
-          fill="outline"
-          class="add-btn"
-          [disabled]="submitting()"
-          (click)="addVirtual()"
+          expand="block"
+          color="primary"
+          class="confirm-btn"
+          [disabled]="totalSelected() === 0 || submitting()"
+          (click)="submit()"
         >
-          <ion-icon name="add-outline" slot="start" />
-          Add
+          @if (submitting()) {
+            <ion-spinner name="crescent" slot="start" />
+            Adding...
+          } @else {
+            Add {{ totalSelected() }} {{ totalSelected() === 1 ? 'person' : 'people' }}
+          }
         </ion-button>
       </div>
+    } @else {
+      <app-invite-view
+        [groupId]="groupId"
+        [mode]="view() === 'qr' ? 'qr' : 'link'"
+        (back)="backToPeople()"
+      />
     }
-
-    <div class="form-actions">
-      <ion-button
-        expand="block"
-        color="primary"
-        class="confirm-btn"
-        [disabled]="totalSelected() === 0 || submitting()"
-        (click)="submit()"
-      >
-        @if (submitting()) {
-          <ion-spinner name="crescent" slot="start" />
-          Adding...
-        } @else {
-          Add {{ totalSelected() }} {{ totalSelected() === 1 ? 'person' : 'people' }}
-        }
-      </ion-button>
-    </div>
   </div>
 </ion-content>

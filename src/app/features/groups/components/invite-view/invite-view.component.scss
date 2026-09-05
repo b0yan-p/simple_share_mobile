@@ -1,0 +1,85 @@
+@use '../../../../../theme/variables.scss' as c;
+
+// No shell here: this renders inside the "Add people" sheet body, which already
+// owns the header, the background and the horizontal padding.
+:host {
+  display: block;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+// ─── Link ─────────────────────────────────────────────────────────────────────
+.link-box {
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: c.$border-radius-l;
+  color: c.$text-light;
+  font-size: 14px;
+  // The link is one unbroken token, so it has to be allowed to wrap mid-string
+  // rather than pushing the sheet into a horizontal scroll.
+  word-break: break-all;
+}
+
+.invite-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  ion-button {
+    flex: 1;
+    margin: 0;
+    height: 48px;
+  }
+}
+
+// ─── QR ───────────────────────────────────────────────────────────────────────
+.qr-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin: 0 auto 20px;
+  width: fit-content;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: c.$border-radius-xl;
+}
+
+.qr-art {
+  display: block;
+  width: 200px;
+  height: 200px;
+  fill: c.$text-light;
+  shape-rendering: crispEdges;
+}
+
+// ─── Warning ──────────────────────────────────────────────────────────────────
+.warning-callout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--ss-warning-bg);
+  border: 1px solid #{rgba(c.$warn, 0.5)};
+  border-radius: c.$border-radius-l;
+  color: var(--ss-warning-text);
+  font-size: 13px;
+
+  ion-icon {
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+}
+
+// ─── Back ─────────────────────────────────────────────────────────────────────
+.back-btn {
+  margin-top: 20px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}

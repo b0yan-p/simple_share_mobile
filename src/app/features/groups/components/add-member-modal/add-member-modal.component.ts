@@ -42,6 +42,7 @@ import { ConnectionService } from 'src/app/features/connections/services/connect
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { AddGroupMemberItem } from '../../models/add-group-members.model';
 import { GroupService } from '../../services/group.service';
+import { InviteViewComponent } from '../invite-view/invite-view.component';
 
 /** One entry in the horizontally scrollable "N selected" strip. */
 interface SelectedChip {
@@ -59,6 +60,7 @@ interface SelectedChip {
   imports: [
     ReactiveFormsModule,
     AvatarComponent,
+    InviteViewComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -82,6 +84,11 @@ export class AddMemberModalComponent implements OnInit {
   private connectionService = inject(ConnectionService);
   private toastService = inject(ToastService);
 
+  /**
+   * Which screen the sheet is showing. The invite screens replace this body
+   * rather than opening on top of it, so the picked people survive the trip.
+   */
+  view = signal<'people' | 'link' | 'qr'>('people');
   activeTab = signal<'connections' | 'virtual'>('connections');
   submitting = signal(false);
   error = signal(false);
@@ -178,12 +185,20 @@ export class AddMemberModalComponent implements OnInit {
     this.activeTab.set(value === 'virtual' ? 'virtual' : 'connections');
   }
 
+  title = computed(() =>
+    this.view() === 'link' ? 'Invite link' : this.view() === 'qr' ? 'QR code' : 'Add people',
+  );
+
   dismiss(): void {
     this.modalController.dismiss(null, 'cancel');
   }
 
-  comingSoon(): void {
-    void this.toastService.infoToast('Coming soon');
+  openInvite(mode: 'link' | 'qr'): void {
+    this.view.set(mode);
+  }
+
+  backToPeople(): void {
+    this.view.set('people');
   }
 
   toggleConnection(connection: ConnectionItem & { alreadyInGroup: boolean }): void {

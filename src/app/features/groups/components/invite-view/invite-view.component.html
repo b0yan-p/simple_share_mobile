@@ -1,0 +1,108 @@
+@if (mode === 'link') {
+  <p class="modal-subtitle c-text">Share this link to invite people into your group</p>
+
+  <div class="link-box">{{ inviteLink }}</div>
+
+  <div class="invite-actions">
+    <ion-button color="primary" (click)="copyLink()">
+      <ion-icon name="copy-outline" slot="start" />
+      Copy link
+    </ion-button>
+    <ion-button fill="outline" (click)="shareLink()">
+      <ion-icon name="share-social-outline" slot="start" />
+      Share link
+    </ion-button>
+  </div>
+
+  <div class="warning-callout">
+    <ion-icon name="alert-circle-outline" />
+    <span>Anyone with this link can join your group.</span>
+  </div>
+} @else {
+  <p class="modal-subtitle c-text">Scan this QR code to join the group</p>
+
+  <div class="qr-frame">
+    <!--
+      TODO: placeholder pattern, not a scannable code. Replace with a real
+      QR once the backend issues invite tokens.
+    -->
+    <svg class="qr-art" viewBox="0 0 29 29" aria-hidden="true">
+      <!-- Finder squares -->
+      <g class="qr-art__finder">
+        <path
+          d="M0 0h9v9H0zM2 2v5h5V2z M20 0h9v9h-9zM22 2v5h5V2z M0 20h9v9H0zM2 22v5h5v-5z"
+          fill-rule="evenodd"
+        />
+        <path d="M3 3h3v3H3z M23 3h3v3h-3z M3 23h3v3H3z" />
+      </g>
+      <!-- Timing + data modules -->
+      <path
+        class="qr-art__modules"
+        d="M10 0h1v1h-1z M12 0h1v1h-1z M15 0h1v1h-1z M17 0h1v1h-1z
+           M11 1h1v1h-1z M14 1h1v1h-1z M18 1h1v1h-1z
+           M10 2h1v1h-1z M13 2h1v1h-1z M16 2h1v1h-1z M18 2h1v1h-1z
+           M11 3h1v1h-1z M12 3h1v1h-1z M15 3h1v1h-1z
+           M10 4h1v1h-1z M14 4h1v1h-1z M17 4h1v1h-1z M18 4h1v1h-1z
+           M12 5h1v1h-1z M13 5h1v1h-1z M16 5h1v1h-1z
+           M10 6h1v1h-1z M11 6h1v1h-1z M15 6h1v1h-1z M18 6h1v1h-1z
+           M13 7h1v1h-1z M17 7h1v1h-1z
+           M10 8h1v1h-1z M12 8h1v1h-1z M14 8h1v1h-1z M16 8h1v1h-1z M18 8h1v1h-1z
+           M0 10h1v1H0z M2 10h1v1H2z M5 10h1v1H5z M7 10h1v1H7z
+           M10 10h1v1h-1z M13 10h1v1h-1z M15 10h1v1h-1z M18 10h1v1h-1z
+           M21 10h1v1h-1z M23 10h1v1h-1z M26 10h1v1h-1z M28 10h1v1h-1z
+           M1 11h1v1H1z M4 11h1v1H4z M8 11h1v1H8z
+           M11 11h1v1h-1z M12 11h1v1h-1z M16 11h1v1h-1z
+           M20 11h1v1h-1z M24 11h1v1h-1z M27 11h1v1h-1z
+           M0 12h1v1H0z M3 12h1v1H3z M6 12h1v1H6z
+           M10 12h1v1h-1z M14 12h1v1h-1z M17 12h1v1h-1z M19 12h1v1h-1z
+           M22 12h1v1h-1z M25 12h1v1h-1z M28 12h1v1h-1z
+           M2 13h1v1H2z M5 13h1v1H5z M8 13h1v1H8z
+           M12 13h1v1h-1z M13 13h1v1h-1z M18 13h1v1h-1z
+           M21 13h1v1h-1z M23 13h1v1h-1z M26 13h1v1h-1z
+           M0 14h1v1H0z M4 14h1v1H4z M7 14h1v1H7z
+           M10 14h1v1h-1z M15 14h1v1h-1z M16 14h1v1h-1z M19 14h1v1h-1z
+           M20 14h1v1h-1z M24 14h1v1h-1z M27 14h1v1h-1z M28 14h1v1h-1z
+           M1 15h1v1H1z M3 15h1v1H3z M6 15h1v1H6z M8 15h1v1H8z
+           M11 15h1v1h-1z M14 15h1v1h-1z M17 15h1v1h-1z
+           M22 15h1v1h-1z M25 15h1v1h-1z
+           M0 16h1v1H0z M5 16h1v1H5z M7 16h1v1H7z
+           M10 16h1v1h-1z M12 16h1v1h-1z M16 16h1v1h-1z M18 16h1v1h-1z
+           M21 16h1v1h-1z M23 16h1v1h-1z M27 16h1v1h-1z
+           M2 17h1v1H2z M4 17h1v1H4z M8 17h1v1H8z
+           M13 17h1v1h-1z M15 17h1v1h-1z M19 17h1v1h-1z
+           M20 17h1v1h-1z M26 17h1v1h-1z M28 17h1v1h-1z
+           M1 18h1v1H1z M3 18h1v1H3z M6 18h1v1H6z
+           M11 18h1v1h-1z M14 18h1v1h-1z M17 18h1v1h-1z
+           M22 18h1v1h-1z M24 18h1v1h-1z M27 18h1v1h-1z
+           M10 20h1v1h-1z M12 20h1v1h-1z M15 20h1v1h-1z M17 20h1v1h-1z
+           M20 20h1v1h-1z M23 20h1v1h-1z M26 20h1v1h-1z M28 20h1v1h-1z
+           M11 21h1v1h-1z M13 21h1v1h-1z M16 21h1v1h-1z M18 21h1v1h-1z
+           M21 21h1v1h-1z M25 21h1v1h-1z M27 21h1v1h-1z
+           M10 22h1v1h-1z M14 22h1v1h-1z M17 22h1v1h-1z
+           M20 22h1v1h-1z M22 22h1v1h-1z M26 22h1v1h-1z
+           M12 23h1v1h-1z M15 23h1v1h-1z M18 23h1v1h-1z
+           M21 23h1v1h-1z M24 23h1v1h-1z M28 23h1v1h-1z
+           M11 24h1v1h-1z M13 24h1v1h-1z M16 24h1v1h-1z
+           M20 24h1v1h-1z M23 24h1v1h-1z M25 24h1v1h-1z M27 24h1v1h-1z
+           M10 25h1v1h-1z M14 25h1v1h-1z M18 25h1v1h-1z
+           M22 25h1v1h-1z M26 25h1v1h-1z M28 25h1v1h-1z
+           M12 26h1v1h-1z M15 26h1v1h-1z M17 26h1v1h-1z
+           M21 26h1v1h-1z M24 26h1v1h-1z M27 26h1v1h-1z
+           M11 27h1v1h-1z M13 27h1v1h-1z M16 27h1v1h-1z M19 27h1v1h-1z
+           M20 27h1v1h-1z M23 27h1v1h-1z M25 27h1v1h-1z
+           M10 28h1v1h-1z M14 28h1v1h-1z M17 28h1v1h-1z
+           M22 28h1v1h-1z M26 28h1v1h-1z M28 28h1v1h-1z"
+      />
+    </svg>
+  </div>
+
+  <div class="warning-callout">
+    <ion-icon name="alert-circle-outline" />
+    <span>Anyone who scans this QR code can join your group.</span>
+  </div>
+}
+
+<ion-button expand="block" fill="clear" class="back-btn" (click)="back.emit()">
+  <ion-icon name="arrow-back-outline" slot="start" />
+  Back
+</ion-button>
