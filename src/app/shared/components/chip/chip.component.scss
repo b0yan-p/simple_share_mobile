@@ -20,3 +20,13 @@
   background-color: rgba(c.$error, 0.1);
   color: c.$error;
 }
+
+:host.info {
+  background-color: rgba(c.$primary, 0.1);
+  color: c.$primary;
+}
+
+:host.neutral {
+  background-color: rgba(c.$text, 0.1);
+  color: c.$text;
+}

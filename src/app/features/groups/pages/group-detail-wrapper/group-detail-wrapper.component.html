@@ -27,6 +27,7 @@
       [totalOwed]="group.myDebtSummary.owedTotal"
       [totalBalance]="group.myDebtSummary.net"
       (addMembers)="openAddMembers()"
+      (viewMembers)="openMembers(group.currentMemberId)"
     />
   }
 

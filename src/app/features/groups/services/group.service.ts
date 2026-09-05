@@ -51,6 +51,12 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
       .pipe(first());
   }
 
+  public removeGroupMember(groupId: string, memberId: string): Observable<void> {
+    return this.httpClient
+      .delete<void>(`${environment.baseAPIUrl}/groupmember/${groupId}/members/${memberId}`)
+      .pipe(first());
+  }
+
   public getGroupBalances(groupId: string): Observable<BalanceResponse> {
     return this.httpClient
       .get<BalanceResponse>(`${this.baseApi}/${groupId}/balances`)

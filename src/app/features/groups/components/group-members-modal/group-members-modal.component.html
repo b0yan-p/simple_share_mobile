@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="dismiss()">
+        <ion-icon name="arrow-back-outline" slot="icon-only" class="back-icon" />
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Members</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-body">
+    @if (addedCount() > 0) {
+      <div class="success-banner">
+        <ion-icon name="checkmark-circle" />
+        <span> {{ addedCount() }} {{ addedCount() === 1 ? 'person' : 'people' }} added </span>
+      </div>
+    }
+
+    <div class="meta">
+      <small class="c-text">
+        {{ members().length }} {{ members().length === 1 ? 'member' : 'members' }}
+        @if (withoutAccountCount() > 0) {
+          · {{ withoutAccountCount() }} without account
+        }
+      </small>
+      <ion-button color="primary" class="btn-sm" (click)="openAddPeople()">
+        <ion-icon name="add-outline" slot="start" />
+        Add people
+      </ion-button>
+    </div>
+
+    @if (loading()) {
+      <div class="state-msg">
+        <ion-spinner name="crescent" />
+      </div>
+    } @else {
+      <ion-list class="member-list" lines="none">
+        @for (row of rows(); track row.member.memberId) {
+          <ion-item
+            button
+            detail="true"
+            class="member-item"
+            lines="none"
+            (click)="openMemberActions(row.member)"
+          >
+            <div class="member-content">
+              <app-avatar
+                [src]="null"
+                [name]="row.member.displayName"
+                [colorKey]="row.member.memberId"
+              />
+
+              <div class="bdd-flex bdd-flex-col bdd-flex-1 member-text">
+                <span class="c-light font-w-500">{{ row.member.displayName }}</span>
+                @if (row.isOwner) {
+                  <app-chip title="Owner" severity="info" class="chip-sm" />
+                } @else if (row.isVirtual) {
+                  <app-chip title="No account" severity="neutral" class="chip-sm" />
+                }
+              </div>
+            </div>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  </div>
+</ion-content>

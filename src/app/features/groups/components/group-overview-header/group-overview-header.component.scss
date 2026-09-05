@@ -21,11 +21,33 @@
     margin-left: -14px;
   }
 
-  .members-btn {
+  .member-stack {
     display: flex;
-    gap: 12px;
-    padding: 12px;
-    background-color: var(--ss-primary-light);
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  // Sits in the same overlapping row as the avatars, so it has to match their
+  // 36px box and the 3px surface ring from .avatar.borders. box-sizing keeps
+  // the ring from pushing it past 36px and knocking the row out of alignment.
+  .member-stack__more {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid var(--ss-surface);
+    background-color: var(--ss-primary-subtle);
+    color: var(--ss-primary);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
   }
 
   .border-bottom {

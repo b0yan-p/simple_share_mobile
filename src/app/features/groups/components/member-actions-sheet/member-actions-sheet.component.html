@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()">
+        <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sheet-body">
+    <div class="identity">
+      <app-avatar
+        [name]="member.displayName"
+        [src]="null"
+        [colorKey]="member.memberId"
+        [size]="72"
+      />
+      <h4 class="identity__name">{{ member.displayName }}</h4>
+      @if (isOwner()) {
+        <app-chip title="Owner" severity="info" />
+      } @else if (isVirtual()) {
+        <app-chip title="No account" severity="neutral" />
+      }
+    </div>
+
+    <div class="member-balance">
+      <span class="member-balance__label c-text">Current balance</span>
+      <span class="member-balance__amount" [class.is-unknown]="netBalance === null">
+        @if (netBalance === null) {
+          &mdash;
+        } @else {
+          {{ netBalance | number: '1.2-2' }} BAM
+        }
+      </span>
+    </div>
+
+    @if (isVirtual()) {
+      <ion-button expand="block" color="primary" class="link-btn" (click)="linkToAccount()">
+        Link to account
+      </ion-button>
+      <p class="link-hint c-text">Connect this person to an existing SimpleShare account.</p>
+    }
+
+    @if (canRemove) {
+      <ion-button
+        expand="block"
+        fill="outline"
+        class="remove-btn"
+        [disabled]="removing()"
+        (click)="confirmRemove()"
+      >
+        @if (removing()) {
+          <ion-spinner name="crescent" slot="start" />
+          Removing...
+        } @else {
+          <ion-icon name="trash-outline" slot="start" />
+          Remove from group
+        }
+      </ion-button>
+    }
+  </div>
+</ion-content>

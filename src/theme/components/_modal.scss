@@ -38,3 +38,29 @@ ion-modal.modal-sheet {
     }
   }
 }
+
+// ─── Full-screen dialog ──────────────────────────────────────────────
+// Opened without `breakpoints`, so it is a plain modal rather than a sheet: it
+// fills the viewport and carries a back arrow instead of a drag handle.
+ion-modal.modal-fullscreen {
+  --border-radius: 0;
+  --width: 100%;
+  --height: 100%;
+  --background: #{c.$bg};
+
+  ion-header ion-toolbar {
+    --background: #{c.$bg};
+    --border-width: 0;
+    --padding-top: 8px;
+    --padding-start: 8px;
+    --padding-end: 8px;
+
+    ion-title {
+      padding-inline: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: c.$text-light;
+    }
+  }
+}

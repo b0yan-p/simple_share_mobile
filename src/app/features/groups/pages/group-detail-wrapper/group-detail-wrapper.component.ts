@@ -24,6 +24,7 @@ import { ExpenseListComponent } from 'src/app/features/expenses/components/expen
 import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
+import { GroupMembersModalComponent } from '../../components/group-members-modal/group-members-modal.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupFacade } from '../../services/group-facade.service';
@@ -143,6 +144,28 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private restoreScroll(tab: GroupDetailTab): void {
     const target = this.store.scrollTopFor(tab);
     requestAnimationFrame(() => void this.content()?.scrollToPoint(0, target, 0));
+  }
+
+  /**
+   * Full screen rather than a sheet: it is a list you scroll and drill into, and
+   * the "Add people" sheet has to be able to sit on top of it.
+   */
+  async openMembers(currentMemberId: string | null): Promise<void> {
+    const modal = await this.modalController.create({
+      component: GroupMembersModalComponent,
+      componentProps: {
+        groupId: this.route.snapshot.params['id'],
+        currentMemberId,
+      },
+      cssClass: 'modal-fullscreen',
+    });
+
+    await modal.present();
+    const { role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      this.refresh$.next();
+    }
   }
 
   async openAddMembers(): Promise<void> {

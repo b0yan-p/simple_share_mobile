@@ -1,0 +1,114 @@
+@use '../../../../../theme/variables.scss' as c;
+
+ion-content {
+  --background: #{c.$bg};
+}
+
+.back-icon {
+  color: c.$primary;
+  font-size: 24px;
+}
+
+.page-body {
+  padding: 8px 20px 40px;
+}
+
+// ─── Banner ───────────────────────────────────────────────────────────────────
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  background: rgba(c.$success, 0.1);
+  border-radius: 12px;
+  color: c.$success;
+  font-size: 15px;
+  font-weight: 500;
+
+  ion-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+}
+
+// ─── Meta row ─────────────────────────────────────────────────────────────────
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  ion-button {
+    flex-shrink: 0;
+    margin: 0;
+  }
+}
+
+.state-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+// ─── List ─────────────────────────────────────────────────────────────────────
+// One rounded card per row, matching the groups list (app-list-item) rather
+// than one shared surface-card — so the radius, shadow and 12px gap below are
+// copied from list-item.component.scss on purpose.
+.member-list {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+.member-item {
+  --background: #{c.$surface};
+  --border-width: 0;
+  --inner-border-width: 0;
+  --detail-icon-color: #{c.$text};
+  --detail-icon-opacity: 0.5;
+  --detail-icon-font-size: 18px;
+  background-color: var(--ss-surface);
+  border-radius: c.$border-radius-xl;
+  margin-bottom: 12px;
+
+  box-shadow:
+    0 8px 24px rgba(83, 74, 183, 0.08),
+    0 2px 6px rgba(83, 74, 183, 0.04);
+}
+
+.member-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-block: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.member-text {
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 0;
+
+  > span {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// The shared chip defaults to 14px/4px 12px, which is too heavy for a list row.
+.chip-sm {
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+}

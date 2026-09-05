@@ -16,7 +16,12 @@
 
   <!-- members -->
   <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-gap-1">
-    <div>
+    <button
+      type="button"
+      class="member-stack"
+      aria-label="View all members"
+      (click)="viewMembers.emit()"
+    >
       @for (member of reducedMembers(); track member.memberId) {
         <app-avatar
           [name]="member.displayName"
@@ -27,7 +32,10 @@
           [ngClass]="{ 'avatar-negative-margin': !$first }"
         />
       }
-    </div>
+      @if (hiddenCount() > 0) {
+        <span class="member-stack__more avatar-negative-margin">+{{ hiddenCount() }}</span>
+      }
+    </button>
     <ion-button fill="outline" class="btn-sm" size="small" (click)="addMembers.emit()"
       >Add members</ion-button
     >

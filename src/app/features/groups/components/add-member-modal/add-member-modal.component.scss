@@ -81,6 +81,19 @@ ion-content {
   }
 }
 
+.friend-row.is-taken {
+  opacity: 1;
+  background: rgba(c.$primary, 0.03);
+}
+
+.friend-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .friend-name {
   flex: 1;
   font-size: 15px;
@@ -91,36 +104,197 @@ ion-content {
   text-overflow: ellipsis;
 }
 
-.friend-add-icon {
-  color: c.$primary;
-  font-size: 22px;
-  flex-shrink: 0;
+.friend-note {
+  font-size: 12px;
 }
 
-// ─── Form fields ──────────────────────────────────────────────────────────────
-.field-group {
+.pick-icon {
+  flex-shrink: 0;
+  font-size: 24px;
+  color: c.$borders;
+
+  &--on {
+    color: c.$primary;
+  }
+
+  &--taken {
+    color: c.$success;
+  }
+}
+
+// ─── Invite (stub) ────────────────────────────────────────────────────────────
+.invite-card {
+  padding: 16px;
+  margin-bottom: 20px;
+  background: rgba(c.$primary, 0.05);
+  border: 1px solid rgba(c.$primary, 0.12);
+  border-radius: c.$border-radius-xl;
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: c.$primary;
+  }
+
+  &__text {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: c.$text;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+
+    ion-button {
+      flex: 1;
+      margin: 0;
+    }
+  }
+}
+
+// ─── Selected strip ───────────────────────────────────────────────────────────
+.selected {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid c.$borders;
+
+  &__count {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: c.$primary;
+  }
+}
+
+// The fade is painted by the wrapper, not the scroller, so it stays pinned to
+// the right edge instead of scrolling away with the chips.
+.selected-scroll {
+  position: relative;
+  border-radius: c.$border-radius-m;
+  // Clips the chips to the rounded shape; the strip inside still scrolls.
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    right: -1px;
+    width: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    // Soft edge rather than a hard purple bar, matching the wrapper's corners.
+    border-radius: inherit;
+    // Two layers: the base fade masks the chips, the primary wash on top just
+    // tints the very edge. The mid stop keeps the ramp gentle instead of
+    // ramping straight to full strength. rgba(x, 0) rather than `transparent`
+    // throughout, which WebKit would otherwise interpolate through black.
+    background:
+      linear-gradient(
+        to right,
+        rgba(c.$primary, 0) 0%,
+        rgba(c.$primary, 0.05) 55%,
+        rgba(c.$primary, 0.14) 100%
+      ),
+      linear-gradient(to right, rgba(c.$bg, 0), c.$bg);
+  }
+
+  &.has-more::after {
+    opacity: 1;
+  }
+}
+
+// Horizontal only: the strip has to keep growing sideways as people are picked
+// rather than wrapping and pushing the list below out of reach.
+.selected-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 4px 2px 0;
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  > * {
+    flex: 0 0 auto;
+  }
+}
+
+.selected-chip {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 6px;
-  margin-bottom: 16px;
+  width: 60px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  &__avatar {
+    position: relative;
+    display: inline-flex;
+  }
+
+  // Tapping the chip already removes it; the badge is what makes that legible.
+  // The ring is the sheet background, not the surface, so it reads as a cut-out.
+  &__remove {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid c.$bg;
+    background: c.$error;
+    color: c.$surface;
+
+    ion-icon {
+      font-size: 11px;
+    }
+  }
+
+  &__name {
+    max-width: 100%;
+    font-size: 12px;
+    color: c.$text-light;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
-.field-label {
+// ─── Without-account tab ──────────────────────────────────────────────────────
+.hint {
+  margin: 0 0 16px;
   font-size: 13px;
-  font-weight: 500;
-  color: c.$text;
-  padding-left: 2px;
 }
 
-ion-input {
-  --background: #{c.$surface} !important;
-  --color: #{c.$text-light};
-  --placeholder-color: #{c.$text};
-  --border-radius: 12px;
-  --padding-start: 14px;
-  --padding-end: 14px;
-  border: 1px solid c.$borders;
-  border-radius: 12px;
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+
+  ion-input {
+    flex: 1;
+  }
+}
+
+.add-btn {
+  flex-shrink: 0;
+  margin: 0;
 }
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
@@ -131,8 +305,12 @@ ion-input {
   margin-top: 28px;
 }
 
+.friend-list + .form-actions,
+.selected + .form-actions {
+  margin-top: 24px;
+}
+
 .confirm-btn {
-  --border-radius: 14px;
   height: 52px;
   font-size: 16px;
   font-weight: 600;

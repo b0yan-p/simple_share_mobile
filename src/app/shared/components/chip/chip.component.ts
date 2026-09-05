@@ -12,6 +12,6 @@ import { Component, input } from '@angular/core';
 export class ChipComponent {
   title = input.required<string>();
 
-  severity = input<'success' | 'error'>('success');
+  severity = input<'success' | 'error' | 'info' | 'neutral'>('success');
   rounded = input<boolean>(true);
 }
