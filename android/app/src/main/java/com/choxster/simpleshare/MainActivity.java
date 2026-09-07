@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.choxster.simpleshare;
 
 import com.getcapacitor.BridgeActivity;
 

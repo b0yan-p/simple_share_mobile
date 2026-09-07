@@ -4,10 +4,22 @@ import { catchError, throwError } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 
-const SKIP_AUTH = ['/auth/login', '/auth/register'];
+const SKIP_AUTH: (string | RegExp)[] = [
+  '/auth/login',
+  '/auth/register',
+  // Public invite preview: /groupinvitation/{token} and nothing else on that
+  // controller. A regex rather than a substring because plain matching cannot
+  // tell it apart from /groupinvitation/group/{id} or /groupinvitation/{token}/join,
+  // both of which are authenticated. Without this entry the interceptor would
+  // log a visitor out for opening an invite link.
+  /\/groupinvitation\/(?!group\/)[^/]+$/i,
+];
+
+const skipsAuth = (url: string): boolean =>
+  SKIP_AUTH.some((rule) => (typeof rule === 'string' ? url.includes(rule) : rule.test(url)));
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  if (SKIP_AUTH.some((x) => req.url.includes(x))) return next(req);
+  if (skipsAuth(req.url)) return next(req);
 
   const tokenService = inject(TokenStorageService);
   const authService = inject(AuthService);

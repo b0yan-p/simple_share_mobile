@@ -1,0 +1,73 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Join group</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-body">
+    @if (loading()) {
+      <div class="state-msg">
+        <ion-spinner name="crescent" />
+      </div>
+    } @else if (failed()) {
+      <app-empty-state
+        icon="alert-circle-outline"
+        title="Invite unavailable"
+        subtitle="This invite link is no longer valid, or the group has been removed."
+        actionLabel="Try again"
+        (action)="loadPreview()"
+      />
+    } @else if (joined()) {
+      <!-- Confirmation -->
+      <div class="panel">
+        <span class="success-mark">
+          <ion-icon name="checkmark-circle" />
+        </span>
+        @if (alreadyMember()) {
+          <h3 class="panel__title">You're already in {{ preview()?.groupName }}</h3>
+          <p class="panel__text c-text">Nothing to do — you were added to this group before.</p>
+        } @else {
+          <h3 class="panel__title">You've joined {{ preview()?.groupName }}</h3>
+          <p class="panel__text c-text">
+            You can now add expenses and settle up with everyone in this group.
+          </p>
+        }
+
+        <ion-button expand="block" color="primary" class="cta" (click)="openGroup()">
+          Open group
+        </ion-button>
+      </div>
+    } @else {
+      <!-- Invitation -->
+      <div class="panel">
+        <app-avatar [name]="preview()!.groupName" [src]="null" [size]="72" />
+        <h3 class="panel__title">{{ preview()!.groupName }}</h3>
+        <small class="c-text">
+          {{ preview()!.memberCount }}
+          {{ preview()!.memberCount === 1 ? 'member' : 'members' }}
+        </small>
+        <p class="panel__text c-text">You've been invited to join this group.</p>
+
+        <ion-button
+          expand="block"
+          color="primary"
+          class="cta"
+          [disabled]="joining()"
+          (click)="join()"
+        >
+          @if (joining()) {
+            <ion-spinner name="crescent" slot="start" />
+            Joining...
+          } @else {
+            Join group
+          }
+        </ion-button>
+
+        <ion-button expand="block" fill="clear" [disabled]="joining()" (click)="goHome()">
+          Not now
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

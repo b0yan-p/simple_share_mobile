@@ -7,13 +7,15 @@ import { TokenStorageService } from '../services/token-storage.service';
  * by AuthBootstrapService (an app initializer), so reading the signal here is
  * safe - initializers always finish before the router runs.
  */
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
   const tokenService = inject(TokenStorageService);
   const router = inject(Router);
 
   if (tokenService.isAuthenticated()) return true;
 
-  return router.createUrlTree(['login']);
+  // Carry the attempted URL through login: someone opening an invite link
+  // usually has no account yet, and dropping it would strand them on home.
+  return router.createUrlTree(['login'], { queryParams: { returnUrl: state.url } });
 };
 
 /** Keeps an already logged in user away from the login/register pages. */

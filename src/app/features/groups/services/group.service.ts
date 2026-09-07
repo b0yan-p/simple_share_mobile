@@ -10,6 +10,11 @@ import { BalanceResponse } from '../models/balance-response.model';
 import { GroupMember } from '../models/group-member.model';
 import { GroupOverview } from '../models/group-overview.model';
 import { Group, GroupListItem } from '../models/group.model';
+import {
+  GroupInvitation,
+  InvitePreview,
+  JoinGroupResponse,
+} from '../models/invite-preview.model';
 import { UpdateGroup } from '../models/update-group.model';
 import { mapGroupListItems } from '../utils/group-list.utils';
 
@@ -54,6 +59,25 @@ export class GroupService extends BaseService<GroupListItem, Group, UpdateGroup>
   public removeGroupMember(groupId: string, memberId: string): Observable<void> {
     return this.httpClient
       .delete<void>(`${environment.baseAPIUrl}/groupmember/${groupId}/members/${memberId}`)
+      .pipe(first());
+  }
+
+  public getGroupInvitation(groupId: string): Observable<GroupInvitation> {
+    return this.httpClient
+      .get<GroupInvitation>(`${environment.baseAPIUrl}/groupinvitation/group/${groupId}`)
+      .pipe(first());
+  }
+
+  /** Public endpoint — see SKIP_AUTH in auth-interceptor.interceptor.ts. */
+  public getInvitePreview(token: string): Observable<InvitePreview> {
+    return this.httpClient
+      .get<InvitePreview>(`${environment.baseAPIUrl}/groupinvitation/${token}`)
+      .pipe(first());
+  }
+
+  public joinGroup(token: string): Observable<JoinGroupResponse> {
+    return this.httpClient
+      .post<JoinGroupResponse>(`${environment.baseAPIUrl}/groupinvitation/${token}/join`, null)
       .pipe(first());
   }
 

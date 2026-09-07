@@ -13,7 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { LoginInput } from '../../models/login-input.model';
 
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TokenStorageService } from '../../services/token-storage.service';
 
@@ -34,8 +34,12 @@ export class LoginComponent {
   auth = inject(AuthService);
   tokenService = inject(TokenStorageService);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loading = false;
+
+  /** Set by authGuard when a protected URL (e.g. an invite link) was blocked. */
+  readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
   form = new FormGroup({
     email: new FormControl<string | null>('pero@peric.com', [
@@ -58,7 +62,8 @@ export class LoginComponent {
         if (!res) return;
 
         this.loading = false;
-        this.router.navigate(['home']);
+        // navigateByUrl, not navigate: returnUrl is a whole URL, not a segment.
+        this.router.navigateByUrl(this.returnUrl ?? '/home');
       },
       error: (err) => {
         console.error(err);

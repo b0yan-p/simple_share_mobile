@@ -25,6 +25,7 @@ import { mapGroupListItems } from '../utils/group-list.utils';
 import { GroupApiService } from './group-api.service';
 import { GroupIdbService } from './group-idb.service';
 import { GroupPaginatorService } from './group-paginator.service';
+import { JoinGroupResponse } from '../models/invite-preview.model';
 import { GroupService } from './group.service';
 
 const OFFLINE_MUTATION_MESSAGE = 'You are offline. Connect to the internet and try again.';
@@ -298,6 +299,21 @@ export class GroupFacade {
 
     this.ui.itemLoading.set(true);
     return this.groupApi.updateGroup(payload).pipe(
+      finalize(() => this.ui.itemLoading.set(false)),
+      tap(() => this.reloadGroupLists()),
+    );
+  }
+
+  /**
+   * Joining changes what the user is a member of, so both group lists have to
+   * be reloaded — otherwise the group they just joined is missing from the
+   * store and the IDB cache until something else invalidates them.
+   */
+  joinGroup(token: string): Observable<JoinGroupResponse> {
+    if (!this.networkService.isOnline()) return this.offlineMutation();
+
+    this.ui.itemLoading.set(true);
+    return this.groupService.joinGroup(token).pipe(
       finalize(() => this.ui.itemLoading.set(false)),
       tap(() => this.reloadGroupLists()),
     );

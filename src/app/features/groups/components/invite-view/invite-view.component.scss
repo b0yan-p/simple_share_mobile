@@ -11,6 +11,19 @@
   margin-bottom: 24px;
 }
 
+.link-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
 // ─── Link ─────────────────────────────────────────────────────────────────────
 .link-box {
   padding: 14px 16px;
@@ -50,12 +63,13 @@
   border-radius: c.$border-radius-xl;
 }
 
-.qr-art {
+.qr-host {
   display: block;
-  width: 200px;
-  height: 200px;
-  fill: c.$text-light;
-  shape-rendering: crispEdges;
+  line-height: 0;
+
+  svg {
+    display: block;
+  }
 }
 
 // ─── Warning ──────────────────────────────────────────────────────────────────

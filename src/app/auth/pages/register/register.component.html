@@ -58,7 +58,7 @@
       Register
     </ion-button>
 
-    <ion-button fill="clear" [routerLink]="['/login']">
+    <ion-button fill="clear" [routerLink]="['/login']" [queryParams]="{ returnUrl }">
       Already have an account? Login
     </ion-button>
   </form>

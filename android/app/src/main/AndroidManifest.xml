@@ -22,6 +22,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!--
+                Verified App Link for invite links. autoVerify makes Android
+                fetch /.well-known/assetlinks.json from the host and, on a
+                match, open this activity instead of a browser. pathPrefix
+                keeps the claim to /join - without it the app would also be
+                offered for /api/* and /health on the same host.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="simpleshare-api.choxster.com"
+                    android:pathPrefix="/join" />
+            </intent-filter>
+
         </activity>
 
         <provider

@@ -8,6 +8,17 @@ export const routes: Routes = [
     redirectTo: 'home',
   },
   {
+    // Top level on purpose: everything under feature.routes is a child of
+    // LayoutWrapperComponent and arrives with the tab bar, and this is a
+    // focused flow the user drops into from outside the app.
+    path: 'join/:token',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/groups/pages/join-group/join-group.component').then(
+        (c) => c.JoinGroupComponent,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     canActivateChild: [authGuard],

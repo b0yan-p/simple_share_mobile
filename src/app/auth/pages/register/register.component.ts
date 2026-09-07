@@ -7,7 +7,7 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
@@ -34,8 +34,12 @@ import { AuthService } from '../../services/auth.service';
 export class RegisterComponent {
   auth = inject(AuthService);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   loading = false;
+
+  /** Set by authGuard when a protected URL (e.g. an invite link) was blocked. */
+  readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
   form = new FormGroup(
     {
@@ -64,7 +68,8 @@ export class RegisterComponent {
         if (!res) return;
 
         this.loading = false;
-        this.router.navigate(['home']);
+        // navigateByUrl, not navigate: returnUrl is a whole URL, not a segment.
+        this.router.navigateByUrl(this.returnUrl ?? '/home');
       },
       error: (err) => {
         console.error(err);

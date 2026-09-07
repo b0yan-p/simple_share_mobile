@@ -1,0 +1,68 @@
+@use '../../../../../theme/variables.scss' as c;
+
+ion-header ion-toolbar {
+  --background: #{c.$bg};
+  --border-width: 0;
+}
+
+ion-content {
+  --background: #{c.$bg};
+}
+
+.page-body {
+  padding: 0 24px 40px;
+}
+
+.state-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+// ─── Panel ────────────────────────────────────────────────────────────────────
+// Shared by the invitation and the confirmation: same centred column, so the
+// two screens do not shift under the user when one replaces the other.
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 0 0;
+  text-align: center;
+
+  &__title {
+    margin: 8px 0 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: c.$text-light;
+  }
+
+  &__text {
+    margin: 16px 0 8px;
+    font-size: 14px;
+  }
+}
+
+.success-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(c.$success, 0.12);
+  color: c.$success;
+
+  ion-icon {
+    font-size: 48px;
+  }
+}
+
+.cta {
+  width: 100%;
+  margin-top: 16px;
+  height: 52px;
+  font-size: 16px;
+  font-weight: 600;
+}

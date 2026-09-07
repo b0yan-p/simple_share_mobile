@@ -24,7 +24,7 @@
 
     <ion-button [disabled]="form.invalid || loading" (click)="login()"> Login </ion-button>
 
-    <ion-button fill="clear" [routerLink]="['/register']">
+    <ion-button fill="clear" [routerLink]="['/register']" [queryParams]="{ returnUrl }">
       Don't have an account? Register
     </ion-button>
   </form>
