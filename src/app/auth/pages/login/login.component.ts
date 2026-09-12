@@ -63,7 +63,7 @@ export class LoginComponent {
 
         this.loading = false;
         // navigateByUrl, not navigate: returnUrl is a whole URL, not a segment.
-        this.router.navigateByUrl(this.returnUrl ?? '/home');
+        this.router.navigateByUrl(this.returnUrl ?? '/home', { replaceUrl: true });
       },
       error: (err) => {
         console.error(err);

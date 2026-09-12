@@ -13,13 +13,13 @@
   <div class="link-box">{{ inviteLink() }}</div>
 
   <div class="invite-actions">
-    <ion-button color="primary" (click)="copyLink()">
-      <ion-icon name="copy-outline" slot="start" />
-      Copy link
-    </ion-button>
-    <ion-button fill="outline" (click)="shareLink()">
+    <ion-button (click)="shareLink()">
       <ion-icon name="share-social-outline" slot="start" />
       Share link
+    </ion-button>
+    <ion-button fill="outline" (click)="copyLink()">
+      <ion-icon name="copy-outline" slot="start" />
+      Copy link
     </ion-button>
   </div>
 

@@ -95,6 +95,12 @@ cd android
 ./gradlew assembleDebug
 ```
 
+Cijela komanda
+
+```
+npx ng build --configuration production && npx cap sync android && cd android && ./gradlew assembleDebug
+```
+
 APK završi na:
 
 ```

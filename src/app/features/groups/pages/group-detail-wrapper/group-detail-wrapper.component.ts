@@ -1,7 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, effect, inject, OnInit, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -9,7 +9,10 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItem,
   IonLabel,
+  IonList,
+  IonPopover,
   IonSegment,
   IonSegmentButton,
   IonTitle,
@@ -51,6 +54,9 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     IonSegment,
     IonSegmentButton,
     IonLabel,
+    IonList,
+    IonItem,
+    IonPopover,
     GroupDetailsComponent,
     ExpenseListComponent,
     GroupBalanceComponent,
@@ -60,6 +66,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private groupFacade = inject(GroupFacade);
   private groupMemberFacade = inject(GroupMemberFacade);
   private modalController = inject(ModalController);
@@ -144,6 +151,11 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private restoreScroll(tab: GroupDetailTab): void {
     const target = this.store.scrollTopFor(tab);
     requestAnimationFrame(() => void this.content()?.scrollToPoint(0, target, 0));
+  }
+
+  /** The group form doubles as the edit screen — same route the list uses. */
+  navigateToEdit(): void {
+    void this.router.navigate(['groups', this.route.snapshot.params['id']]);
   }
 
   /**

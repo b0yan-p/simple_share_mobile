@@ -59,6 +59,7 @@ export class GroupBalanceComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.balance.set(data);
+          this.expandedMemberId.set(data.members[0]?.memberId ?? null);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),

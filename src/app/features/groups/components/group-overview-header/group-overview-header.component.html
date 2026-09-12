@@ -6,11 +6,7 @@
       <h4 class="text-one-line">
         {{ group().name }}
       </h4>
-      <small class="c-text">
-        {{ members()?.length }} member{{
-          !!members()?.length && members()!.length > 1 ? 's' : ''
-        }}
-      </small>
+      <small class="c-text"> Trip group </small>
     </div>
   </div>
 
@@ -18,27 +14,32 @@
   <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-gap-1">
     <button
       type="button"
-      class="member-stack"
+      class="member-stack ion-activatable"
       aria-label="View all members"
       (click)="viewMembers.emit()"
     >
-      @for (member of reducedMembers(); track member.memberId) {
-        <app-avatar
-          [name]="member.displayName"
-          [src]="null"
-          [colorKey]="member.memberId"
-          [size]="36"
-          [showBorders]="true"
-          [ngClass]="{ 'avatar-negative-margin': !$first }"
-        />
-      }
-      @if (hiddenCount() > 0) {
-        <span class="member-stack__more avatar-negative-margin">+{{ hiddenCount() }}</span>
-      }
+      <ion-ripple-effect class="custom-ripple" />
+      <div>
+        @for (member of reducedMembers(); track member.memberId) {
+          <app-avatar
+            [name]="member.displayName"
+            [src]="null"
+            [colorKey]="member.memberId"
+            [size]="36"
+            [showBorders]="true"
+            [ngClass]="{ 'avatar-negative-margin': !$first }"
+          />
+        }
+        @if (hiddenCount() > 0) {
+          <span class="member-stack__more avatar-negative-margin">+{{ hiddenCount() }}</span>
+        }
+        <small class="c-text bdd-ml-1">members</small>
+      </div>
+
+      <div class="bdd-flex bdd-ai-center bdd-gap-1">
+        <ion-icon class="members-chevron" name="chevron-forward-outline" />
+      </div>
     </button>
-    <ion-button fill="outline" class="btn-sm" size="small" (click)="addMembers.emit()"
-      >Add members</ion-button
-    >
   </div>
 </div>
 

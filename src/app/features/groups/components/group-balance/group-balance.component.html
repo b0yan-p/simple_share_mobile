@@ -4,12 +4,17 @@
   </div>
 } @else if (balance(); as data) {
   <div class="balance-page">
-    <!-- Members heading -->
-    <div class="card-title font-14" style="--width: 90px">Balance Breakdown</div>
-
     <!-- Member cards -->
     <div class="members-list">
-      @for (member of data.members; track member.memberId) {
+      @for (member of data.members; track member.memberId; let i = $index) {
+        @if (i === 0) {
+          <!-- Current user heading -->
+          <div class="card-title font-14" style="--width: 90px">Your settlements</div>
+        } @else if (i === 1) {
+          <!-- Other members heading -->
+          <div class="card-title font-14" style="--width: 90px">Other users settlements</div>
+        }
+
         <div class="member-card" [class.is-expanded]="expandedMemberId() === member.memberId">
           <!-- Clickable header row -->
           <div class="member-row" (click)="toggle(member.memberId)">

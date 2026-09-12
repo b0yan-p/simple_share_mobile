@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, input, output } from '@angular/core';
-import { IonGrid, IonIcon, IonRow } from '@ionic/angular/standalone';
+import { IonButton, IonGrid, IonIcon, IonRow } from '@ionic/angular/standalone';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { GroupOverview } from '../../models/group-overview.model';
 
@@ -9,7 +9,7 @@ import { GroupOverview } from '../../models/group-overview.model';
   templateUrl: './group-details.component.html',
   styleUrls: ['./group-details.component.scss'],
   standalone: true,
-  imports: [IonIcon, NgClass, IonGrid, IonRow, ChipComponent],
+  imports: [IonButton, IonIcon, NgClass, IonGrid, IonRow, ChipComponent],
 })
 export class GroupDetailsComponent {
   /**
@@ -18,6 +18,5 @@ export class GroupDetailsComponent {
    * Null when there is nothing to show — offline with an empty cache.
    */
   readonly group = input<GroupOverview | null>(null);
-
   openBalance = output<void>();
 }

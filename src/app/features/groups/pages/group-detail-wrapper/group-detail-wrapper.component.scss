@@ -27,3 +27,9 @@
     text-transform: none;
   }
 }
+
+.group-menu {
+  ion-item {
+    --min-height: 44px;
+  }
+}

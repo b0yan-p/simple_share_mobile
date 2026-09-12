@@ -78,7 +78,9 @@ export class GroupItemComponent implements OnInit {
     this.facade.createGroup(this.form.value as CreateGroup).subscribe({
       next: (res) => {
         this.toastService.successToast('Group created successfully!');
-        this.router.navigate(['groups', res.id, 'details']);
+        // replaceUrl drops the form from the navigation stack — otherwise back
+        // returns to the still-filled form and save creates a duplicate group.
+        this.router.navigate(['groups', res.id, 'details'], { replaceUrl: true });
       },
       error: (err) => {
         console.error('ERROR: ', err);
@@ -91,7 +93,7 @@ export class GroupItemComponent implements OnInit {
     this.facade.updateGroup(this.form.value as UpdateGroup).subscribe({
       next: (res) => {
         this.toastService.successToast('Group updated successfully!');
-        this.router.navigate(['groups', res.id, 'details']);
+        this.router.navigate(['groups', res.id, 'details'], { replaceUrl: true });
       },
       error: (err) => {
         console.error('ERROR: ', err);

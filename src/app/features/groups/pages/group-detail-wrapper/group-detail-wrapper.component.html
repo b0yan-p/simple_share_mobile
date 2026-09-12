@@ -1,16 +1,44 @@
+@let group = group$ | async;
+
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="groups" size="small" color="primary" />
     </ion-buttons>
-    <ion-title class="small">Groups</ion-title>
-    <ion-buttons slot="end"> </ion-buttons>
+    <ion-title class="small">Group</ion-title>
+    <ion-buttons slot="end">
+      <ion-button id="group-menu-trigger" fill="clear" size="small" color="primary">
+        <ion-icon name="ellipsis-vertical" slot="icon-only" />
+      </ion-button>
+      <ion-popover
+        trigger="group-menu-trigger"
+        [dismissOnSelect]="true"
+        side="bottom"
+        alignment="end"
+      >
+        <ng-template>
+          <ion-list lines="none" class="group-menu">
+            <ion-item button detail="false" (click)="navigateToEdit()">
+              <ion-label>Edit group</ion-label>
+            </ion-item>
+            <ion-item button detail="false" (click)="openAddMembers()">
+              <ion-label>Add people</ion-label>
+            </ion-item>
+            <ion-item
+              button
+              detail="false"
+              (click)="openMembers(group?.currentMemberId ?? null)"
+            >
+              <ion-label>Manage people</ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-template>
+      </ion-popover>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  @let group = group$ | async;
-
   @if (!networkService.isOnline()) {
     <app-offline-warning />
   }
@@ -62,8 +90,10 @@
     }
   </div>
 
-  <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
-    <ion-icon name="add-outline" />
-    <span>Add expense</span>
-  </ion-button>
+  @if (store.activeTab() === 'overview' || store.activeTab() === 'expenses') {
+    <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
+      <ion-icon name="add-outline" />
+      <span>Add expense</span>
+    </ion-button>
+  }
 </ion-content>

@@ -65,10 +65,20 @@
                 class="amount"
                 placeholder="0.00"
                 inputmode="decimal"
+                [max]="amountMax"
               />
               <span class="amount-currency-label">{{ currency }}</span>
             </div>
           </div>
+
+          @if (form.controls.totalAmount.hasError('max')) {
+            <div class="validation-hint">
+              <ion-icon name="information-circle-outline" />
+              <span>
+                Amount cannot exceed {{ amountMax | number: '1.2-2' }} {{ currency }}
+              </span>
+            </div>
+          }
 
           <!-- Description -->
           <ion-input

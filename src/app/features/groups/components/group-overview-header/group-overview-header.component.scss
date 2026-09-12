@@ -1,4 +1,4 @@
-// @use './../../../../../theme/theme.light' as p;
+@use './../../../../../theme/variables.scss' as c;
 
 :host {
   display: flex;
@@ -23,11 +23,23 @@
 
   .member-stack {
     display: flex;
+    flex: 1;
     align-items: center;
+    justify-content: space-between;
+
     padding: 0;
     border: 0;
+    border-radius: c.$border-radius-m;
+
     background: none;
     cursor: pointer;
+
+    position: relative;
+    overflow: hidden;
+
+    .custom-ripple {
+      color: c.$primary;
+    }
   }
 
   // Sits in the same overlapping row as the avatars, so it has to match their
@@ -48,6 +60,12 @@
     font-size: 13px;
     font-weight: 600;
     line-height: 1;
+  }
+
+  .members-chevron {
+    flex-shrink: 0;
+    font-size: 18px;
+    color: c.$text;
   }
 
   .border-bottom {

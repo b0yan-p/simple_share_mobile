@@ -35,7 +35,7 @@
     background-color: rgba(v.$warn, 0.2);
     padding: 8px 12px;
     border-radius: v.$border-radius-xxl;
-    border: 1px solid v.$warn;
+    border: 1px solid rgba(v.$error, 0.4);
 
     color: v.$error;
 

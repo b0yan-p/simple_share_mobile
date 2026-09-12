@@ -36,7 +36,7 @@ import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty
 import { CreateExpenseRequest } from '../../models/create-expense.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
-import { AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
+import { AMOUNT_MAX, AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
 import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
 
 interface MemberEntry extends GroupMember {
@@ -84,6 +84,7 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   uiService = inject(UiService);
 
   readonly currency = CURRENCY;
+  readonly amountMax = AMOUNT_MAX;
   readonly arrowBack = arrowBackSharp;
   readonly stepsCount = 3;
   currentStep = 1;
@@ -99,6 +100,7 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
     totalAmount: new FormControl<number | null>(null, [
       Validators.required,
       Validators.min(AMOUNT_MIN),
+      Validators.max(AMOUNT_MAX),
     ]),
     description: new FormControl<string>('', [Validators.required]),
     expenseDate: new FormControl<string | null>(new Date().toISOString()),

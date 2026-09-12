@@ -2,7 +2,12 @@
   @if (group(); as group) {
     <!-- Debt overview card -->
     <!-- <div class="surface-card-title">Your balance</div> -->
-    <small class="card-title">Your share</small>
+    <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-mb-1">
+      <small class="card-title">Your share</small>
+      <ion-button fill="outline" class="btn-sm" size="small" (click)="openBalance.emit()">
+        Settle up
+      </ion-button>
+    </div>
     <ion-row
       class="surface-card balance-overview"
       style="position: relative"

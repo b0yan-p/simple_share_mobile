@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
-import { IonButton } from '@ionic/angular/standalone';
+import { IonIcon, IonRippleEffect } from '@ionic/angular/standalone';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupOverview } from '../../models/group-overview.model';
@@ -9,7 +9,7 @@ import { GroupOverview } from '../../models/group-overview.model';
   selector: 'app-group-overview-header',
   templateUrl: './group-overview-header.component.html',
   styleUrls: ['./group-overview-header.component.scss'],
-  imports: [IonButton, AvatarComponent, NgClass],
+  imports: [IonRippleEffect, IonIcon, AvatarComponent, NgClass],
 })
 export class GroupOverviewHeaderComponent {
   readonly REDUCED_NUMBER_OF_MEMBERS: number = 3;
