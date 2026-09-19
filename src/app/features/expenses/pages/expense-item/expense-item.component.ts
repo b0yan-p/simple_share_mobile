@@ -1,5 +1,6 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -12,38 +13,53 @@ import {
   IonHeader,
   IonIcon,
   IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
   IonModal,
-  IonSegment,
-  IonSegmentButton,
+  IonSpinner,
   IonTitle,
   IonToolbar,
+  ViewDidEnter,
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackSharp, checkmarkCircle, cloudOfflineOutline } from 'ionicons/icons';
-import { concatMap } from 'rxjs';
-import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
+import {
+  alertCircleOutline,
+  calendarOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  closeCircle,
+  cloudOfflineOutline,
+  informationCircleOutline,
+  peopleOutline,
+  receiptOutline,
+  timeOutline,
+  walletOutline,
+} from 'ionicons/icons';
+import { concatMap, first, from } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
 import { GroupMemberFacade } from 'src/app/features/groups/services/group-member-facade.service';
-import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { CreateExpenseRequest } from '../../models/create-expense.model';
+import { AllocationKind, draftKey, expensePath } from '../../models/expense-draft.model';
+import { ExpenseDraftStore } from '../../services/expense-draft.store';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
-import { AMOUNT_MAX, AMOUNT_MIN, CURRENCY } from '../../utils/expense.constants';
-import { amountsMatch, splitEqually, sumSelectedAmounts } from '../../utils/split.util';
+import {
+  AMOUNT_MAX,
+  AMOUNT_MIN,
+  CURRENCY,
+  DESCRIPTION_MAX_LENGTH,
+} from '../../utils/expense.constants';
+import { fromMinor, toMinor } from '../../utils/money.util';
 
-interface MemberEntry extends GroupMember {
-  selected: boolean;
-  amount: number;
-}
-
+/**
+ * Add / Edit Expense. The page owns the whole expense draft: amount, description
+ * and date are edited here, payer and split configuration are edited on their own
+ * screens and committed back into the same draft. Nothing reaches the API until
+ * `Save Expense`.
+ */
 @Component({
   selector: 'app-expense-item',
   templateUrl: './expense-item.component.html',
@@ -52,7 +68,6 @@ interface MemberEntry extends GroupMember {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
-    AvatarComponent,
     EmptyStateComponent,
     IonHeader,
     IonToolbar,
@@ -62,322 +77,254 @@ interface MemberEntry extends GroupMember {
     IonTitle,
     IonContent,
     IonFooter,
-    IonList,
-    IonItem,
     IonInput,
     IonModal,
     IonDatetime,
     IonIcon,
-    IonSegment,
-    IonSegmentButton,
-    IonLabel,
+    IonSpinner,
   ],
 })
-export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private expenseService = inject(ExpenseService);
-  private expenseFacade = inject(ExpenseFacade);
-  private toastService = inject(ToastService);
-  private tokenStorage = inject(TokenStorageService);
-  private groupMemberFacade = inject(GroupMemberFacade);
-  uiService = inject(UiService);
+export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWillLeave {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly expenseService = inject(ExpenseService);
+  private readonly expenseFacade = inject(ExpenseFacade);
+  private readonly toastService = inject(ToastService);
+  private readonly groupMemberFacade = inject(GroupMemberFacade);
+  readonly draftStore = inject(ExpenseDraftStore);
+  readonly uiService = inject(UiService);
 
   readonly currency = CURRENCY;
   readonly amountMax = AMOUNT_MAX;
-  readonly arrowBack = arrowBackSharp;
-  readonly stepsCount = 3;
-  currentStep = 1;
+  readonly descriptionMaxLength = DESCRIPTION_MAX_LENGTH;
+
   groupId = '';
   editMode = false;
   expenseId = '';
   pendingMode = false;
   pendingTempId = '';
+
   /** Members could not be loaded from either the network or the cache. */
   readonly membersError = signal(false);
+  /** One save request at a time — guards against double taps on the CTA. */
+  readonly saving = signal(false);
 
-  form = new FormGroup({
+  private readonly formValid = signal(false);
+  /** Bumped whenever control state changes, so template guards stay reactive. */
+  private readonly formTick = signal(0);
+  readonly descriptionFocused = signal(false);
+
+  private readonly amountInput = viewChild<IonInput>('amountInput');
+  /** A fresh expense opens with the keyboard up; a returning one must not. */
+  private focusAmountOnEnter = false;
+  /** Set just before opening an editor screen so leaving does not drop the draft. */
+  private navigatingToEditor = false;
+
+  readonly form = new FormGroup({
     totalAmount: new FormControl<number | null>(null, [
       Validators.required,
       Validators.min(AMOUNT_MIN),
       Validators.max(AMOUNT_MAX),
     ]),
-    description: new FormControl<string>('', [Validators.required]),
-    expenseDate: new FormControl<string | null>(new Date().toISOString()),
+    description: new FormControl<string>('', [
+      Validators.required,
+      Validators.maxLength(DESCRIPTION_MAX_LENGTH),
+    ]),
+    expenseDate: new FormControl<string | null>(new Date().toISOString(), [
+      Validators.required,
+    ]),
   });
 
-  paidByEntries: MemberEntry[] = [];
-  splitEntries: MemberEntry[] = [];
-  paidByMode: 'equal' | 'custom' = 'equal';
-  splitMode: 'equal' | 'custom' = 'equal';
+  readonly totalMinor = this.draftStore.totalMinor;
+  readonly paidByRow = this.draftStore.paidByRow;
+  readonly splitRow = this.draftStore.splitRow;
+  readonly summary = this.draftStore.summary;
 
-  get totalAmount(): number {
-    return this.form.value.totalAmount ?? 0;
-  }
+  /** Allocations are only worth complaining about once there is an amount. */
+  readonly payerError = computed(() => this.totalMinor() > 0 && !this.draftStore.payerValid());
+  readonly splitError = computed(() => this.totalMinor() > 0 && !this.draftStore.splitValid());
 
-  get paidByTotal(): number {
-    return sumSelectedAmounts(this.paidByEntries);
-  }
+  readonly canSave = computed(
+    () =>
+      this.formValid() &&
+      this.draftStore.payerValid() &&
+      this.draftStore.splitValid() &&
+      !this.saving(),
+  );
 
-  get splitTotal(): number {
-    return sumSelectedAmounts(this.splitEntries);
-  }
+  /** Inline description error, shown only once the user has engaged with it. */
+  readonly descriptionError = computed(() => {
+    this.formTick();
+    const control = this.form.controls.description;
 
-  get noneSelectedPayer(): boolean {
-    return !this.paidByEntries.some((e) => e.selected);
-  }
+    return control.invalid && (control.touched || control.dirty);
+  });
 
-  get noneSelectedSplit(): boolean {
-    return !this.splitEntries.some((e) => e.selected);
-  }
+  readonly saveLabel = computed(() =>
+    this.pendingMode ? 'Update Pending' : this.editMode ? 'Update Expense' : 'Save Expense',
+  );
 
-  get paidByValid(): boolean {
-    return !this.noneSelectedPayer && amountsMatch(this.paidByTotal, this.totalAmount);
-  }
-
-  get splitValid(): boolean {
-    return !this.noneSelectedSplit && amountsMatch(this.splitTotal, this.totalAmount);
-  }
+  readonly title = computed(() =>
+    this.pendingMode ? 'Edit Pending' : this.editMode ? 'Edit Expense' : 'Add Expense',
+  );
 
   constructor() {
     addIcons({
-      arrowBackSharp,
-      checkmarkCircle,
+      alertCircleOutline,
+      calendarOutline,
+      chevronDownOutline,
+      chevronForwardOutline,
+      closeCircle,
       cloudOfflineOutline,
+      informationCircleOutline,
+      peopleOutline,
+      receiptOutline,
+      timeOutline,
+      walletOutline,
+    });
+
+    this.form.controls.totalAmount.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((amount) => this.draftStore.setTotalMinor(toMinor(amount)));
+
+    this.form.controls.description.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((description) =>
+        this.draftStore.patchDetails({ description: description ?? '' }),
+      );
+
+    this.form.controls.expenseDate.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((expenseDate) =>
+        this.draftStore.patchDetails({ expenseDate: expenseDate ?? new Date().toISOString() }),
+      );
+
+    this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.formValid.set(this.form.valid);
+      this.formTick.update((tick) => tick + 1);
     });
   }
 
   ionViewWillEnter(): void {
-    // Focused wizard: hide the bottom tab bar so only the pinned CTA shows.
+    // Focused flow: hide the bottom tab bar so only the pinned CTA shows.
     this.uiService.tabBarVisible.set(false);
+    this.navigatingToEditor = false;
+    this.saving.set(false);
 
-    this.currentStep = 1;
-    this.editMode = false;
-    this.expenseId = '';
-    this.pendingMode = false;
-    this.pendingTempId = '';
-    this.paidByMode = 'equal';
-    this.splitMode = 'equal';
-    this.form.reset({ expenseDate: new Date().toISOString() });
+    const params = this.route.snapshot.params;
+    this.groupId = params['id'];
+    this.expenseId = params['expenseId'] ?? '';
+    this.pendingTempId = params['pendingId'] ?? '';
+    this.editMode = !!this.expenseId;
+    this.pendingMode = !!this.pendingTempId;
 
-    this.groupId = this.route.snapshot.params['id'];
-    const expenseId = this.route.snapshot.params['expenseId'];
-    const pendingId = this.route.snapshot.params['pendingId'];
-
-    if (expenseId) {
-      this.editMode = true;
-      this.expenseId = expenseId;
-    } else if (pendingId) {
-      this.pendingMode = true;
-      this.pendingTempId = pendingId;
+    // Returning from the payer / split editor — the draft (and therefore the
+    // members and the amounts) is already in place, so leave it alone.
+    if (this.draftStore.isFor(this.currentDraftKey())) {
+      this.focusAmountOnEnter = false;
+      this.syncFormFromDraft();
+      return;
     }
+
+    this.focusAmountOnEnter = !this.editMode && !this.pendingMode;
+
+    this.draftStore.clear();
+    this.form.reset({ expenseDate: new Date().toISOString() });
+    this.formValid.set(this.form.valid);
+    this.formTick.update((tick) => tick + 1);
     this.loadMembers();
+  }
+
+  /**
+   * Ionic fires this once the page transition has finished, which is the point
+   * the input is mounted and actually focusable — no setTimeout guessing at how
+   * long the animation takes.
+   */
+  ionViewDidEnter(): void {
+    if (!this.focusAmountOnEnter) return;
+
+    this.focusAmountOnEnter = false;
+    const input = this.amountInput();
+
+    if (!input) return;
+
+    from(input.setFocus()).pipe(first()).subscribe();
   }
 
   ionViewWillLeave(): void {
     // Restore the tab bar for the rest of the app.
     this.uiService.tabBarVisible.set(true);
+
+    // Anything other than a hop to an editor screen ends the flow: drop the
+    // draft so the next expense never starts from stale data.
+    if (!this.navigatingToEditor) this.draftStore.clear();
   }
 
   /**
-   * Public so the empty state can retry. The facade is the single source of truth
-   * here — it is network-first with a cache fallback, which this screen used to
-   * reimplement without the fallback.
+   * Public so the empty state can retry. The facade is network-first with a
+   * cache fallback, which this screen used to reimplement without the fallback.
    */
   loadMembers(): void {
     this.membersError.set(false);
 
     this.groupMemberFacade.getGroupMembers(this.groupId).subscribe({
       next: (members) => {
-        this.paidByEntries = members.map((m) => ({ ...m, selected: false, amount: 0 }));
-        this.splitEntries = members.map((m) => ({ ...m, selected: true, amount: 0 }));
-        if (this.pendingMode) this.loadPendingExpenseData();
-        else if (this.editMode) this.loadExpenseData();
-        else this.recalculateEqualSplit();
+        const key = this.currentDraftKey();
+
+        if (this.pendingMode) this.loadPendingExpenseData(key, members);
+        else if (this.editMode) this.loadExpenseData(key, members);
+        else this.draftStore.start(key, this.groupId, members);
+
+        this.syncFormFromDraft();
       },
       // An inline state rather than a redirect: router.navigate() from the async
       // tail of ionViewWillEnter races the Ionic transition and can be dropped,
-      // which left the user on a wizard with no members and no explanation.
+      // which left the user on a page with no members and no explanation.
       error: () => this.membersError.set(true),
     });
   }
 
-  private loadPendingExpenseData(): void {
-    this.expenseFacade.getPendingExpense(this.pendingTempId).subscribe({
-      next: (pending) => {
-        if (!pending) return;
-        this.form.patchValue({
-          totalAmount: pending.payload.totalAmount,
-          description: pending.payload.description,
-          expenseDate: pending.payload.expenseDate,
-        });
-
-        this.paidByEntries.forEach((entry) => {
-          const match = pending.payload.payments.find((p) => p.memberId === entry.memberId);
-          entry.selected = !!match;
-          entry.amount = match?.amount ?? 0;
-        });
-        this.paidByMode = 'custom';
-
-        this.splitEntries.forEach((entry) => {
-          const match = pending.payload.splits.find((s) => s.memberId === entry.memberId);
-          entry.selected = !!match;
-          entry.amount = match?.amount ?? 0;
-        });
-        this.splitMode = 'custom';
-      },
-      error: () => this.toastService.errorToast('Failed to load pending expense'),
-    });
+  openPayers(): void {
+    this.openEditor('payers');
   }
 
-  private loadExpenseData(): void {
-    this.expenseService.getExpense(this.groupId, this.expenseId).subscribe({
-      next: (expense) => {
-        this.form.patchValue({
-          totalAmount: expense.amount,
-          description: expense.description,
-          expenseDate: expense.expenseDate,
-        });
-
-        this.paidByEntries.forEach((entry) => {
-          const match = expense.paidBy.find((p) => p.memberId === entry.memberId);
-          entry.selected = !!match;
-          entry.amount = match?.amount ?? 0;
-        });
-        this.paidByMode = 'custom';
-
-        this.splitEntries.forEach((entry) => {
-          const match = expense.splittedBy.find((s) => s.memberId === entry.memberId);
-          entry.selected = !!match;
-          entry.amount = match?.amount ?? 0;
-        });
-        this.splitMode = 'custom';
-      },
-      error: () => this.toastService.errorToast('Failed to load expense'),
-    });
+  openSplit(): void {
+    this.openEditor('splits');
   }
 
-  nextStep(): void {
-    if (this.currentStep === 1) {
-      if (this.form.invalid) {
-        this.form.markAllAsTouched();
-        return;
-      }
-      this.initDefaultPayer();
-      if (this.paidByMode === 'equal') {
-        this.dividePayersEqually();
-      }
-      this.recalculateEqualSplit();
-    }
-    if (this.currentStep === 2 && !this.paidByValid) {
-      return;
-    }
-    if (this.currentStep < this.stepsCount) {
-      this.currentStep++;
-    }
+  /** Minor units as a major-unit number, for the `number` pipe. */
+  major(minor: number): number {
+    return fromMinor(minor);
   }
 
-  private initDefaultPayer(): void {
-    const user = this.tokenStorage.user();
-
-    if (!user) return;
-
-    const myEntry = this.paidByEntries.find((e) => e.userId === user.id);
-
-    if (!myEntry) return;
-
-    // Only pre-select if the user hasn't already made a selection
-    if (this.paidByEntries.some((e) => e.selected)) return;
-
-    myEntry.selected = true;
-    myEntry.amount = this.totalAmount;
-  }
-
-  prevStep(): void {
-    if (this.currentStep <= 1) return;
-
-    this.currentStep--;
-  }
-
-  togglePayer(entry: MemberEntry): void {
-    entry.selected = !entry.selected;
-
-    if (!entry.selected) entry.amount = 0;
-
-    if (this.paidByMode === 'equal') this.dividePayersEqually();
-    else {
-      const selected = this.paidByEntries.filter((e) => e.selected);
-
-      if (selected.length === 1) selected[0].amount = this.totalAmount;
-    }
-  }
-
-  setPaidByMode(mode: 'equal' | 'custom'): void {
-    this.paidByMode = mode;
-    if (mode !== 'equal') return;
-
-    this.dividePayersEqually();
-  }
-
-  private dividePayersEqually(): void {
-    const selected = this.paidByEntries.filter((e) => e.selected);
-
-    if (!selected.length) return;
-
-    const amounts = splitEqually(this.totalAmount, selected.length);
-    selected.forEach((e, i) => (e.amount = amounts[i]));
-  }
-
-  onPayerAmountChange(entry: MemberEntry, value: string | null | undefined): void {
-    entry.amount = Math.max(0, parseFloat(value ?? '0') || 0);
-  }
-
-  toggleSplitter(entry: MemberEntry): void {
-    entry.selected = !entry.selected;
-    if (this.splitMode === 'equal') this.recalculateEqualSplit();
-    else if (!entry.selected) entry.amount = 0;
-  }
-
-  setSplitMode(mode: 'equal' | 'custom'): void {
-    this.splitMode = mode;
-
-    if (mode !== 'equal') return;
-
-    this.recalculateEqualSplit();
-  }
-
-  onSplitterAmountChange(entry: MemberEntry, value: string | null | undefined): void {
-    entry.amount = Math.max(0, parseFloat(value ?? '0') || 0);
-  }
-
-  private recalculateEqualSplit(): void {
-    const selected = this.splitEntries.filter((e) => e.selected);
-
-    if (!selected.length) return;
-
-    const amounts = splitEqually(this.totalAmount, selected.length);
-    selected.forEach((e, i) => (e.amount = amounts[i]));
-    this.splitEntries.filter((e) => !e.selected).forEach((e) => (e.amount = 0));
+  /** Clears the description without giving the row a second tap target. */
+  clearDescription(): void {
+    this.form.controls.description.setValue('');
+    this.form.controls.description.markAsTouched();
+    this.formTick.update((tick) => tick + 1);
   }
 
   submit(): void {
-    if (!this.splitValid) return;
+    if (!this.canSave()) return;
 
-    const basePayload: CreateExpenseRequest = {
-      description: this.form.value.description!,
-      expenseDate: this.form.value.expenseDate!,
-      totalAmount: this.totalAmount,
-      payments: this.paidByEntries
-        .filter((e) => e.selected && e.amount > 0)
-        .map((e) => ({ memberId: e.memberId, amount: e.amount })),
-      splits: this.splitEntries
-        .filter((e) => e.selected && e.amount > 0)
-        .map((e) => ({ memberId: e.memberId, amount: e.amount })),
-    };
+    const draft = this.draftStore.draft();
 
+    if (!draft) return;
+
+    this.saving.set(true);
     this.uiService.itemLoading.set(true);
 
+    const basePayload: CreateExpenseRequest = {
+      description: draft.description,
+      expenseDate: draft.expenseDate,
+      totalAmount: fromMinor(draft.totalMinor),
+      payments: toMemberAmounts(draft.payers.entries),
+      splits: toMemberAmounts(draft.splits.entries),
+    };
+
     const onError = (err: { error?: { message?: string } }) => {
+      // The draft is deliberately left intact so the user can retry.
+      this.saving.set(false);
       this.uiService.itemLoading.set(false);
       this.toastService.errorToast(err?.error?.message ?? 'Failed to save expense');
     };
@@ -387,29 +334,34 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
         .updatePendingExpense(this.pendingTempId, this.groupId, basePayload)
         .subscribe({
           next: () => {
-            this.uiService.itemLoading.set(false);
-            this.toastService.successToast('Pending expense updated');
+            this.finishSave('Pending expense updated');
             this.router.navigate(['groups', this.groupId, 'details']);
           },
           error: onError,
         });
     } else if (this.editMode) {
-      const onSuccess = () => {
-        this.uiService.itemLoading.set(false);
-        this.toastService.successToast('Expense updated!');
-        this.router.navigate(['groups', this.groupId, 'expenses', this.expenseId, 'details']);
-      };
       // The legacy service does not touch the cache, so drop it explicitly —
       // otherwise the list would keep serving the pre-edit rows.
       this.expenseService
         .updateExpense(this.groupId, { ...basePayload, id: this.expenseId })
         .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
-        .subscribe({ next: onSuccess, error: onError });
+        .subscribe({
+          next: () => {
+            this.finishSave('Expense updated!');
+            this.router.navigate([
+              'groups',
+              this.groupId,
+              'expenses',
+              this.expenseId,
+              'details',
+            ]);
+          },
+          error: onError,
+        });
     } else {
       this.expenseFacade.createExpense(this.groupId, basePayload).subscribe({
         next: ({ queued }) => {
-          this.uiService.itemLoading.set(false);
-          this.toastService.successToast(
+          this.finishSave(
             queued ? 'Expense saved offline, will sync when connected' : 'Expense added!',
           );
           this.router.navigate(['groups', this.groupId, 'details']);
@@ -418,4 +370,90 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
       });
     }
   }
+
+  private finishSave(message: string): void {
+    this.saving.set(false);
+    this.uiService.itemLoading.set(false);
+    this.draftStore.clear();
+    this.toastService.successToast(message);
+  }
+
+  private openEditor(kind: AllocationKind): void {
+    if (!this.draftStore.draft()) return;
+
+    this.navigatingToEditor = true;
+    this.router.navigate([
+      ...expensePath(this.groupId, {
+        expenseId: this.expenseId,
+        pendingId: this.pendingTempId,
+      }),
+      kind === 'payers' ? 'payers' : 'split',
+    ]);
+  }
+
+  private currentDraftKey(): string {
+    return draftKey(this.groupId, {
+      expenseId: this.expenseId,
+      pendingId: this.pendingTempId,
+    });
+  }
+
+  private syncFormFromDraft(): void {
+    const draft = this.draftStore.draft();
+
+    if (!draft) return;
+
+    this.form.patchValue(
+      {
+        totalAmount: draft.totalMinor ? fromMinor(draft.totalMinor) : null,
+        description: draft.description,
+        expenseDate: draft.expenseDate,
+      },
+      { emitEvent: false },
+    );
+    this.form.updateValueAndValidity({ emitEvent: false });
+    this.formValid.set(this.form.valid);
+  }
+
+  private loadPendingExpenseData(key: string, members: GroupMember[]): void {
+    this.expenseFacade.getPendingExpense(this.pendingTempId).subscribe({
+      next: (pending) => {
+        if (!pending) return;
+
+        this.draftStore.hydrate(key, this.groupId, members, {
+          description: pending.payload.description,
+          expenseDate: pending.payload.expenseDate,
+          totalAmount: pending.payload.totalAmount,
+          payments: pending.payload.payments,
+          splits: pending.payload.splits,
+        });
+        this.syncFormFromDraft();
+      },
+      error: () => this.toastService.errorToast('Failed to load pending expense'),
+    });
+  }
+
+  private loadExpenseData(key: string, members: GroupMember[]): void {
+    this.expenseService.getExpense(this.groupId, this.expenseId).subscribe({
+      next: (expense) => {
+        this.draftStore.hydrate(key, this.groupId, members, {
+          description: expense.description,
+          expenseDate: expense.expenseDate,
+          totalAmount: expense.amount,
+          payments: expense.paidBy,
+          splits: expense.splittedBy,
+        });
+        this.syncFormFromDraft();
+      },
+      error: () => this.toastService.errorToast('Failed to load expense'),
+    });
+  }
+}
+
+function toMemberAmounts(
+  entries: readonly { memberId: string; selected: boolean; amountMinor: number }[],
+) {
+  return entries
+    .filter((entry) => entry.selected && entry.amountMinor > 0)
+    .map((entry) => ({ memberId: entry.memberId, amount: fromMinor(entry.amountMinor) }));
 }

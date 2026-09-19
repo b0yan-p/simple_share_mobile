@@ -1,0 +1,132 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="backHref" size="small" color="primary" />
+    </ion-buttons>
+    <ion-title>{{ title() }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="bdd-flex bdd-flex-col bdd-gap-3">
+    <ion-segment [value]="mode()" (ionChange)="setMode($any($event).detail.value)">
+      <ion-segment-button value="equal">
+        <ion-label>
+          <ion-icon name="checkmark-circle" />
+          Equally
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="custom">
+        <ion-label>
+          <ion-icon name="checkmark-circle" />
+          Custom
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <div class="bdd-flex bdd-flex-col bdd-gap-2">
+      @for (entry of entries(); track entry.memberId) {
+        <div
+          role="button"
+          tabindex="0"
+          class="member-card"
+          [class.member-card--selected]="entry.selected"
+          [attr.aria-pressed]="entry.selected"
+          [attr.aria-label]="
+            entry.displayName +
+            (entry.selected
+              ? ', selected, ' + (amountOf(entry) | number: '1.2-2') + ' ' + currency
+              : ', not selected')
+          "
+          (click)="toggle(entry)"
+          (keydown.enter)="toggle(entry)"
+          (keydown.space)="$event.preventDefault(); toggle(entry)"
+        >
+          <span class="bdd-flex bdd-ai-center bdd-gap-2 bdd-flex-1">
+            <span class="avatar-wrap">
+              <app-avatar
+                [src]="null"
+                [name]="entry.displayName"
+                [colorKey]="entry.memberId"
+                [size]="38"
+              />
+              @if (entry.selected) {
+                <ion-icon name="checkmark-circle" class="avatar-check" aria-hidden="true" />
+              }
+            </span>
+            <span class="member-name" [class.member-name--selected]="entry.selected">
+              {{ entry.displayName }}
+            </span>
+          </span>
+
+          @if (entry.selected) {
+            @if (mode() === 'equal') {
+              <span class="c-primary font-w-500 font-14">
+                {{ amountOf(entry) | number: '1.2-2' }} {{ currency }}
+              </span>
+            } @else {
+              <span class="bdd-flex bdd-ai-center bdd-gap-1" (click)="$event.stopPropagation()">
+                <ion-input
+                  type="number"
+                  min="0"
+                  inputmode="decimal"
+                  class="member-amount-input"
+                  [attr.aria-label]="'Amount for ' + entry.displayName + ' in ' + currency"
+                  [value]="amountOf(entry)"
+                  (ionInput)="onAmountInput(entry, $any($event).detail.value)"
+                />
+                <span class="c-light font-14">{{ currency }}</span>
+              </span>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    @if (!selectedCount()) {
+      <div class="validation-hint" role="alert">
+        <ion-icon name="alert-circle-outline" aria-hidden="true" />
+        <span>
+          {{
+            isPayers()
+              ? 'Select at least one person who paid'
+              : 'Select at least one person to split with'
+          }}
+        </span>
+      </div>
+    } @else if (!hasContributor()) {
+      <div class="validation-hint" role="alert">
+        <ion-icon name="alert-circle-outline" aria-hidden="true" />
+        <span>At least one amount must be greater than zero</span>
+      </div>
+    } @else if (differenceMinor() !== 0) {
+      <div class="validation-hint" role="alert">
+        <ion-icon name="alert-circle-outline" aria-hidden="true" />
+        @if (differenceMinor() < 0) {
+          <span>
+            Total exceeds the expense by
+            {{ major(-differenceMinor()) | number: '1.2-2' }} {{ currency }}
+          </span>
+        } @else {
+          <span>
+            {{ major(differenceMinor()) | number: '1.2-2' }} {{ currency }} not yet assigned
+          </span>
+        }
+      </div>
+    }
+
+    <div class="total-indicator" [class.total-indicator--valid]="canSubmit()">
+      <span>{{ totalLabel() }}</span>
+      <span>
+        {{ major(assignedMinor()) | number: '1.2-2' }} of
+        {{ major(totalMinor()) | number: '1.2-2' }} {{ currency }}
+      </span>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="cta-footer">
+  <ion-button color="primary" class="cta-button" [disabled]="!canSubmit()" (click)="done()">
+    Done
+  </ion-button>
+</ion-footer>

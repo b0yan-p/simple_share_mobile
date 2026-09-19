@@ -1,265 +1,309 @@
 @use './../../../../../theme/variables.scss' as c;
 
 :host {
-  ion-input.amount {
-    font-size: 40px;
-    color: c.$text-light;
-    --text-align: center;
-    flex: 1;
+  // Leave room for the sticky CTA so the summary can always scroll clear of it.
+  .expense-form {
+    padding-bottom: 96px;
   }
 
-  ion-item:has(div) {
-    border: 1px solid c.$borders;
-    border-radius: 12px;
-  }
+  // ─── Shared field label ───
 
-  ion-input ion-icon[slot='start'] {
+  .field-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
     color: c.$text;
   }
 
-  ion-datetime.datetime-size-fixed:not(.datetime-prefer-wheel) {
-    max-width: unset !important;
-  }
-
-  // ─── Pinned CTA footer ───
-  // Sits at the bottom of the page (above the tab bar); the list scrolls
-  // above it so nothing overlaps.
-  .step-footer {
-    background: var(--ss-bg, #{c.$bg});
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-    box-shadow: none;
-
-    // Ionic draws a shadow line above md footers; remove it so the bar
-    // blends with the page background.
-    &::before {
-      display: none;
-    }
-  }
-
-  .step-button {
-    margin: 0;
-    width: 100%;
-  }
-
-  // ─── Segment toggle ───
-  // Pill track on the page background; the checked option floats as a white
-  // card with a filled checkmark in front of its label.
-  ion-segment {
-    // Tinted track — a touch darker than the page background so the whole
-    // control reads as one group, not just a floating white pill.
-    --background: #{rgba(c.$primary, 0.1)};
-    background: rgba(c.$primary, 0.1);
-    border: none;
-    border-radius: 14px;
-    padding: 4px;
-  }
-
-  ion-segment-button {
-    --color: #{c.$text};
-    --color-checked: #{c.$text-light};
-    --background: transparent;
-    --background-checked: #{c.$surface};
-    --indicator-color: transparent;
-    --indicator-box-shadow: none;
-    --border-radius: 11px;
-
-    min-height: 44px;
-    font-size: 15px;
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
-    transition: box-shadow 0.2s ease;
-
-    // Ionic leaves .button-native at border-radius: 0 and paints the hover /
-    // focus / pressed tint on its ::after (inset 0), so those states render as
-    // hard rectangles. Rounding the native part clips them (it is overflow:
-    // hidden) back to the pill shape.
-    &::part(native) {
-      padding-inline: 10px;
-      border-radius: var(--border-radius);
-    }
-
-    &::part(indicator) {
-      display: none;
-    }
-
-    // The checkmark lives inside the label so it sits on the same line as the
-    // text (Ionic stacks slotted icons above the label by default).
-    ion-label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      margin: 0;
-    }
-
-    // Only the checked option shows its checkmark.
-    ion-icon {
-      display: none;
-      font-size: 19px;
-      color: c.$primary;
-    }
-
-    &.segment-button-checked {
-      font-weight: 600;
-
-      // Shadow belongs on the host: Ionic paints --background-checked there
-      // and rounds it, while .button-native inside has border-radius: 0 — a
-      // shadow on the native part would draw a rectangle around the pill.
-      box-shadow: 0 1px 3px rgba(26, 22, 64, 0.12);
-
-      ion-icon {
-        display: block;
-      }
-    }
-  }
-
-  // ─── Pending chip ───
-
-  .pending-chip {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: rgba(c.$primary, 0.08);
-    border: 1px solid rgba(c.$primary, 0.3);
-    color: c.$primary;
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 4px;
-
-    ion-icon {
-      font-size: 13px;
-    }
-  }
-
-  // ─── Step progress dots ───
-
-  .step-dots-container {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding-inline: 20px;
-    padding-bottom: 4px;
-
-    .step-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: c.$borders;
-      transition: all 0.25s ease;
-
-      &--active {
-        width: 18px;
-        border-radius: 3px;
-        background: c.$primary;
-      }
-
-      &--done {
-        background: c.$success;
-      }
-    }
-  }
-
-  // ─── Amount hero (Step 1) ───
-
-  .amount-hero {
+  .field {
     display: flex;
     flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-error {
+    font-size: 13px;
+    color: var(--ss-negative);
+  }
+
+  // ─── Icon tiles ───
+  // Purple for structural rows, teal as the accent on content rows.
+
+  .icon-tile {
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 28px 20px 24px;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+
+    ion-icon {
+      font-size: 18px;
+    }
+
+    &--purple {
+      background: var(--ss-primary-subtle);
+
+      ion-icon {
+        color: var(--ss-primary);
+      }
+    }
+
+    &--teal {
+      background: var(--ss-positive-bg);
+
+      ion-icon {
+        color: var(--ss-positive);
+      }
+    }
+  }
+
+  // ─── Amount card ───
+  // Compact: the value stays the loudest thing on the page without the card
+  // eating a third of the viewport the way the old hero did.
+
+  .amount-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 18px 20px;
     border-radius: 16px;
     background: c.$surface;
     border: 1px solid c.$borders;
 
-    .amount-label {
-      font-size: 11px;
-      color: c.$text;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    &__row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
   }
 
-  .amount-display {
+  ion-input.amount-input {
+    flex: 1;
+    min-width: 0;
+    // The global ion-input rule pads 14px top and bottom, which on a 40px
+    // figure is pure dead height — the card's own padding is the gutter here.
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    min-height: 0;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: c.$text-light;
+  }
+
+  .currency-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    background: var(--ss-primary-subtle);
+    color: var(--ss-primary);
+    font-size: 18px;
+    font-weight: 600;
+
+    // Hairline separating the currency from the amount, as in the design.
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 4px;
+      bottom: 4px;
+      width: 1px;
+      background: c.$borders;
+    }
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+
+  // ─── White rounded rows (description, date, payment rows) ───
+
+  .surface-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 56px;
+    padding: 8px 14px;
+    border-radius: 14px;
+    background: c.$surface;
+    border: 1px solid c.$borders;
+    text-align: left;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    // Focus is a primary-purple ring. Teal stays an accent colour, never a
+    // form state.
+    &--focused {
+      border-color: var(--ss-border-focus);
+      box-shadow: 0 0 0 3px #{rgba(c.$primary, 0.14)};
+    }
+
+    &--error {
+      border-color: var(--ss-negative);
+    }
+  }
+
+  ion-input.description-input {
+    flex: 1;
+    min-width: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    font-size: 16px;
+    color: c.$text-light;
+  }
+
+  .clear-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .amount-currency-label {
-    font-size: 22px;
-    font-weight: 500;
-    color: c.$text;
     flex-shrink: 0;
-  }
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 
-  // ─── Avatar with checkmark badge ───
+    ion-icon {
+      font-size: 22px;
+      color: c.$text;
+    }
 
-  .avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-
-    .avatar-check {
-      position: absolute;
-      bottom: -2px;
-      right: -2px;
-      font-size: 15px;
-      color: c.$primary;
-      background: c.$surface;
+    &:focus-visible {
+      outline: 2px solid c.$primary;
+      outline-offset: -4px;
       border-radius: 50%;
-      line-height: 1;
     }
   }
 
-  // ─── Member name ───
+  // ─── Payment details card ───
 
-  .member-name {
-    font-weight: 500;
-    color: c.$text;
-    transition: color 0.2s ease;
+  .section-heading {
+    margin: 6px 0 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: c.$text-light;
+  }
 
-    &--selected {
-      color: c.$text-light;
+  .detail-card {
+    border-radius: 14px;
+    background: c.$surface;
+    border: 1px solid c.$borders;
+    overflow: hidden;
+
+    &__divider {
+      height: 1px;
+      margin-left: 60px;
+      background: c.$borders;
+    }
+
+    // The rows already sit inside the card's border and divider.
+    .detail-row {
+      border: none;
+      border-radius: 0;
     }
   }
 
-  // ─── Member cards ───
-
-  .member-card {
+  // Tappable row: whole row is the target, the chevron is decoration only.
+  .detail-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid c.$borders;
+    width: 100%;
+    min-height: 60px;
+    padding: 9px 14px;
     background: c.$surface;
+    border: 1px solid c.$borders;
+    border-radius: 14px;
+    text-align: left;
     cursor: pointer;
-    transition:
-      border-color 0.2s ease,
-      background 0.2s ease;
+    transition: background 0.15s ease;
 
-    &--selected {
-      border-color: c.$primary;
-      background: rgba(c.$primary, 0.06);
+    &:active {
+      background: var(--ss-surface-selected);
+    }
 
-      .avatar-wrap .avatar-check {
-        background: rgba(c.$primary, 0.06);
+    &:focus-visible {
+      outline: 2px solid c.$primary;
+      outline-offset: -2px;
+    }
+
+    &__label {
+      font-size: 16px;
+      color: c.$text;
+    }
+
+    &__values {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      margin-left: auto;
+      min-width: 0;
+    }
+
+    &__value {
+      margin-left: auto;
+      font-size: 16px;
+      font-weight: 600;
+      color: c.$text-light;
+      text-align: right;
+    }
+
+    &__hint {
+      font-size: 12px;
+      color: c.$text;
+      text-align: right;
+
+      &--error {
+        color: var(--ss-negative);
+        font-weight: 500;
       }
+    }
+
+    &__chevron {
+      flex-shrink: 0;
+      font-size: 18px;
+      color: var(--ss-primary);
+    }
+
+    // Not colour alone: the row also gains a left marker and the inline
+    // "x of y assigned" hint underneath its value.
+    &--error {
+      box-shadow: inset 3px 0 0 0 var(--ss-negative);
     }
   }
 
-  .member-amount-input {
-    --padding-start: 4px;
-    --padding-end: 4px;
-    text-align: right;
-    width: 80px;
-    font-size: 16px;
-    color: c.$text-light;
+  // ─── Summary line ───
+
+  .summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 0 2px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: c.$text;
+
+    ion-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 17px;
+      color: var(--ss-positive);
+    }
   }
 
   // ─── Validation hint ───
@@ -281,23 +325,65 @@
     }
   }
 
-  // ─── Total indicator ───
+  // ─── Pending chip ───
 
-  .total-indicator {
+  .pending-chip {
+    align-self: flex-start;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: c.$surface;
-    border: 1px solid c.$borders;
-    font-size: 14px;
-    color: c.$text;
-    transition: border-color 0.2s ease;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(c.$primary, 0.08);
+    border: 1px solid rgba(c.$primary, 0.3);
+    color: c.$primary;
+    font-size: 12px;
+    font-weight: 500;
 
-    &--valid {
-      border-color: c.$success;
-      color: c.$success;
+    ion-icon {
+      font-size: 13px;
     }
+  }
+
+  // ─── Sticky CTA ───
+
+  .cta-footer {
+    background: var(--ss-bg, #{c.$bg});
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    box-shadow: none;
+
+    // Ionic draws a shadow line above md footers; remove it so the bar
+    // blends with the page background.
+    &::before {
+      display: none;
+    }
+  }
+
+  .cta-button {
+    margin: 0;
+    width: 100%;
+
+    &__label {
+      margin-left: 8px;
+    }
+  }
+
+  // ─── Date picker modal ───
+  // It presents full-screen, and Ionic only reserves the status-bar inset for a
+  // toolbar inside a routed page shell — inside a modal template it does not,
+  // so the header would sit under the notch / clock. Reserve it here.
+  ion-modal.date-modal {
+    ion-header ion-toolbar {
+      padding-top: env(safe-area-inset-top, 0px);
+      --background: #{c.$surface};
+    }
+
+    ion-content {
+      --padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  }
+
+  ion-datetime.datetime-size-fixed:not(.datetime-prefer-wheel) {
+    max-width: unset;
   }
 }

@@ -40,10 +40,58 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'groups/:id/expenses/new/payers',
+        data: { kind: 'payers' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/new/split',
+        data: { kind: 'splits' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
+          ),
+      },
+      {
         path: 'groups/:id/expenses/pending/:pendingId',
         loadComponent: () =>
           import('./expenses/pages/expense-item/expense-item.component').then(
             (c) => c.ExpenseItemComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/pending/:pendingId/payers',
+        data: { kind: 'payers' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/pending/:pendingId/split',
+        data: { kind: 'splits' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/:expenseId/payers',
+        data: { kind: 'payers' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
+          ),
+      },
+      {
+        path: 'groups/:id/expenses/:expenseId/split',
+        data: { kind: 'splits' },
+        loadComponent: () =>
+          import('./expenses/pages/expense-allocation/expense-allocation.component').then(
+            (c) => c.ExpenseAllocationComponent,
           ),
       },
       {
