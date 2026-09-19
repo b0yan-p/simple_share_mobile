@@ -42,18 +42,76 @@
   }
 
   // ─── Segment toggle ───
+  // Pill track on the page background; the checked option floats as a white
+  // card with a filled checkmark in front of its label.
   ion-segment {
-    --background: #{c.$surface};
-    border: 1px solid c.$borders;
-    border-radius: 10px;
+    // Tinted track — a touch darker than the page background so the whole
+    // control reads as one group, not just a floating white pill.
+    --background: #{rgba(c.$primary, 0.1)};
+    background: rgba(c.$primary, 0.1);
+    border: none;
+    border-radius: 14px;
+    padding: 4px;
   }
 
   ion-segment-button {
     --color: #{c.$text};
     --color-checked: #{c.$text-light};
-    --background-checked: #{c.$surface-borders};
+    --background: transparent;
+    --background-checked: #{c.$surface};
     --indicator-color: transparent;
-    --border-radius: 8px;
+    --indicator-box-shadow: none;
+    --border-radius: 11px;
+
+    min-height: 44px;
+    font-size: 15px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    transition: box-shadow 0.2s ease;
+
+    // Ionic leaves .button-native at border-radius: 0 and paints the hover /
+    // focus / pressed tint on its ::after (inset 0), so those states render as
+    // hard rectangles. Rounding the native part clips them (it is overflow:
+    // hidden) back to the pill shape.
+    &::part(native) {
+      padding-inline: 10px;
+      border-radius: var(--border-radius);
+    }
+
+    &::part(indicator) {
+      display: none;
+    }
+
+    // The checkmark lives inside the label so it sits on the same line as the
+    // text (Ionic stacks slotted icons above the label by default).
+    ion-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 0;
+    }
+
+    // Only the checked option shows its checkmark.
+    ion-icon {
+      display: none;
+      font-size: 19px;
+      color: c.$primary;
+    }
+
+    &.segment-button-checked {
+      font-weight: 600;
+
+      // Shadow belongs on the host: Ionic paints --background-checked there
+      // and rounds it, while .button-native inside has border-radius: 0 — a
+      // shadow on the native part would draw a rectangle around the pill.
+      box-shadow: 0 1px 3px rgba(26, 22, 64, 0.12);
+
+      ion-icon {
+        display: block;
+      }
+    }
   }
 
   // ─── Pending chip ───

@@ -24,7 +24,7 @@ import {
   ViewWillLeave,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackSharp, cloudOfflineOutline } from 'ionicons/icons';
+import { arrowBackSharp, checkmarkCircle, cloudOfflineOutline } from 'ionicons/icons';
 import { concatMap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -142,6 +142,7 @@ export class ExpenseItemComponent implements ViewWillEnter, ViewWillLeave {
   constructor() {
     addIcons({
       arrowBackSharp,
+      checkmarkCircle,
       cloudOfflineOutline,
     });
   }
