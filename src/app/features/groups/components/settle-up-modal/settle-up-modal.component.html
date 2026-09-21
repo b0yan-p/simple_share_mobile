@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title>Settle up</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="dismiss()">
+      <ion-button fill="clear" aria-label="Close" (click)="dismiss()">
         <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
       </ion-button>
     </ion-buttons>
@@ -10,102 +10,169 @@
 </ion-header>
 
 <ion-content>
-  <div class="modal-body">
-    <p class="modal-subtitle c-text">Record a payment between members</p>
+  <div class="sheet-body">
+    <p class="sheet-subtitle">Record a payment between members</p>
 
-    <!-- Transaction flow -->
-    <div class="flow-card">
-      <div class="flow-row">
-        <!-- FROM side -->
-        <div class="flow-participant">
-          <div
-            class="flow-avatar"
-            [class.flow-you]="fromIsCurrentUser"
-            [class.flow-other]="!fromIsCurrentUser"
-          >
-            @if (fromIsCurrentUser) {
-              YOU
-            } @else {
-              {{ fromInitials }}
-            }
-          </div>
-          <span class="flow-label c-text">{{ fromLabel }}</span>
+    <!-- ─── Payment direction ─── -->
+    <div class="direction-card">
+      <div class="direction-party">
+        <div class="direction-avatar direction-avatar--payer" aria-hidden="true">
+          {{ fromIsCurrentUser ? 'YOU' : fromInitials }}
         </div>
+        <span class="direction-name">{{ fromLabel }}</span>
+      </div>
 
-        <!-- Arrow + live amount -->
-        <div class="flow-connector">
-          <span class="flow-amount c-primary">{{ liveAmount() | number: '1.2-2' }} BAM</span>
-          <div class="arrow-track">
-            <div class="arrow-line"></div>
-            <div class="arrow-head"></div>
-          </div>
+      <div class="direction-middle">
+        <p class="direction-headline">{{ directionText }}</p>
+        <p class="direction-outstanding">
+          Outstanding: {{ outstandingAmount() | number: '1.2-2' }} {{ currency }}
+        </p>
+        <div class="arrow-track" aria-hidden="true">
+          <div class="arrow-line"></div>
+          <div class="arrow-head"></div>
         </div>
+      </div>
 
-        <!-- TO side -->
-        <div class="flow-participant">
-          <div
-            class="flow-avatar"
-            [class.flow-you]="toIsCurrentUser"
-            [class.flow-other]="!toIsCurrentUser"
-          >
-            @if (toIsCurrentUser) {
-              YOU
-            } @else {
-              {{ toInitials }}
-            }
-          </div>
-          <span class="flow-label c-text">{{ toLabel }}</span>
+      <div class="direction-party">
+        <div class="direction-avatar direction-avatar--receiver" aria-hidden="true">
+          {{ toIsCurrentUser ? 'YOU' : toInitials }}
         </div>
+        <span class="direction-name">{{ toLabel }}</span>
       </div>
     </div>
 
-    <!-- Error message -->
     @if (error) {
-      <div class="error-banner">
-        <ion-icon name="alert-circle-outline" />
+      <div class="error-banner" role="alert">
+        <ion-icon name="alert-circle-outline" aria-hidden="true" />
         <span>Something went wrong. Please try again.</span>
       </div>
     }
 
-    <!-- Form -->
     <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="field-group">
-        <label class="field-label">Amount (BAM)</label>
-        <ion-input
-          type="number"
-          formControlName="amount"
-          fill="solid"
-          inputmode="decimal"
-          [min]="0.01"
-          step="0.01"
-          placeholder="0.00"
-          class="amount-input"
+      <!-- ─── Amount ─── -->
+      <div class="field">
+        <div class="amount-card">
+          <label class="field-label" for="settle-amount">Payment amount</label>
+          <div class="amount-card__row">
+            <ion-input
+              id="settle-amount"
+              type="number"
+              formControlName="amount"
+              class="amount-input"
+              placeholder="0.00"
+              inputmode="decimal"
+              step="0.01"
+              [attr.aria-label]="'Payment amount in ' + currency"
+            />
+            <!-- Fixed suffix: the settlement always uses the group's currency. -->
+            <div class="currency-chip" aria-hidden="true">
+              <span>{{ currency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Payment result ─── -->
+        @switch (amountState()) {
+          @case ('settles') {
+            <div class="result result--success" role="status">
+              <ion-icon name="checkmark-circle" aria-hidden="true" />
+              <span>This settles your balance</span>
+            </div>
+          }
+          @case ('partial') {
+            <div class="result result--warning" role="status">
+              <ion-icon name="information-circle-outline" aria-hidden="true" />
+              <span>
+                {{ remainingOwedPrefix }} {{ remainingAmount() | number: '1.2-2' }}
+                {{ currency }} after this payment
+              </span>
+            </div>
+          }
+          @case ('exceeds') {
+            <div class="result result--error" role="alert">
+              <ion-icon name="alert-circle-outline" aria-hidden="true" />
+              <span>
+                Amount can't exceed {{ outstandingAmount() | number: '1.2-2' }} {{ currency }}
+              </span>
+            </div>
+          }
+          @case ('nonPositive') {
+            <div class="result result--error" role="alert">
+              <ion-icon name="alert-circle-outline" aria-hidden="true" />
+              <span>Amount must be greater than 0</span>
+            </div>
+          }
+          @case ('missing') {
+            <div class="result result--error" role="alert">
+              <ion-icon name="alert-circle-outline" aria-hidden="true" />
+              <span>Enter a payment amount</span>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- ─── Date ─── -->
+      <button
+        type="button"
+        id="open-settle-date-picker"
+        class="detail-row"
+        [attr.aria-label]="
+          'Payment date ' + (form.value.date | date: 'EE, dd MMM yyyy') + '. Change the date.'
+        "
+      >
+        <span class="icon-tile icon-tile--purple" aria-hidden="true">
+          <ion-icon name="calendar-outline" />
+        </span>
+        <span class="detail-row__label">Payment date</span>
+        <span class="detail-row__value">
+          {{ form.value.date | date: 'EE, dd MMM yyyy' }}
+        </span>
+        <ion-icon
+          class="detail-row__chevron"
+          name="chevron-forward-outline"
+          aria-hidden="true"
         />
-      </div>
+      </button>
 
-      <div class="field-group">
-        <label class="field-label">Date</label>
-        <ion-input type="date" formControlName="date" fill="solid" />
-      </div>
-
-      <div class="form-actions">
+      <ion-modal
+        class="date-modal"
+        trigger="open-settle-date-picker"
+        [keepContentsMounted]="true"
+      >
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <div class="bdd-px-3">Select date</div>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <ion-datetime
+              size="cover"
+              [showDefaultButtons]="true"
+              presentation="date"
+              formControlName="date"
+            />
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+      <!-- ─── Actions ─── -->
+      <div class="sheet-actions">
         <ion-button
           expand="block"
           color="primary"
           type="submit"
-          [disabled]="form.invalid || submitting"
           class="confirm-btn"
+          [disabled]="!canSubmit() || submitting"
         >
           @if (submitting) {
-            <ion-spinner name="crescent" slot="start" />
-            Processing...
+            <ion-spinner name="crescent" aria-hidden="true" />
+            <span class="confirm-btn__label">Processing…</span>
           } @else {
-            <ion-icon name="checkmark-circle-outline" slot="start" />
             Confirm payment
           }
         </ion-button>
 
-        <ion-button expand="block" fill="clear" (click)="dismiss()" class="cancel-btn">
+        <ion-button expand="block" fill="clear" class="cancel-btn" (click)="dismiss()">
           Cancel
         </ion-button>
       </div>

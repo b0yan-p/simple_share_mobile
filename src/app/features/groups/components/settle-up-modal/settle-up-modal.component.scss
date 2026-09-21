@@ -1,10 +1,11 @@
 @use '../../../../../theme/variables.scss' as c;
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
+// Title, gutters and the drag-handle clearance come from the shared
+// `ion-modal.modal-sheet` rules in theme/components/_modal.scss.
 ion-header ion-toolbar {
   --background: #{c.$bg};
   --border-width: 0;
-  --padding-top: 0;
 }
 
 ion-content {
@@ -12,115 +13,122 @@ ion-content {
 }
 
 .close-icon {
-  color: c.$text;
-  font-size: 22px;
+  color: c.$text-light;
+  font-size: 24px;
 }
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
-.modal-body {
+.sheet-body {
   padding: 0 24px 40px;
 }
 
-.modal-subtitle {
-  font-size: 14px;
-  margin-bottom: 24px;
+.sheet-subtitle {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: c.$text;
 }
 
-// ─── Flow visualization ───────────────────────────────────────────────────────
-.flow-card {
-  background: c.$surface;
-  border: 1px solid c.$borders;
-  border-radius: 18px;
-  padding: 20px 16px;
-  margin-bottom: 28px;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(c.$primary, 0.6), transparent);
-  }
-}
-
-.flow-row {
+// ─── Payment direction ────────────────────────────────────────────────────────
+.direction-card {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  padding: 14px 14px 16px;
+  margin-bottom: 16px;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: 16px;
 }
 
-.flow-participant {
+.direction-party {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  width: 66px;
 }
 
-.flow-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+.direction-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.3px;
 
-  &.flow-you {
-    background: rgba(c.$primary, 0.14);
-    color: c.$primary;
-    border: 1.5px solid rgba(c.$primary, 0.4);
-    box-shadow: 0 0 14px rgba(c.$primary, 0.18);
+  // Payer is primary/lilac, receiver is the app's success green.
+  &--payer {
+    background: var(--ss-primary-subtle);
+    color: var(--ss-primary);
+    border: 1.5px solid #{rgba(c.$primary, 0.35)};
   }
 
-  &.flow-other {
-    background: rgba(c.$success, 0.14);
-    color: c.$success;
-    border: 1.5px solid rgba(c.$success, 0.4);
-    box-shadow: 0 0 14px rgba(c.$success, 0.18);
+  &--receiver {
+    background: var(--ss-positive-bg);
+    color: var(--ss-positive);
+    border: 1.5px solid #{rgba(c.$success, 0.35)};
   }
 }
 
-.flow-label {
-  font-size: 11px;
-  max-width: 64px;
+.direction-name {
+  max-width: 100%;
+  font-size: 12px;
+  color: c.$text;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.flow-connector {
+.direction-middle {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 2px;
 }
 
-.flow-amount {
+.direction-headline {
+  max-width: 100%;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: c.$text-light;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.direction-outstanding {
+  max-width: 100%;
+  margin: 0;
   font-size: 13px;
-  font-weight: 600;
+  color: c.$text;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-// Matches the arrow used in the balance breakdown debt flows
+// Direction only — the editable amount is never drawn on the arrow.
 .arrow-track {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0 6px;
+  margin-top: 8px;
 }
 
 .arrow-line {
   flex: 1;
   height: 1.5px;
-  background: rgba(c.$primary, 0.35);
+  background: #{rgba(c.$primary, 0.45)};
 }
 
 .arrow-head {
@@ -129,21 +137,21 @@ ion-content {
   height: 0;
   border-top: 4px solid transparent;
   border-bottom: 4px solid transparent;
-  border-left: 6px solid rgba(c.$primary, 0.55);
+  border-left: 6px solid #{rgba(c.$primary, 0.65)};
 }
 
-// ─── Error ────────────────────────────────────────────────────────────────────
+// ─── Error banner ─────────────────────────────────────────────────────────────
 .error-banner {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: rgba(c.$error, 0.1);
+  margin-bottom: 16px;
+  background: var(--ss-negative-bg);
   border: 1px solid rgba(c.$error, 0.25);
   border-radius: 10px;
   color: c.$error;
   font-size: 13px;
-  margin-bottom: 16px;
 
   ion-icon {
     font-size: 18px;
@@ -151,53 +159,244 @@ ion-content {
   }
 }
 
-// ─── Form fields ──────────────────────────────────────────────────────────────
-.field-group {
+// ─── Fields ───────────────────────────────────────────────────────────────────
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+// ─── Amount card & date row ───────────────────────────────────────────────────
+// Same treatment as the Add Expense form: white surface card for the amount,
+// white tappable row with a purple icon tile for the date.
+
+.icon-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &--purple {
+    background: var(--ss-primary-subtle);
+
+    ion-icon {
+      color: var(--ss-primary);
+    }
+  }
+}
+
+.amount-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 16px;
-}
-
-.field-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: c.$text;
-  padding-left: 2px;
-}
-
-ion-input {
-  --background: #{c.$surface} !important;
-  --color: #{c.$text-light};
-  --placeholder-color: #{c.$text};
-  --border-radius: 12px;
-  --padding-start: 14px;
-  --padding-end: 14px;
+  width: 100%;
+  padding: 18px 18px 20px;
+  border-radius: 16px;
+  background: c.$surface;
   border: 1px solid c.$borders;
-  border-radius: 12px;
 
-  &.amount-input {
-    --font-size: 18px;
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+}
+
+ion-input.amount-input {
+  flex: 1;
+  min-width: 0;
+  // The global ion-input rule pads 14px top and bottom, which on a 40px
+  // figure is pure dead height — the card's own padding is the gutter here.
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  min-height: 0;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: c.$text-light;
+}
+
+.currency-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: var(--ss-primary-subtle);
+  color: var(--ss-primary);
+  font-size: 18px;
+  font-weight: 600;
+
+  // Hairline separating the currency from the amount, as in the design.
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: c.$borders;
+  }
+}
+
+// Tappable row: whole row is the target, the chevron is decoration only.
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 9px 14px;
+  background: c.$surface;
+  border: 1px solid c.$borders;
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:active {
+    background: var(--ss-surface-selected);
+  }
+
+  &:focus-visible {
+    outline: 2px solid c.$primary;
+    outline-offset: -2px;
+  }
+
+  &__label {
+    font-size: 16px;
+    color: c.$text;
+  }
+
+  &__value {
+    margin-left: auto;
+    font-size: 16px;
     font-weight: 600;
+    color: c.$text-light;
+    text-align: right;
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    font-size: 18px;
+    color: var(--ss-primary);
+  }
+}
+
+// ─── Pay full amount ──────────────────────────────────────────────────────────
+.pay-full {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  background: var(--ss-primary-subtle);
+  border: none;
+  border-radius: 12px;
+  color: var(--ss-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid c.$primary;
+    outline-offset: 2px;
+  }
+}
+
+// ─── Payment result message ───────────────────────────────────────────────────
+// Every state carries its own icon, so colour is never the only signal.
+.result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+
+  ion-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+
+  &--success {
+    background: var(--ss-positive-bg);
+    color: var(--ss-positive);
+  }
+
+  // A partial payment leaves debt behind — amber says "not done yet" without
+  // claiming something went wrong.
+  &--warning {
+    background: var(--ss-warning-bg);
+    border: 1px solid var(--ss-warning);
+    color: var(--ss-warning-text);
+  }
+
+  &--error {
+    background: var(--ss-negative-bg);
+    border: 1px solid rgba(c.$error, 0.3);
+    color: c.$error;
   }
 }
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
-.form-actions {
+// Sheets in this app keep their actions at the end of the body rather than in a
+// pinned footer (see member-actions-sheet), so the sheet only scrolls when the
+// content genuinely does not fit.
+.sheet-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 28px;
+  gap: 4px;
+  margin-top: 12px;
 }
 
 .confirm-btn {
-  --border-radius: 14px;
-  height: 52px;
+  margin: 0;
+  height: 54px;
+  --border-radius: 16px;
   font-size: 16px;
   font-weight: 600;
+
+  &__label {
+    margin-left: 8px;
+  }
 }
 
 .cancel-btn {
   --color: #{c.$text};
+  margin: 0;
+  min-height: 44px;
   font-size: 15px;
+}
+
+// ─── Date picker modal ────────────────────────────────────────────────────────
+// Inside a modal template Ionic does not reserve the status-bar inset, so the
+// header would sit under the notch. Reserve it here (same as the expense form).
+ion-modal.date-modal {
+  ion-header ion-toolbar {
+    padding-top: env(safe-area-inset-top, 0px);
+    --background: #{c.$surface};
+  }
+
+  ion-content {
+    --padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+ion-datetime.datetime-size-fixed:not(.datetime-prefer-wheel) {
+  max-width: unset;
 }
