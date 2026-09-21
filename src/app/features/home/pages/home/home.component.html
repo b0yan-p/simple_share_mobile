@@ -19,8 +19,16 @@
   <!-- Total net worth across all groups -->
   <section class="total-debt-card">
     @if (networkService.isOnline()) {
-      <div>
-        <img [src]="'/assets/images/logo.png'" alt="logo" class="logo" />
+      <div class="bdd-mr-1">
+        <img
+          [src]="
+            !!balanceSummary()?.net && balanceSummary()!.net >= 0
+              ? '/assets/images/logo.png'
+              : '/assets/images/logo_sad.png'
+          "
+          alt="logo"
+          class="logo"
+        />
         <div class="shadow"></div>
       </div>
       <div class="bdd-mx-a">
