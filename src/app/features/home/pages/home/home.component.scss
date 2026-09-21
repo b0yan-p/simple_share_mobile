@@ -44,6 +44,10 @@ ion-content {
       }
     }
 
+    ion-spinner {
+      color: var(--ss-text-on-primary);
+    }
+
     .offline-info {
       margin-inline: auto;
 

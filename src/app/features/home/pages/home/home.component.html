@@ -24,9 +24,18 @@
         <div class="shadow"></div>
       </div>
       <div class="bdd-mx-a">
-        <p>You are owed</p>
-        <p class="amount">$48.56</p>
-        <p>across 3 groups</p>
+        @if (balanceSummary(); as summary) {
+          <p>{{ balanceLabel() }}</p>
+          <p class="amount">{{ balanceAmount() | number: '1.2-2' }} BAM</p>
+          @if (summary.groupCount > 0) {
+            <p>
+              across {{ summary.groupCount }}
+              {{ summary.groupCount === 1 ? 'group' : 'groups' }}
+            </p>
+          }
+        } @else if (balanceLoading()) {
+          <ion-spinner name="crescent" />
+        }
       </div>
     } @else {
       <div>
