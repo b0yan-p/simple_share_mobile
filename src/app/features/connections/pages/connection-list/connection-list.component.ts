@@ -3,15 +3,19 @@ import {
   IonContent,
   IonHeader,
   IonList,
+  IonRefresher,
+  IonRefresherContent,
   IonSpinner,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { Observable } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { OfflineEmptyStateComponent } from 'src/app/shared/components/offline-empty-state/offline-empty-state.component';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { ConnectionService } from '../../services/connection.service';
 
 @Component({
@@ -25,9 +29,12 @@ import { ConnectionService } from '../../services/connection.service';
     IonTitle,
     IonList,
     IonSpinner,
+    IonRefresher,
+    IonRefresherContent,
     ListItemComponent,
     EmptyStateComponent,
     OfflineEmptyStateComponent,
+    RefreshDirective,
   ],
 })
 export class ConnectionListComponent implements ViewWillEnter {
@@ -46,4 +53,6 @@ export class ConnectionListComponent implements ViewWillEnter {
 
     this.service.getAll();
   }
+
+  readonly onRefresh = (): Observable<void> => this.service.refreshList();
 }

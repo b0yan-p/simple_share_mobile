@@ -1,4 +1,4 @@
-@if (loading()) {
+@if (loading() && !balance()) {
   <div class="loading-container">
     <ion-spinner name="crescent" color="primary" />
   </div>

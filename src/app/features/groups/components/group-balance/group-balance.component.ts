@@ -3,10 +3,10 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonIcon, IonSpinner, ModalController } from '@ionic/angular/standalone';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { switchMap } from 'rxjs';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
-import { BalanceResponse, DebtEdge } from '../../models/balance-response.model';
-import { GroupService } from '../../services/group.service';
+import { DebtEdge } from '../../models/balance-response.model';
+import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.component';
 
 @Component({
@@ -17,17 +17,19 @@ import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.compo
   imports: [NgClass, DecimalPipe, IonIcon, IonSpinner, ChipComponent],
 })
 export class GroupBalanceComponent implements OnInit {
-  private service = inject(GroupService);
+  private balanceFacade = inject(GroupBalanceFacade);
   private route = inject(ActivatedRoute);
   private destroy = inject(DestroyRef);
   private modalController = inject(ModalController);
 
-  balance = signal<BalanceResponse | null>(null);
-  expandedMemberId = signal<string | null>(null);
-  loading = signal(true);
-  groupId = signal<string>('');
+  // Read straight off the root-provided store: the group screen's @switch
+  // destroys this component whenever another tab is active, and a pull-to-refresh
+  // has to be able to reload balances while that is the case.
+  readonly balance = this.balanceFacade.store.balance;
+  readonly loading = this.balanceFacade.store.loading;
+  readonly groupId = this.balanceFacade.store.groupId;
 
-  private readonly refresh$ = new BehaviorSubject<void>(undefined);
+  expandedMemberId = signal<string | null>(null);
 
   edgesMap = computed(() => {
     const b = this.balance();
@@ -48,22 +50,10 @@ export class GroupBalanceComponent implements OnInit {
   ngOnInit(): void {
     this.route.params
       .pipe(
-        switchMap((params) => {
-          this.groupId.set(params['id']);
-          return this.refresh$.pipe(
-            switchMap(() => this.service.getGroupBalances(params['id'])),
-          );
-        }),
+        switchMap((params) => this.balanceFacade.loadBalances(params['id'])),
         takeUntilDestroyed(this.destroy),
       )
-      .subscribe({
-        next: (data) => {
-          this.balance.set(data);
-          this.expandedMemberId.set(data.members[0]?.memberId ?? null);
-          this.loading.set(false);
-        },
-        error: () => this.loading.set(false),
-      });
+      .subscribe(() => this.expandedMemberId.set(this.balance()?.members[0]?.memberId ?? null));
   }
 
   toggle(memberId: string): void {
@@ -100,7 +90,7 @@ export class GroupBalanceComponent implements OnInit {
         fromIsCurrentUser,
         toIsCurrentUser,
         defaultAmount: edge.amount,
-        groupId: this.groupId(),
+        groupId: this.groupId() ?? '',
       },
       breakpoints: [0, 0.85],
       initialBreakpoint: 0.85,
@@ -111,8 +101,7 @@ export class GroupBalanceComponent implements OnInit {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm' && data?.success) {
-      this.loading.set(true);
-      this.refresh$.next();
+      this.balanceFacade.loadBalances(this.groupId() ?? '').subscribe();
     }
   }
 }

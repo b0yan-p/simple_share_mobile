@@ -5,6 +5,10 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" [appRefresh]="onRefresh">
+    <ion-refresher-content />
+  </ion-refresher>
+
   @if (!network.isOnline()) {
     <app-offline-empty-state />
   }

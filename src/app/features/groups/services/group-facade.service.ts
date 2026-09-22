@@ -7,6 +7,7 @@ import {
   Observable,
   of,
   skip,
+  Subject,
   Subscription,
   switchMap,
   tap,
@@ -15,9 +16,11 @@ import {
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
+import { runAndSettle } from 'src/app/shared/utils/settle.helper';
 import { CreateGroup } from '../models/create-group.model';
 import { GroupOverview } from '../models/group-overview.model';
 import { Group, GroupListItem } from '../models/group.model';
+import { JoinGroupResponse } from '../models/invite-preview.model';
 import { UpdateGroup } from '../models/update-group.model';
 import { GroupListStore } from '../store/group-list-store';
 import { RecentGroupsStore } from '../store/recent-groups-store';
@@ -25,7 +28,6 @@ import { mapGroupListItems } from '../utils/group-list.utils';
 import { GroupApiService } from './group-api.service';
 import { GroupIdbService } from './group-idb.service';
 import { GroupPaginatorService } from './group-paginator.service';
-import { JoinGroupResponse } from '../models/invite-preview.model';
 import { GroupService } from './group.service';
 
 const OFFLINE_MUTATION_MESSAGE = 'You are offline. Connect to the internet and try again.';
@@ -47,6 +49,14 @@ export class GroupFacade {
   $loadGroups?: Subscription;
   $loadRecentGroups?: Subscription;
 
+  /**
+   * Emit once every time a page load settles — success, empty, cached-only or
+   * error alike, since every branch of the pipeline ends in `of([])`. This is
+   * the completion signal the pull-to-refresh spinner waits on.
+   */
+  private readonly groupsSettled = new Subject<void>();
+  private readonly recentSettled = new Subject<void>();
+
   // #region load methods
   /**
    * Reloads the list from page 0. There is no freshness guard by design — the
@@ -54,7 +64,7 @@ export class GroupFacade {
    * The previous items stay on screen while the reload runs, so the cache paint
    * replaces them rather than blanking the list first.
    */
-  loadGroups(): void {
+  loadGroups(opts: { skipCache?: boolean } = {}): void {
     this.$loadGroups?.unsubscribe();
     this.store.setLoading();
     this.paginator.resetPagination();
@@ -78,7 +88,7 @@ export class GroupFacade {
         this.paginator.pageLoading.set(page.skip > 0);
 
         if (page.skip === 0) {
-          return this.loadFirstPage(page);
+          return this.loadFirstPage(page, opts.skipCache ?? false);
         }
 
         return this.loadNextPage(page);
@@ -86,12 +96,22 @@ export class GroupFacade {
     );
 
     this.$loadGroups = ref$.subscribe({
+      next: () => this.groupsSettled.next(),
       error: (err) => console.log('error in group facade: ', err),
     });
   }
 
-  private loadFirstPage(page: { skip: number; take: number }) {
-    return this.idb.getGroups().pipe(
+  /**
+   * `skipCache` is what makes a pull-to-refresh show only server data: the IDB
+   * record is left in place (so a failed request keeps its fallback) but it is
+   * not painted, and it gets overwritten once the fresh page lands.
+   */
+  private loadFirstPage(page: { skip: number; take: number }, skipCache = false) {
+    const cached$: Observable<{ items: GroupListItem[]; totalCount: number } | null> = skipCache
+      ? of(null)
+      : this.idb.getGroups();
+
+    return cached$.pipe(
       switchMap((cached) => {
         if (cached) {
           console.log(
@@ -203,11 +223,15 @@ export class GroupFacade {
    * the home screen refetches, and the previous items stay on screen while the
    * reload runs so the cache paint replaces them rather than blanking the list.
    */
-  loadRecentGroups(): void {
+  loadRecentGroups(opts: { skipCache?: boolean } = {}): void {
     this.$loadRecentGroups?.unsubscribe();
     this.recentStore.setLoading();
 
-    const ref$ = this.idb.getRecentGroups().pipe(
+    const cached$: Observable<GroupListItem[] | null> = opts.skipCache
+      ? of(null)
+      : this.idb.getRecentGroups();
+
+    const ref$ = cached$.pipe(
       switchMap((cached) => {
         if (cached) {
           console.log(`[IDB HIT] recentGroups=${cached.length}`);
@@ -255,6 +279,7 @@ export class GroupFacade {
     );
 
     this.$loadRecentGroups = ref$.subscribe({
+      next: () => this.recentSettled.next(),
       error: (err) => console.log('error in group facade: ', err),
     });
   }
@@ -266,6 +291,18 @@ export class GroupFacade {
     this.recentStore.setError(message);
     this.toastService.errorToast(message);
     return of([] as GroupListItem[]);
+  }
+
+  /**
+   * Pull-to-refresh entry points: reload page one straight from the API and
+   * complete once it has settled.
+   */
+  refreshGroups(): Observable<void> {
+    return runAndSettle(this.groupsSettled, () => this.loadGroups({ skipCache: true }));
+  }
+
+  refreshRecentGroups(): Observable<void> {
+    return runAndSettle(this.recentSettled, () => this.loadRecentGroups({ skipCache: true }));
   }
 
   /**

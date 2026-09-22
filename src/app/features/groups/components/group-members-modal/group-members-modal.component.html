@@ -10,6 +10,10 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" [appRefresh]="onRefresh">
+    <ion-refresher-content />
+  </ion-refresher>
+
   <div class="page-body">
     @if (addedCount() > 0) {
       <div class="success-banner">

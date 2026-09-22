@@ -6,16 +6,20 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonList,
+  IonRefresher,
+  IonRefresherContent,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { Observable } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { OfflineEmptyStateComponent } from 'src/app/shared/components/offline-empty-state/offline-empty-state.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { ActivityListItem } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
 
@@ -31,9 +35,12 @@ import { ActivityService } from '../../services/activity.service';
     IonContent,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonRefresher,
+    IonRefresherContent,
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
+    RefreshDirective,
     OfflineEmptyStateComponent,
   ],
 })
@@ -53,6 +60,9 @@ export class ActivityListComponent implements ViewWillEnter {
 
     this.service.getAll();
   }
+
+  /** getAll() resets pagination and replaces the items at skip 0 — no duplicates. */
+  readonly onRefresh = (): Observable<void> => this.service.refreshList();
 
   openDetails(item: ActivityListItem) {
     this.router.navigate(this.service.resolveNavigation(item.details));

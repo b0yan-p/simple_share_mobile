@@ -9,10 +9,13 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonList,
+  IonRefresher,
+  IonRefresherContent,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
+import { Observable } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { LoadStatus } from 'src/app/core/store/models/list-state.model';
@@ -20,6 +23,7 @@ import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { GroupFacade } from '../../services/group-facade.service';
 import { GroupPaginatorService } from '../../services/group-paginator.service';
 
@@ -39,9 +43,12 @@ import { GroupPaginatorService } from '../../services/group-paginator.service';
     IonContent,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonRefresher,
+    IonRefresherContent,
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
+    RefreshDirective,
     OfflineWarningComponent,
   ],
 })
@@ -71,6 +78,13 @@ export class GroupListComponent implements ViewWillEnter {
   ionViewWillEnter(): void {
     this.facade.loadGroups();
   }
+
+  /**
+   * Reloads page one from the API without painting the cache first. The gesture
+   * is only reachable at the top of the list, so dropping back to one page
+   * cannot strand the user mid-scroll.
+   */
+  readonly onRefresh = (): Observable<void> => this.facade.refreshGroups();
 
   onDelete(id: string) {
     this.facade.deleteGroup(id).subscribe({

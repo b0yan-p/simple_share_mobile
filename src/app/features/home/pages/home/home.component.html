@@ -5,6 +5,10 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-refresher slot="fixed" [appRefresh]="onRefresh">
+    <ion-refresher-content />
+  </ion-refresher>
+
   <!-- Welcome -->
   <section class="home-greetings">
     <div class="bdd-flex bdd-ai-center bdd-jc-space-between">

@@ -4,18 +4,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonHeader,
+  IonRefresher,
+  IonRefresherContent,
   IonSpinner,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { RecentGroupsComponent } from 'src/app/features/groups/components/recent-groups/recent-groups.component';
 import { GroupFacade } from 'src/app/features/groups/services/group-facade.service';
 import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { BalanceSummary } from '../../models/balance-summary.model';
 import { BalanceSummaryService } from '../../services/balance-summary.service';
 
@@ -29,9 +32,12 @@ import { BalanceSummaryService } from '../../services/balance-summary.service';
     IonToolbar,
     IonHeader,
     IonSpinner,
+    IonRefresher,
+    IonRefresherContent,
     DecimalPipe,
     RecentGroupsComponent,
     OfflineWarningComponent,
+    RefreshDirective,
   ],
 })
 export class HomeComponent implements OnInit, ViewWillEnter {
@@ -70,29 +76,34 @@ export class HomeComponent implements OnInit, ViewWillEnter {
    */
   ionViewWillEnter(): void {
     this.groupFacade.loadRecentGroups();
-    this.loadBalanceSummary();
+    this.loadBalanceSummary().subscribe();
   }
+
+  /** Both things on this screen are reloaded together — the total moves with the groups. */
+  readonly onRefresh = (): Observable<void> =>
+    forkJoin([this.groupFacade.refreshRecentGroups(), this.loadBalanceSummary()]).pipe(
+      map(() => void 0),
+    );
 
   /**
    * Nothing is fetched offline: the card renders its offline branch instead of the amount,
    * so there is nothing to show and nothing worth caching.
    */
-  private loadBalanceSummary(): void {
-    if (!this.networkService.isOnline()) return;
+  private loadBalanceSummary(): Observable<void> {
+    if (!this.networkService.isOnline()) return of(void 0);
 
     this.balanceLoading.set(true);
 
-    this.balanceSummaryService
-      .getMyBalanceSummary()
-      .pipe(
-        finalize(() => this.balanceLoading.set(false)),
-        catchError((err: { message?: string }) => {
-          console.warn('[API ERROR] balance summary', err);
-          this.toastService.errorToast(err?.message ?? 'Failed to load your total balance');
-          return of(null);
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((summary) => this.balanceSummary.set(summary));
+    return this.balanceSummaryService.getMyBalanceSummary().pipe(
+      finalize(() => this.balanceLoading.set(false)),
+      catchError((err: { message?: string }) => {
+        console.warn('[API ERROR] balance summary', err);
+        this.toastService.errorToast(err?.message ?? 'Failed to load your total balance');
+        return of(null);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+      tap((summary) => this.balanceSummary.set(summary)),
+      map(() => void 0),
+    );
   }
 }

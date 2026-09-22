@@ -8,11 +8,13 @@ import {
   first,
   map,
   Observable,
+  Subject,
   Subscription,
   switchMap,
   tap,
 } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { runAndSettle } from '../../shared/utils/settle.helper';
 import { BaseModel } from '../models/base-model';
 import { PageData } from '../models/page-data';
 import { PaginatorService } from './paginator.service';
@@ -40,6 +42,14 @@ export abstract class BaseService<
   items = signal<ListT[]>([]);
 
   private listSubscription?: Subscription;
+
+  /**
+   * Emits once every time a list page request settles. It has to be driven by
+   * finalize rather than the subscriber: the catchError below rethrows, which
+   * tears the subscription down, and a pull-to-refresh waiting on a `next` that
+   * never comes would leave its spinner running forever.
+   */
+  protected readonly listSettled = new Subject<void>();
 
   public get baseApi(): string {
     return `${this.rootUrl}/${this.ctrlApi}`;
@@ -78,6 +88,7 @@ export abstract class BaseService<
                 this.toastService.errorToast(err.message);
                 throw err;
               }),
+              finalize(() => this.listSettled.next()),
             );
         }),
       )
@@ -85,6 +96,14 @@ export abstract class BaseService<
         if (this.pageRequest().skip === 0) this.items.set([...data]);
         else this.items.set([...(this.items() ?? []), ...data]);
       });
+  }
+
+  /**
+   * Pull-to-refresh: getAll() already resets pagination and replaces `items` at
+   * skip 0, so this reloads page one and completes once the request settles.
+   */
+  public refreshList(url?: string): Observable<void> {
+    return runAndSettle(this.listSettled, () => this.getAll(url));
   }
 
   public cancelList(): void {

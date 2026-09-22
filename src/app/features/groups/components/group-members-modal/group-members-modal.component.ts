@@ -7,6 +7,8 @@ import {
   IonIcon,
   IonItem,
   IonList,
+  IonRefresher,
+  IonRefresherContent,
   IonSpinner,
   IonTitle,
   IonToolbar,
@@ -14,9 +16,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline, arrowBackOutline, checkmarkCircle } from 'ionicons/icons';
-import { catchError, filter, forkJoin, from, map, of, switchMap, tap } from 'rxjs';
+import { catchError, filter, forkJoin, from, map, Observable, of, switchMap, tap } from 'rxjs';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { GroupMember, GroupRole, isVirtualMember } from '../../models/group-member.model';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupService } from '../../services/group.service';
@@ -41,6 +44,9 @@ import { MemberActionsSheetComponent } from '../member-actions-sheet/member-acti
     IonList,
     IonItem,
     IonSpinner,
+    IonRefresher,
+    IonRefresherContent,
+    RefreshDirective,
   ],
 })
 export class GroupMembersModalComponent implements OnInit {
@@ -84,8 +90,10 @@ export class GroupMembersModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.load();
+    this.load().subscribe();
   }
+
+  readonly onRefresh = (): Observable<void> => this.load();
 
   dismiss(): void {
     this.modalController.dismiss(null, this.changed() ? 'confirm' : 'cancel');
@@ -110,7 +118,7 @@ export class GroupMembersModalComponent implements OnInit {
         tap(({ data }) => {
           this.addedCount.set(data?.addedCount ?? 0);
           this.changed.set(true);
-          this.load();
+          this.load().subscribe();
         }),
       )
       .subscribe();
@@ -143,24 +151,28 @@ export class GroupMembersModalComponent implements OnInit {
       .subscribe();
   }
 
-  private load(): void {
+  /** Returns the load so the refresher can wait for it; callers subscribe. */
+  private load(): Observable<void> {
     this.loading.set(true);
 
     // Balances are decoration here: if that call fails the member list must
     // still render, so it collapses to null rather than erroring the pair.
-    forkJoin({
+    return forkJoin({
       members: this.groupMemberFacade
         .getGroupMembers(this.groupId)
         .pipe(catchError(() => of([] as GroupMember[]))),
       balances: this.groupService
         .getGroupBalances(this.groupId)
         .pipe(catchError(() => of(null))),
-    }).subscribe(({ members, balances }) => {
-      this.members.set(members ?? []);
-      this.netByMemberId.set(
-        new Map((balances?.members ?? []).map((b) => [b.memberId, b.net])),
-      );
-      this.loading.set(false);
-    });
+    }).pipe(
+      tap(({ members, balances }) => {
+        this.members.set(members ?? []);
+        this.netByMemberId.set(
+          new Map((balances?.members ?? []).map((b) => [b.memberId, b.net])),
+        );
+        this.loading.set(false);
+      }),
+      map(() => void 0),
+    );
   }
 }

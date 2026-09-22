@@ -24,7 +24,10 @@ export class ConnectionService extends BaseService<ConnectionItem> {
       .get<ConnectionItem[]>(this.baseApi)
       .pipe(
         first(),
-        finalize(() => this.loading.set(false)),
+        finalize(() => {
+          this.loading.set(false);
+          this.listSettled.next();
+        }),
         catchError((err) => {
           console.error(err);
 

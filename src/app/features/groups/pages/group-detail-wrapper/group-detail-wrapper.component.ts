@@ -13,6 +13,8 @@ import {
   IonLabel,
   IonList,
   IonPopover,
+  IonRefresher,
+  IonRefresherContent,
   IonSegment,
   IonSegmentButton,
   IonTitle,
@@ -21,15 +23,31 @@ import {
   ViewWillEnter,
   ViewWillLeave,
 } from '@ionic/angular/standalone';
-import { BehaviorSubject, catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
+import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
+import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
+import { runAndSettle } from 'src/app/shared/utils/settle.helper';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupMembersModalComponent } from '../../components/group-members-modal/group-members-modal.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { GroupMember } from '../../models/group-member.model';
+import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { GroupFacade } from '../../services/group-facade.service';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupDetailStore, GroupDetailTab } from '../../store/group-detail-store';
@@ -57,6 +75,9 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     IonList,
     IonItem,
     IonPopover,
+    IonRefresher,
+    IonRefresherContent,
+    RefreshDirective,
     GroupDetailsComponent,
     ExpenseListComponent,
     GroupBalanceComponent,
@@ -69,6 +90,8 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private router = inject(Router);
   private groupFacade = inject(GroupFacade);
   private groupMemberFacade = inject(GroupMemberFacade);
+  private expenseFacade = inject(ExpenseFacade);
+  private balanceFacade = inject(GroupBalanceFacade);
   private modalController = inject(ModalController);
   readonly store = inject(GroupDetailStore);
   protected networkService = inject(NetworkService);
@@ -78,30 +101,37 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
 
   private refresh$ = new BehaviorSubject<void>(undefined);
 
+  /** Nexted once the overview + members pair for the current cycle has landed. */
+  private readonly shellSettled = new Subject<void>();
+
   title = 'Group';
   members: GroupMember[] = [];
 
   /**
-   * Emits null instead of erroring when the overview is unavailable. The screen
-   * shell no longer depends on this, and it must not: an errored observable never
-   * emits again, which is what used to leave the whole page blank offline.
+   * The always-visible part of the screen: the overview header and the member
+   * list. Loaded as one pair so a refresh has a single point to wait on, and
+   * driven by refresh$ so a pull — or a member modal closing — re-fetches both.
+   *
+   * Each side collapses to a neutral value instead of erroring. The screen shell
+   * must not depend on either: an errored observable never emits again, which is
+   * what used to leave the whole page blank offline.
    */
-  group$ = this.route.params.pipe(
-    switchMap((p) => this.groupFacade.loadGroupOverview(p['id'])),
-    catchError(() => of(null)),
+  shell$ = combineLatest([this.route.params, this.refresh$]).pipe(
+    switchMap(([p]) =>
+      forkJoin({
+        group: this.groupFacade.loadGroupOverview(p['id']).pipe(catchError(() => of(null))),
+        members: this.groupMemberFacade
+          .getGroupMembers(p['id'])
+          .pipe(catchError(() => of([] as GroupMember[]))),
+      }),
+    ),
+    tap(({ members }) => (this.members = members)),
+    tap(() => this.shellSettled.next()),
+    shareReplay({ bufferSize: 1, refCount: true }),
   );
 
   private groupId$ = this.route.params.pipe(
     map((p) => p['id'] as string),
-    takeUntilDestroyed(),
-  );
-
-  members$ = combineLatest([this.route.params, this.refresh$]).pipe(
-    switchMap(([p]) =>
-      this.groupMemberFacade
-        .getGroupMembers(p['id'])
-        .pipe(catchError(() => of([] as GroupMember[]))),
-    ),
     takeUntilDestroyed(),
   );
 
@@ -121,8 +151,22 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
 
   ngOnInit(): void {
     this.groupId$.subscribe((groupId) => this.store.enter(groupId));
-    this.members$.subscribe((e) => (this.members = e ?? []));
   }
+
+  /**
+   * One gesture, the whole screen: the header, the member list and all three
+   * tabs — including the two that @switch has not rendered, which is why the
+   * expenses and balances stores are root-provided.
+   */
+  readonly onRefresh = (): Observable<void> => {
+    const groupId = this.route.snapshot.params['id'];
+
+    return forkJoin([
+      runAndSettle(this.shellSettled, () => this.refresh$.next()),
+      this.expenseFacade.reloadExpenses(groupId),
+      this.balanceFacade.loadBalances(groupId),
+    ]).pipe(map(() => void 0));
+  };
 
   /** Re-entering from a pushed page (expense detail) — go back to where we were. */
   ionViewWillEnter(): void {

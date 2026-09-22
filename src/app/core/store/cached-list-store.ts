@@ -60,6 +60,18 @@ export abstract class CachedListStore<T> {
     this.loadedAt.set(null);
   }
 
+  /**
+   * Like reset(), but keeps the items already on screen. For a forced reload
+   * that bypasses the cache: blanking the list for the length of the request
+   * would make a pull-to-refresh look like the data disappeared.
+   */
+  reload(key: string): void {
+    this.key.set(key);
+    this.status.set(LoadStatus.Idle);
+    this.error.set(null);
+    this.loadedAt.set(null);
+  }
+
   /** Starts a clean session for `key`, discarding anything held for a previous one. */
   reset(key: string): void {
     this.key.set(key);

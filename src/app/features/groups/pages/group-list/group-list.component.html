@@ -5,6 +5,10 @@
 </ion-header>
 
 <ion-content class="ion-paddinga">
+  <ion-refresher slot="fixed" [appRefresh]="onRefresh">
+    <ion-refresher-content />
+  </ion-refresher>
+
   @if (!network.isOnline()) {
     <app-offline-warning />
   }

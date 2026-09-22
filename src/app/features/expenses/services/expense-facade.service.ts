@@ -10,6 +10,7 @@ import {
   Observable,
   of,
   skip,
+  Subject,
   Subscription,
   switchMap,
   tap,
@@ -18,8 +19,9 @@ import {
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
+import { runAndSettle } from 'src/app/shared/utils/settle.helper';
 import { CreateExpenseRequest, UpdateExpenseRequest } from '../models/create-expense.model';
-import { ExpenseListItem } from '../models/expense-list-item.model';
+import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-item.model';
 import { ExpenseDetail } from '../models/expense.model';
 import { mapExpenses } from '../utils/expense-list.utils';
 import { ExpenseApiService } from './expense-api.service';
@@ -41,6 +43,13 @@ export class ExpenseFacade {
 
   $loadExpenses?: Subscription;
 
+  /**
+   * Emits once every time a page load settles — success, empty, cached-only or
+   * error alike, since every branch of the pipeline ends in `of([])`. This is
+   * the completion signal the pull-to-refresh spinner waits on.
+   */
+  private readonly expensesSettled = new Subject<void>();
+
   // #region load methods
   /**
    * Loads the first page for a group, or does nothing when the store already
@@ -50,11 +59,14 @@ export class ExpenseFacade {
    * pageRequest$ pipeline — and therefore the infinite scroll offset — exactly
    * where the user left it.
    */
-  loadExpenses(groupId: string, opts: { force?: boolean } = {}): void {
+  loadExpenses(groupId: string, opts: { force?: boolean; skipCache?: boolean } = {}): void {
     if (!opts.force && this.$loadExpenses && this.store.isFreshFor(groupId)) return;
 
     this.$loadExpenses?.unsubscribe();
-    this.store.reset(groupId);
+    // A cache-skipping reload has nothing to repaint the list with, so it keeps
+    // the current items until the fresh page lands.
+    if (opts.skipCache) this.store.reload(groupId);
+    else this.store.reset(groupId);
     this.store.setLoading();
     this.paginator.resetPagination();
     this.paginator.totalCount.set(0);
@@ -77,7 +89,7 @@ export class ExpenseFacade {
         this.ui.listLoading.set(true);
 
         if (page.skip === 0) {
-          return this.loadFirstPage(groupId, page);
+          return this.loadFirstPage(groupId, page, opts.skipCache ?? false);
         }
 
         return this.loadNextPage(groupId, page);
@@ -85,12 +97,25 @@ export class ExpenseFacade {
     );
 
     this.$loadExpenses = ref$.subscribe({
+      next: () => this.expensesSettled.next(),
       error: (err) => console.log('error in facade: ', err),
     });
   }
 
-  private loadFirstPage(groupId: string, page: { skip: number; take: number }) {
-    return this.idb.getExpenses(groupId).pipe(
+  /**
+   * `skipCache` is what makes a pull-to-refresh show only server data: the IDB
+   * record is left in place (so a failed request keeps its fallback) but it is
+   * not painted, and it gets overwritten once the fresh page lands.
+   */
+  private loadFirstPage(
+    groupId: string,
+    page: { skip: number; take: number },
+    skipCache = false,
+  ) {
+    const cached$: Observable<{ items: ExpenseListItemDetails[]; totalCount: number } | null> =
+      skipCache ? of(null) : this.idb.getExpenses(groupId);
+
+    return cached$.pipe(
       switchMap((cached) => {
         if (cached) {
           console.log(
@@ -272,8 +297,16 @@ export class ExpenseFacade {
    * back and cannot be relied on to notice that the data went stale.
    */
   refreshExpenses(groupId: string): Observable<void> {
-    return this.invalidateExpenses(groupId).pipe(
-      tap(() => this.loadExpenses(groupId, { force: true })),
+    return this.invalidateExpenses(groupId).pipe(switchMap(() => this.reloadExpenses(groupId)));
+  }
+
+  /**
+   * Page one straight from the API, no cache paint, completing once the list has
+   * settled. Shared by pull-to-refresh and by the post-mutation reload.
+   */
+  reloadExpenses(groupId: string): Observable<void> {
+    return runAndSettle(this.expensesSettled, () =>
+      this.loadExpenses(groupId, { force: true, skipCache: true }),
     );
   }
 
