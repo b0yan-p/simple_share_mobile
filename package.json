@@ -32,6 +32,7 @@
     "@capacitor/network": "^8.0.1",
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "8.0.0",
+    "@capgo/capacitor-social-login": "^8.5.11",
     "@ionic/angular": "^8.0.0",
     "angularx-qrcode": "^20.0.0",
     "bdd-flex": "^1.0.6",

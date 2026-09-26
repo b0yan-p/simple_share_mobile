@@ -253,18 +253,6 @@ export class GroupFacade {
             const items = res ?? [];
             console.log(`[API] recentGroups=${items.length}`);
 
-            if (!items.length) {
-              if (!cached) {
-                this.recentStore.setItems([]);
-                this.recentStore.setReady();
-              } else {
-                this.toastService.warnToast(
-                  'Could not refresh recent groups. Showing cached data.',
-                );
-              }
-              return of([] as GroupListItem[]);
-            }
-
             return this.idb.saveRecentGroups(items).pipe(
               tap(() => {
                 this.recentStore.setItems(mapGroupListItems(items));

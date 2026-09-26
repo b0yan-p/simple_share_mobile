@@ -26,7 +26,7 @@
       <div class="bdd-mr-1">
         <img
           [src]="
-            !!balanceSummary()?.net && balanceSummary()!.net >= 0
+            (balanceSummary()?.net ?? 0) >= 0
               ? '/assets/images/logo.png'
               : '/assets/images/logo_sad.png'
           "

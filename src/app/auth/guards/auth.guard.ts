@@ -18,7 +18,7 @@ export const authGuard: CanActivateFn = (_route, state) => {
   return router.createUrlTree(['login'], { queryParams: { returnUrl: state.url } });
 };
 
-/** Keeps an already logged in user away from the login/register pages. */
+/** Keeps an already logged in user away from the login page. */
 export const guestGuard: CanActivateFn = () => {
   const tokenService = inject(TokenStorageService);
   const router = inject(Router);
