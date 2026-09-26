@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.choxster.simpleshare',
+  appId: 'app.shareorb.simpleshare',
   appName: 'simpleShareMobile',
-  webDir: 'www'
+  webDir: 'www',
 };
 
 export default config;

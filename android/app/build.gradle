@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.choxster.simpleshare"
+    namespace = "app.shareorb.simpleshare"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.choxster.simpleshare"
+        applicationId "app.shareorb.simpleshare"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

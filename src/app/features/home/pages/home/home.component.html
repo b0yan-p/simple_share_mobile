@@ -38,7 +38,9 @@
       <div class="bdd-mx-a">
         @if (balanceSummary(); as summary) {
           <p>{{ balanceLabel() }}</p>
-          <p class="amount">{{ balanceAmount() | number: '1.2-2' }} BAM</p>
+          <p class="amount">
+            {{ balanceAmount() | number: '1.2-2' }} <span class="font-24">BAM</span>
+          </p>
           @if (summary.groupCount > 0) {
             <p>
               across {{ summary.groupCount }}

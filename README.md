@@ -45,10 +45,10 @@ serveru. Deep link se, naravno, ne može testirati ovdje.
 
 ## Konfiguracija po buildu
 
-|                | `environment.ts` (dev)      | `environment.prod.ts` (produkcija)         |
-| -------------- | --------------------------- | ------------------------------------------ |
-| API            | `http://localhost:5169/api` | `https://simpleshare-api.choxster.com/api` |
-| Invite linkovi | `http://localhost:4200`     | `https://simpleshare-api.choxster.com`     |
+|                | `environment.ts` (dev)      | `environment.prod.ts` (produkcija) |
+| -------------- | --------------------------- | ---------------------------------- |
+| API            | `http://localhost:5169/api` | `https://api.shareorb.app/api`     |
+| Invite linkovi | `http://localhost:4200`     | `https://api.shareorb.app`         |
 
 `ng build` **već po default-u koristi produkcijsku konfiguraciju** — u
 `angular.json` build target ima `"defaultConfiguration": "production"`. Do
@@ -91,8 +91,8 @@ Kad ti treba APK da ga nekome pošalješ:
 ```bash
 npx ng build --configuration production   # produkcijski env (API + invite URL)
 nvm use 22 && npx cap sync android && nvm use 20
-cd android
-./gradlew assembleDebug
+cd android && ./gradlew assembleDebug
+open app/build/outputs/apk/debug
 ```
 
 Cijela komanda
@@ -119,36 +119,36 @@ adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 
 ## Deep linkovi (invite linkovi)
 
-Aplikacija je registrovana kao handler za `https://simpleshare-api.choxster.com/join/*`
+Aplikacija je registrovana kao handler za `https://api.shareorb.app/join/*`
 (`android/app/src/main/AndroidManifest.xml`). Kad Android potvrdi domen, invite
 link se otvara u aplikaciji umjesto u browseru.
 
 ### Prije testiranja
 
 1. **Backend mora biti deployovan prvo.** Android provjeru radi **jednom, pri
-   instalaciji** — čita `https://simpleshare-api.choxster.com/.well-known/assetlinks.json`.
+   instalaciji** — čita `https://api.shareorb.app/.well-known/assetlinks.json`.
    Ako tada backend nije bio gore, provjera padne i **ne ponavlja se sama**.
 2. **Obriši staru aplikaciju.** `appId` je promijenjen sa `io.ionic.starter` na
-   `com.choxster.simpleshare`, pa Android novu instalira kao odvojenu aplikaciju
+   `app.shareorb.simpleshare`, pa Android novu instalira kao odvojenu aplikaciju
    — dvije ikone, i stara može presresti link.
 
 ### Provjera
 
 ```bash
-adb shell pm get-app-links com.choxster.simpleshare
+adb shell pm get-app-links app.shareorb.simpleshare
 ```
 
 Pored domena treba da piše `verified`. Ako ne piše, forsiraj ponovnu provjeru:
 
 ```bash
-adb shell pm verify-app-links --re-verify com.choxster.simpleshare
+adb shell pm verify-app-links --re-verify app.shareorb.simpleshare
 ```
 
 Simulacija otvaranja linka:
 
 ```bash
 adb shell am start -a android.intent.action.VIEW \
-  -d "https://simpleshare-api.choxster.com/join/<token>"
+  -d "https://api.shareorb.app/join/<token>"
 ```
 
 Ručno: uzmi `Copy link` u aplikaciji, pošalji sebi (Viber, notes, bilo šta) i

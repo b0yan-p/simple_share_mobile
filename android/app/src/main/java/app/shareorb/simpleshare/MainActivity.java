@@ -1,4 +1,4 @@
-package com.choxster.simpleshare;
+package app.shareorb.simpleshare;
 
 import com.getcapacitor.BridgeActivity;
 
