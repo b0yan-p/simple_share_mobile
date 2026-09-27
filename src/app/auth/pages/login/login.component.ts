@@ -1,9 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { logoGoogle } from 'ionicons/icons';
+import { IonContent } from '@ionic/angular/standalone';
 import { ToastService } from 'src/app/core/services/toast.service';
 
 import { first } from 'rxjs';
@@ -14,7 +12,7 @@ import { isGoogleSignInCancelled } from '../../services/google-auth.service';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonButton, IonIcon, IonContent],
+  imports: [IonContent],
 })
 export class LoginComponent {
   auth = inject(AuthService);
@@ -26,10 +24,6 @@ export class LoginComponent {
 
   /** Set by authGuard when a protected URL (e.g. an invite link) was blocked. */
   readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-
-  constructor() {
-    addIcons({ logoGoogle });
-  }
 
   loginWithGoogle() {
     if (this.loading) return;
