@@ -90,7 +90,7 @@ Kad ti treba APK da ga nekome pošalješ:
 
 ```bash
 npx ng build --configuration production   # produkcijski env (API + invite URL)
-nvm use 22 && npx cap sync android && nvm use 20
+nvm use 22 && npx cap sync android
 cd android && ./gradlew assembleDebug
 open app/build/outputs/apk/debug
 ```
@@ -98,7 +98,7 @@ open app/build/outputs/apk/debug
 Cijela komanda
 
 ```
-npx ng build --configuration production && npx cap sync android && cd android && ./gradlew assembleDebug
+npx ng build --configuration production && nvm use 22 && npx cap sync android && cd android && ./gradlew assembleDebug
 ```
 
 APK završi na:
