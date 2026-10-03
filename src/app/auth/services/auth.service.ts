@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { catchError, first, Observable, of, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GoogleLoginInput } from '../models/google-login-input.model';
+import { LoginInput } from '../models/login-input.model';
 import { LoginUser } from '../models/login-user.model';
 import { GoogleAuthService } from './google-auth.service';
 import { TokenStorageService } from './token-storage.service';
@@ -18,7 +19,16 @@ export class AuthService {
   private googleAuth = inject(GoogleAuthService);
   private router = inject(Router);
 
+  private loginAPI = `${environment.baseAPIUrl}/auth/login`;
   private googleLoginAPI = `${environment.baseAPIUrl}/auth/google`;
+
+  public login(input: LoginInput): Observable<boolean> {
+    return this.http.post<LoginUser>(this.loginAPI, input).pipe(
+      first(),
+      switchMap((res) => this.tokenStorage.setUser(res)),
+      switchMap((res) => this.tokenStorage.setAccessToken(res.token)),
+    );
+  }
 
   /**
    * One endpoint covers both cases: the backend logs the user in or registers
@@ -58,6 +68,6 @@ export class AuthService {
     this.tokenStorage
       .clearAll()
       .pipe(first())
-      .subscribe(() => this.router.navigate(['login']));
+      .subscribe(() => this.router.navigate(['welcome']));
   }
 }

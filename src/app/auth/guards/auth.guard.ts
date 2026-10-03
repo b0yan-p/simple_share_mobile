@@ -13,12 +13,12 @@ export const authGuard: CanActivateFn = (_route, state) => {
 
   if (tokenService.isAuthenticated()) return true;
 
-  // Carry the attempted URL through login: someone opening an invite link
-  // usually has no account yet, and dropping it would strand them on home.
-  return router.createUrlTree(['login'], { queryParams: { returnUrl: state.url } });
+  // Carry the attempted URL through the auth flow: someone opening an invite
+  // link usually has no account yet, and dropping it would strand them on home.
+  return router.createUrlTree(['welcome'], { queryParams: { returnUrl: state.url } });
 };
 
-/** Keeps an already logged in user away from the login page. */
+/** Keeps an already logged in user away from the auth pages. */
 export const guestGuard: CanActivateFn = () => {
   const tokenService = inject(TokenStorageService);
   const router = inject(Router);

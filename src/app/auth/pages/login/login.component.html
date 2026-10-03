@@ -1,84 +1,111 @@
 <ion-content [fullscreen]="true">
-  <div class="login-page">
-    <div class="login-content">
-      <div class="login-brand">
+  <div class="auth-page">
+    <header class="auth-header">
+      <button class="auth-back" type="button" aria-label="Go back" (click)="goBack()">
+        <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <main class="auth-content">
+      <div class="auth-brand">
         <!-- Decorative because the wordmark below already contains the brand name -->
-        <img class="login-logo" src="/assets/images/logo.png" alt="" />
+        <img class="auth-logo" src="/assets/images/logo.png" alt="" />
 
-        <p class="login-wordmark"><span>Simple</span>Share</p>
+        <p class="auth-wordmark">Simple<span>Share</span></p>
       </div>
 
-      <div class="login-copy">
-        <h1 class="login-title">
-          <span>Split expenses.</span>
-          <span><strong>Not</strong> friendships.</span>
-        </h1>
+      <section class="auth-heading">
+        <h1 class="auth-title">Welcome back</h1>
 
-        <p class="login-subtitle">
-          Share costs with the people<br />
-          you care about.
-        </p>
-      </div>
+        <p class="auth-subtitle">Log in to your account.</p>
+      </section>
 
-      <div class="login-actions">
-        <button
-          class="gsi-material-button"
-          type="button"
-          [disabled]="loading"
-          (click)="loginWithGoogle()"
-        >
-          <div class="gsi-material-button-state"></div>
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="login()">
+        <div class="auth-field">
+          <ion-icon class="auth-field__icon" name="mail-outline" aria-hidden="true"></ion-icon>
 
-          <div class="gsi-material-button-content-wrapper">
-            <div class="gsi-material-button-icon">
-              <svg
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 48"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                style="display: block"
-              >
-                <path
-                  fill="#EA4335"
-                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                ></path>
+          <ion-input
+            class="auth-field__input"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            enterkeyhint="next"
+            placeholder="Email"
+            aria-label="Email"
+            formControlName="email"
+          />
+        </div>
 
-                <path
-                  fill="#4285F4"
-                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                ></path>
+        <div class="auth-field">
+          <ion-icon
+            class="auth-field__icon"
+            name="lock-closed-outline"
+            aria-hidden="true"
+          ></ion-icon>
 
-                <path
-                  fill="#FBBC05"
-                  d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                ></path>
+          <ion-input
+            class="auth-field__input"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            autocomplete="current-password"
+            enterkeyhint="go"
+            placeholder="Password"
+            aria-label="Password"
+            formControlName="password"
+          />
 
-                <path
-                  fill="#34A853"
-                  d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                ></path>
+          <button
+            class="auth-field__toggle"
+            type="button"
+            [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="passwordVisible()"
+            (click)="togglePassword()"
+          >
+            <ion-icon
+              [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
+              aria-hidden="true"
+            ></ion-icon>
+          </button>
+        </div>
 
-                <path fill="none" d="M0 0h48v48H0z"></path>
-              </svg>
-            </div>
-
-            <span class="gsi-material-button-contents">Continue with Google</span>
-
-            <span style="display: none">Continue with Google</span>
-          </div>
+        <button class="auth-forgot" type="button" (click)="forgotPassword()">
+          Forgot password?
         </button>
 
-        <p class="login-legal">
-          By continuing, you agree to our
-          <a href="https://shareorb.app/terms" target="_blank" rel="noopener noreferrer"
-            >Terms of Service</a
-          >
-          and
-          <a href="https://shareorb.app/privacy" target="_blank" rel="noopener noreferrer"
-            >Privacy Policy</a
-          >.
-        </p>
+        <button
+          class="auth-submit"
+          type="submit"
+          [disabled]="loading()"
+          [attr.aria-busy]="loading()"
+        >
+          @if (loading()) {
+            <ion-spinner name="crescent" />
+          } @else {
+            Log in
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span class="auth-divider__line"></span>
+
+        <span class="auth-divider__label">or</span>
+
+        <span class="auth-divider__line"></span>
       </div>
-    </div>
+
+      <app-google-sign-in-button
+        theme="light"
+        [loading]="googleLoading()"
+        (pressed)="loginWithGoogle()"
+      />
+
+      <p class="auth-switch">
+        Don't have an account?
+
+        <button class="auth-switch__link" type="button" (click)="goToRegister()">
+          Create account
+        </button>
+      </p>
+    </main>
   </div>
 </ion-content>

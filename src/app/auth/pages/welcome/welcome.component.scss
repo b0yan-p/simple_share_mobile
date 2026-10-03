@@ -1,0 +1,560 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// SimpleShare Welcome
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+  --welcome-accent: #ad96ff;
+  --welcome-bottom: #34337d;
+
+  ion-content {
+    /*
+     * IMPORTANT
+     *
+     * Purple starts entering noticeably earlier than before.
+     *
+     * The Google button sits around the image -> purple transition.
+     * The email panel sits mostly/fully inside the purple UI area.
+     * Legal text sits completely on #34337D.
+     */
+    --background:
+      linear-gradient(
+          to bottom,
+          rgba(52, 51, 125, 0) 0%,
+          rgba(52, 51, 125, 0) 52%,
+          rgba(52, 51, 125, 0.04) 57%,
+          rgba(52, 51, 125, 0.1) 62%,
+          rgba(52, 51, 125, 0.2) 67%,
+          rgba(52, 51, 125, 0.34) 71%,
+          rgba(52, 51, 125, 0.52) 75%,
+          rgba(52, 51, 125, 0.7) 79%,
+          rgba(52, 51, 125, 0.84) 83%,
+          rgba(52, 51, 125, 0.94) 87%,
+          var(--welcome-bottom) 91%,
+          var(--welcome-bottom) 100%
+        )
+        center / 100% 100% no-repeat,
+      url('/assets/images/login_background.png') center top / 100% auto no-repeat
+        var(--welcome-bottom);
+
+    --padding-top: 0;
+    --padding-bottom: 32px;
+  }
+
+  ion-content::part(scroll) {
+    overflow-y: hidden;
+  }
+
+  @media (max-height: 500px) {
+    ion-content::part(scroll) {
+      overflow-y: auto;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────────────────────────────────────
+
+.welcome-page {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  /*
+   * Readability only.
+   *
+   * This is NOT a visible panel.
+   * It just slightly stabilizes contrast behind the headline.
+   */
+  &::before {
+    content: '';
+
+    position: absolute;
+    z-index: 0;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 58%;
+
+    pointer-events: none;
+
+    background: linear-gradient(
+      to bottom,
+      rgba(20, 22, 65, 0.26) 0%,
+      rgba(20, 22, 65, 0.22) 30%,
+      rgba(20, 22, 65, 0.2) 55%,
+      rgba(20, 22, 65, 0.12) 78%,
+      rgba(20, 22, 65, 0) 100%
+    );
+  }
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  flex: 1 1 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding: calc(env(safe-area-inset-top, 0px) + 24px) 24px
+    max(20px, env(safe-area-inset-bottom, 0px));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Brand
+// ─────────────────────────────────────────────────────────────────────────────
+
+.welcome-brand {
+  margin-top: 20px;
+
+  text-align: center;
+}
+
+.welcome-logo {
+  display: block;
+
+  width: 124px;
+  height: auto;
+
+  margin-inline: auto;
+}
+
+.welcome-wordmark {
+  margin: 8px 0 0;
+
+  font-size: 28px;
+  line-height: 1.15;
+
+  font-weight: 700;
+  letter-spacing: -0.4px;
+
+  color: #ffffff;
+
+  text-shadow: 0 2px 12px rgba(12, 15, 48, 0.28);
+
+  span {
+    color: var(--welcome-accent);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main copy
+// ─────────────────────────────────────────────────────────────────────────────
+
+.welcome-copy {
+  width: 100%;
+}
+
+.welcome-title {
+  margin: 32px 0 0;
+
+  text-align: center;
+
+  font-size: clamp(36px, 9vw, 42px);
+  line-height: 1.08;
+
+  font-weight: 700;
+  letter-spacing: -1px;
+
+  color: #ffffff;
+
+  text-shadow: 0 2px 14px rgba(10, 13, 45, 0.3);
+
+  span {
+    display: block;
+  }
+
+  strong {
+    color: var(--welcome-accent);
+
+    font-weight: inherit;
+
+    text-shadow: 0 2px 12px rgba(10, 13, 45, 0.24);
+  }
+}
+
+.welcome-subtitle {
+  margin: 14px 0 0;
+
+  text-align: center;
+
+  font-size: 14px;
+  line-height: 1.4;
+
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.94);
+
+  /*
+   * The line falls right on the sunset, the brightest part of the artwork, so
+   * a single soft shadow is not enough - the tight one carries the contrast,
+   * the wide one separates the text from the glow behind it.
+   */
+  text-shadow:
+    0 1px 2px rgba(10, 13, 45, 0.55),
+    0 2px 14px rgba(10, 13, 45, 0.45);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bottom actions
+// ─────────────────────────────────────────────────────────────────────────────
+
+.welcome-actions {
+  margin-top: auto;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Email card
+//
+// THIS IS THE CARD FROM THE REFERENCE.
+//
+// - clearly visible purple surface
+// - NO outer border
+// - NO blur
+// - rounded background
+// - two inner outlined actions
+// ─────────────────────────────────────────────────────────────────────────────
+
+.email-panel {
+  width: 100%;
+  max-width: 400px;
+
+  margin: 16px auto 0;
+
+  padding: 13px 12px 12px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 22px;
+
+  /*
+   * Important:
+   *
+   * This must actually be visible.
+   * Previous versions were far too transparent.
+   *
+   * The reference contains a clearly separated but subtle purple panel.
+   */
+  background: rgba(72, 67, 145, 0.68);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 6px 20px rgba(25, 24, 72, 0.08);
+
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Email card heading
+// ─────────────────────────────────────────────────────────────────────────────
+
+.email-panel__header {
+  width: 100%;
+
+  margin-bottom: 11px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.email-panel__divider {
+  flex: 1 1 auto;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.email-panel__label {
+  flex: 0 0 auto;
+
+  font-size: 13px;
+  line-height: 1;
+
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.76);
+
+  white-space: nowrap;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Email buttons row
+// ─────────────────────────────────────────────────────────────────────────────
+
+.email-panel__actions {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 10px;
+}
+
+.email-action-button {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 48px;
+
+  margin: 0;
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 15px;
+
+  background: rgba(42, 39, 104, 0.14);
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+  line-height: 1;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 100ms ease;
+
+  ion-icon {
+    flex: 0 0 auto;
+
+    width: 18px;
+    height: 18px;
+
+    font-size: 18px;
+
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  span {
+    min-width: 0;
+
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.38);
+
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  &:active {
+    transform: scale(0.985);
+
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(173, 150, 255, 0.92);
+    outline-offset: 2px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Legal
+// ─────────────────────────────────────────────────────────────────────────────
+
+.welcome-legal {
+  margin: 18px 0 0;
+
+  max-width: 310px;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.45;
+
+  font-weight: 400;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  a {
+    color: rgba(255, 255, 255, 0.92);
+
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Narrow screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+@media (max-width: 360px) {
+  .email-panel {
+    padding-inline: 10px;
+  }
+
+  .email-panel__actions {
+    gap: 8px;
+  }
+
+  .email-action-button {
+    padding-inline: 7px;
+
+    gap: 6px;
+
+    font-size: 14px;
+
+    ion-icon {
+      width: 17px;
+      height: 17px;
+
+      font-size: 17px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Short screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+@media (max-height: 700px) {
+  .welcome-content {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  }
+
+  .welcome-brand {
+    margin-top: 6px;
+  }
+
+  .welcome-logo {
+    width: 56px;
+  }
+
+  .welcome-wordmark {
+    margin-top: 6px;
+
+    font-size: 24px;
+  }
+
+  .welcome-title {
+    margin-top: 28px;
+
+    font-size: clamp(34px, 9vw, 38px);
+  }
+
+  .welcome-subtitle {
+    margin-top: 16px;
+
+    font-size: 16px;
+  }
+
+  .email-panel {
+    margin-top: 12px;
+
+    padding: 10px;
+  }
+
+  .email-panel__header {
+    margin-bottom: 8px;
+  }
+
+  .email-action-button {
+    height: 44px;
+  }
+
+  .welcome-legal {
+    margin-top: 13px;
+  }
+}
+
+@media (max-height: 580px) {
+  .welcome-content {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  }
+
+  .welcome-brand {
+    margin-top: 0;
+  }
+
+  .welcome-logo {
+    width: 48px;
+  }
+
+  .welcome-wordmark {
+    font-size: 22px;
+  }
+
+  .welcome-title {
+    margin-top: 20px;
+
+    font-size: 32px;
+  }
+
+  .welcome-subtitle {
+    margin-top: 12px;
+
+    font-size: 15px;
+  }
+
+  .email-panel {
+    margin-top: 9px;
+
+    padding: 8px 9px 9px;
+  }
+
+  .email-panel__header {
+    margin-bottom: 7px;
+  }
+
+  .email-panel__label {
+    font-size: 12px;
+  }
+
+  .email-action-button {
+    height: 42px;
+
+    font-size: 14px;
+  }
+
+  .welcome-legal {
+    margin-top: 10px;
+  }
+}

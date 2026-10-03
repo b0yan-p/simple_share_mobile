@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true">
+  <div class="welcome-page">
+    <div class="welcome-content">
+      <div class="welcome-brand">
+        <img class="welcome-logo" src="/assets/images/logo.png" alt="" />
+
+        <p class="welcome-wordmark"><span>Simple</span>Share</p>
+      </div>
+
+      <div class="welcome-copy">
+        <h1 class="welcome-title">
+          <span>Split expenses.</span>
+          <span> <strong>Not</strong> friendships. </span>
+        </h1>
+        <p class="welcome-subtitle">
+          Share costs with the people<br />
+          you care about.
+        </p>
+      </div>
+
+      <div class="welcome-actions">
+        <app-google-sign-in-button [loading]="loading" (pressed)="loginWithGoogle()" />
+
+        <!-- Email authentication group -->
+        <div class="email-panel">
+          <div class="email-panel__header">
+            <span class="email-panel__divider"></span>
+
+            <span class="email-panel__label"> Continue with email </span>
+
+            <span class="email-panel__divider"></span>
+          </div>
+
+          <div class="email-panel__actions">
+            <button class="email-action-button" type="button" (click)="goToLogin()">
+              <ion-icon name="mail-outline" aria-hidden="true"></ion-icon>
+
+              <span>Log in</span>
+            </button>
+
+            <button class="email-action-button" type="button">
+              <ion-icon name="person-add-outline" aria-hidden="true"></ion-icon>
+
+              <span>Create account</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="welcome-legal">
+          By continuing, you agree to our
+
+          <a href="https://shareorb.app/terms" target="_blank" rel="noopener noreferrer">
+            Terms of Service
+          </a>
+
+          and
+
+          <a href="https://shareorb.app/privacy" target="_blank" rel="noopener noreferrer">
+            Privacy Policy </a
+          >.
+        </p>
+      </div>
+    </div>
+  </div>
+</ion-content>

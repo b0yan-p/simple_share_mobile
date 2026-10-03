@@ -1,475 +1,495 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// SimpleShare Login
+// SimpleShare email login - the light counterpart to the illustrated welcome
 // ─────────────────────────────────────────────────────────────────────────────
 
 :host {
-  --login-accent: #ad96ff;
-
-  --login-bottom: #34337d;
+  --auth-purple: #7357e8;
+  --auth-ink: #121038;
+  --auth-muted: #6f6a96;
 
   ion-content {
-    /*
-     * Background composition:
-     *
-     * 1. Bottom purple transition
-     * 2. Original login artwork
-     *
-     * The illustration remains untouched through most of the screen.
-     * Only the lower section gradually blends into #34337D.
-     */
-    --background:
-      linear-gradient(
-          to bottom,
-          rgba(52, 51, 125, 0) 0%,
-          rgba(52, 51, 125, 0) 69%,
-          rgba(52, 51, 125, 0.08) 73%,
-          rgba(52, 51, 125, 0.2) 77%,
-          rgba(52, 51, 125, 0.4) 81%,
-          rgba(52, 51, 125, 0.62) 85%,
-          rgba(52, 51, 125, 0.82) 89%,
-          rgba(52, 51, 125, 0.95) 93%,
-          var(--login-bottom) 96%,
-          var(--login-bottom) 100%
-        )
-        center / 100% 100% no-repeat,
-      url('/assets/images/login_background.png') center center / cover no-repeat;
+    --background: linear-gradient(to bottom, #fcfbff 0%, #faf9ff 70%, #f8f5ff 100%);
 
     --padding-top: 0;
-    --padding-bottom: 32px;
+    --padding-bottom: 0;
   }
 
-  /*
-   * Prevent unnecessary Ionic rubber-band scrolling on normal phone screens.
-   */
-  ion-content::part(scroll) {
-    overflow-y: hidden;
+  .auth-page {
+    position: relative;
+    isolation: isolate;
+
+    width: 100%;
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+
+    overflow: hidden;
   }
 
-  /*
-   * Very short viewports genuinely need scrolling.
-   */
-  @media (max-height: 500px) {
-    ion-content::part(scroll) {
-      overflow-y: auto;
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Header
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  .auth-header {
+    position: relative;
+    z-index: 1;
+
+    padding-inline: 12px;
+  }
+
+  .auth-back {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #17143f;
+
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 24px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--auth-purple);
+      outline-offset: 2px;
+
+      border-radius: 12px;
     }
   }
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Content column
+  // ─────────────────────────────────────────────────────────────────────────────
 
-.login-page {
-  position: relative;
-  isolation: isolate;
+  .auth-content {
+    position: relative;
+    z-index: 1;
 
-  width: 100%;
-  min-height: 100%;
+    width: 100%;
+    max-width: 400px;
 
-  display: flex;
-  flex-direction: column;
+    margin-inline: auto;
 
-  overflow: hidden;
-  &::before {
+    box-sizing: border-box;
+
+    padding-top: 28px;
+    padding-inline: 24px;
+
+    @media (max-width: 360px) {
+      padding-inline: 20px;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Brand
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  .auth-brand {
+    text-align: center;
+  }
+
+  .auth-logo {
+    display: block;
+
+    width: 104px;
+    height: auto;
+
+    margin-inline: auto;
+  }
+
+  .auth-wordmark {
+    margin: 8px 0 0;
+
+    font-size: 28px;
+    line-height: 1.15;
+
+    font-weight: 700;
+    letter-spacing: -0.5px;
+
+    color: #111038;
+
+    span {
+      color: var(--auth-purple);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Heading
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  .auth-heading {
+    margin-top: 48px;
+
+    text-align: center;
+  }
+
+  .auth-title {
+    margin: 0;
+
+    font-size: 30px;
+    line-height: 1.15;
+
+    font-weight: 700;
+    letter-spacing: -0.6px;
+
+    color: var(--auth-ink);
+  }
+
+  .auth-subtitle {
+    margin: 8px 0 0;
+
+    font-size: 16px;
+    line-height: 1.4;
+
+    font-weight: 400;
+
+    color: var(--auth-muted);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Form
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  .auth-form {
+    margin-top: 38px;
+
+    display: flex;
+    flex-direction: column;
+
+    /*
+     * theme/components/_input.scss puts gap: 16px on every form; the spacing
+     * between the fields, the link and the button is set per element here.
+     */
+    gap: 0;
+  }
+
+  .auth-field {
+    height: 58px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border: 1px solid #ddd9ef;
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.72);
+
+    transition:
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+
+    &:focus-within {
+      border-color: #7560df;
+      box-shadow: 0 0 0 3px rgba(117, 96, 223, 0.1);
+    }
+
+    + .auth-field {
+      margin-top: 10px;
+    }
+  }
+
+  .auth-field__icon {
+    flex: 0 0 auto;
+
+    font-size: 20px;
+
+    color: #8a84bb;
+  }
+
+  /*
+ * theme/components/_input.scss gives every ion-input 14px of inner padding, and
+ * Ionic's own native wrapper adds more; inside this field the icon and the text
+ * are spaced by the flex gap alone, so all of it has to go.
+ */
+  .auth-field .auth-field__input {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    --background: transparent;
+    --color: #17143f;
+    --placeholder-color: #9690bf;
+    --placeholder-opacity: 1;
+    --placeholder-font-weight: 400;
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --highlight-height: 0;
+
+    font-size: 16px;
+    font-weight: 400;
+
+    ::ng-deep .native-wrapper,
+    ::ng-deep .input-wrapper,
+    ::ng-deep input {
+      margin: 0;
+      padding: 0;
+    }
+
+    /*
+   * Chrome paints a pale blue plate behind autofilled values, which reads as a
+   * second box inside the field. The inset shadow is the only way to repaint it,
+   * and it needs ::ng-deep because the native input is Ionic's own child, not
+   * part of this template.
+   */
+    ::ng-deep input:-webkit-autofill,
+    ::ng-deep input:-webkit-autofill:hover,
+    ::ng-deep input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px #fdfcff inset;
+      -webkit-text-fill-color: #17143f;
+
+      caret-color: #17143f;
+
+      transition: background-color 100000s ease-in-out 0s;
+    }
+  }
+
+  /*
+ * The eye needs a real tap target; the icon alone is far below the comfortable
+ * minimum, and the field's 58px height leaves room for a proper button.
+ */
+  .auth-field__toggle {
+    -webkit-appearance: none;
+    appearance: none;
+
+    flex: 0 0 auto;
+
+    width: 40px;
+    height: 40px;
+
+    margin-right: -8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #8882b8;
+
+    cursor: pointer;
+
+    ion-icon {
+      font-size: 20px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--auth-purple);
+      outline-offset: -2px;
+
+      border-radius: 10px;
+    }
+  }
+
+  .auth-forgot {
+    -webkit-appearance: none;
+    appearance: none;
+
+    margin: 0;
+    padding: 8px 0 4px;
+
+    align-self: flex-end;
+
+    line-height: 1;
+
+    border: none;
+    background: transparent;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: var(--auth-purple);
+
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    cursor: pointer;
+  }
+
+  .auth-submit {
+    -webkit-appearance: none;
+    appearance: none;
+
+    margin-top: 20px;
+
+    width: 100%;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 18px;
+
+    background: linear-gradient(90deg, #7357e8 0%, #855ef0 100%);
+
+    font-size: 16px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition: filter 150ms ease;
+
+    &:active:not(:disabled) {
+      filter: brightness(0.93);
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--auth-purple);
+      outline-offset: 2px;
+    }
+
+    ion-spinner {
+      width: 22px;
+      height: 22px;
+
+      color: #ffffff;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Divider and alternatives
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  app-google-sign-in-button {
+    margin-top: 16px;
+  }
+
+  .auth-divider {
+    margin-top: 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .auth-divider__line {
+    flex: 1;
+
+    height: 1px;
+
+    background: #e3dff0;
+  }
+
+  .auth-divider__label {
+    font-size: 14px;
+    font-weight: 400;
+
+    color: #777198;
+  }
+
+  .auth-switch {
+    margin: 26px 0 0;
+
+    text-align: center;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    color: #34304f;
+  }
+
+  .auth-switch__link {
+    -webkit-appearance: none;
+    appearance: none;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: var(--auth-purple);
+
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    cursor: pointer;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Decoration
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /*
+ * Decoration only, so it lives here rather than as a stray <img>. The asset is
+ * transparent above its clouds, so it just has to keep its aspect ratio -
+ * cropping it into a fixed band cuts straight through them.
+ */
+  .auth-page::after {
     content: '';
 
     position: absolute;
     z-index: 0;
 
-    top: 0;
     left: 0;
     right: 0;
+    bottom: 0;
 
-    height: 60%;
+    aspect-ratio: 941 / 1672;
+
+    background: url('/assets/images/clauds.png') bottom center / 100% auto no-repeat;
 
     pointer-events: none;
-
-    background: linear-gradient(
-      to bottom,
-      rgba(20, 22, 65, 0.26) 0%,
-      rgba(20, 22, 65, 0.2) 24%,
-      rgba(20, 22, 65, 0.13) 45%,
-      rgba(20, 22, 65, 0.06) 68%,
-      rgba(20, 22, 65, 0) 100%
-    );
-  }
-}
-
-.login-content {
-  position: relative;
-  z-index: 1;
-
-  width: 100%;
-
-  flex: 1 1 auto;
-
-  display: flex;
-  flex-direction: column;
-
-  box-sizing: border-box;
-
-  padding: calc(env(safe-area-inset-top, 0px) + 24px) 24px
-    max(20px, env(safe-area-inset-bottom, 0px));
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Brand
-// ─────────────────────────────────────────────────────────────────────────────
-
-.login-brand {
-  margin-top: 32px;
-
-  text-align: center;
-}
-
-.login-logo {
-  display: block;
-
-  width: 124px;
-  height: auto;
-
-  margin-inline: auto;
-}
-
-.login-wordmark {
-  margin: 8px 0 0;
-
-  font-size: 28px;
-  line-height: 1.15;
-
-  font-weight: 700;
-  letter-spacing: -0.4px;
-
-  color: #ffffff;
-  text-shadow: 0 2px 12px rgba(12, 15, 48, 0.28);
-
-  span {
-    color: var(--login-accent);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main copy
-// ─────────────────────────────────────────────────────────────────────────────
-
-.login-copy {
-  width: 100%;
-}
-
-.login-title {
-  margin: 48px 0 0;
-
-  text-align: center;
-
-  font-size: clamp(36px, 9vw, 42px);
-  line-height: 1.08;
-
-  font-weight: 700;
-  letter-spacing: -1px;
-
-  color: #ffffff;
-  text-shadow: 0 2px 14px rgba(10, 13, 45, 0.3);
-
-  span {
-    display: block;
   }
 
-  strong {
-    color: var(--login-accent);
-    font-weight: inherit;
-    text-shadow: 0 2px 12px rgba(10, 13, 45, 0.24);
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Short screens - the brand area gives way before any tap target does
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  @media (max-height: 700px) {
+    .auth-logo {
+      width: 84px;
+    }
+
+    .auth-heading {
+      margin-top: 32px;
+    }
+
+    .auth-title {
+      font-size: 28px;
+    }
+
+    .auth-form {
+      margin-top: 28px;
+    }
+
+    .auth-divider {
+      margin-top: 20px;
+    }
+
+    .auth-switch {
+      margin-top: 20px;
+    }
   }
-}
-
-.login-subtitle {
-  margin: 22px 0 0;
-
-  text-align: center;
-
-  font-size: 18px;
-  line-height: 1.4;
-
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.94);
-  text-shadow: 0 1px 9px rgba(10, 13, 45, 0.26);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Login actions
-// ─────────────────────────────────────────────────────────────────────────────
-
-.login-actions {
-  margin-top: auto;
-
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.login-legal {
-  margin: 24px 0 0;
-
-  max-width: 310px;
-
-  text-align: center;
-
-  font-size: 13px;
-  line-height: 1.45;
-
-  font-weight: 400;
-
-  color: rgba(255, 255, 255, 0.72);
-
-  a {
-    color: rgba(255, 255, 255, 0.92);
-
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Short screens
-// ─────────────────────────────────────────────────────────────────────────────
-
-@media (max-height: 700px) {
-  .login-content {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
-  }
-
-  .login-brand {
-    margin-top: 6px;
-  }
-
-  .login-logo {
-    width: 56px;
-  }
-
-  .login-wordmark {
-    margin-top: 6px;
-
-    font-size: 24px;
-  }
-
-  .login-title {
-    margin-top: 28px;
-
-    font-size: clamp(34px, 9vw, 38px);
-  }
-
-  .login-subtitle {
-    margin-top: 16px;
-
-    font-size: 16px;
-  }
-
-  .login-legal {
-    margin-top: 18px;
-  }
-}
-
-@media (max-height: 580px) {
-  .login-content {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
-  }
-
-  .login-brand {
-    margin-top: 0;
-  }
-
-  .login-logo {
-    width: 48px;
-  }
-
-  .login-wordmark {
-    font-size: 22px;
-  }
-
-  .login-title {
-    margin-top: 20px;
-
-    font-size: 32px;
-  }
-
-  .login-subtitle {
-    margin-top: 12px;
-
-    font-size: 15px;
-  }
-
-  .login-legal {
-    margin-top: 14px;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Official Google Sign-In button
-// ─────────────────────────────────────────────────────────────────────────────
-
-.gsi-material-button {
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  -webkit-appearance: none;
-  appearance: none;
-
-  background-color: #f2f2f2;
-  background-image: none;
-
-  border: none;
-
-  -webkit-border-radius: 20px;
-  border-radius: 20px;
-
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-
-  color: #1f1f1f;
-
-  cursor: pointer;
-
-  font-family: 'Roboto', arial, sans-serif;
-  font-size: 14px;
-
-  height: 40px;
-
-  letter-spacing: 0.25px;
-
-  outline: none;
-  overflow: hidden;
-
-  padding: 0 12px;
-
-  position: relative;
-
-  text-align: center;
-
-  -webkit-transition:
-    background-color 0.218s,
-    border-color 0.218s,
-    box-shadow 0.218s;
-
-  transition:
-    background-color 0.218s,
-    border-color 0.218s,
-    box-shadow 0.218s;
-
-  vertical-align: middle;
-
-  white-space: nowrap;
-
-  width: auto;
-  max-width: 400px;
-  min-width: min-content;
-}
-
-.gsi-material-button .gsi-material-button-icon {
-  height: 20px;
-
-  margin-right: 10px;
-
-  min-width: 20px;
-  width: 20px;
-}
-
-.gsi-material-button .gsi-material-button-content-wrapper {
-  -webkit-align-items: center;
-  align-items: center;
-
-  display: flex;
-
-  -webkit-flex-direction: row;
-  flex-direction: row;
-
-  -webkit-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-
-  height: 100%;
-
-  justify-content: space-between;
-
-  position: relative;
-
-  width: 100%;
-}
-
-.gsi-material-button .gsi-material-button-contents {
-  -webkit-flex-grow: 1;
-  flex-grow: 1;
-
-  font-family: 'Roboto', arial, sans-serif;
-  font-weight: 500;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  vertical-align: top;
-}
-
-.gsi-material-button .gsi-material-button-state {
-  -webkit-transition: opacity 0.218s;
-  transition: opacity 0.218s;
-
-  bottom: 0;
-  left: 0;
-
-  opacity: 0;
-
-  position: absolute;
-
-  right: 0;
-  top: 0;
-}
-
-.gsi-material-button:disabled {
-  cursor: default;
-
-  background-color: #ffffff61;
-}
-
-.gsi-material-button:disabled .gsi-material-button-state {
-  background-color: #1f1f1f1f;
-}
-
-.gsi-material-button:disabled .gsi-material-button-contents {
-  opacity: 38%;
-}
-
-.gsi-material-button:disabled .gsi-material-button-icon {
-  opacity: 38%;
-}
-
-.gsi-material-button:not(:disabled):active .gsi-material-button-state,
-.gsi-material-button:not(:disabled):focus .gsi-material-button-state {
-  background-color: #001d35;
-
-  opacity: 12%;
-}
-
-.gsi-material-button:not(:disabled):hover {
-  -webkit-box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.3),
-    0 1px 3px 1 rgba(60, 64, 67, 0.15);
-
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.3),
-    0 1px 3px 1 rgba(60, 64, 67, 0.15);
-}
-
-.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
-  background-color: #001d35;
-
-  opacity: 8%;
-}
-
-.login-actions .gsi-material-button {
-  width: 100%;
-  max-width: 400px;
-
-  margin-inline: auto;
 }

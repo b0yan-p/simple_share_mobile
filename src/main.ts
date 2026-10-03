@@ -18,7 +18,9 @@ import { SimpleShareIdbService } from './app/core/services/simpleshare-idb.servi
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular(),
+    // Only the chevron in headers: on iOS Ionic defaults the back button label
+    // to "Back", which does not belong in this design.
+    provideIonicAngular({ backButtonText: '' }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAppInitializer(() => {

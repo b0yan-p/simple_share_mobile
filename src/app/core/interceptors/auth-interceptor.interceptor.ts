@@ -5,6 +5,8 @@ import { AuthService } from 'src/app/auth/services/auth.service';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 
 const SKIP_AUTH: (string | RegExp)[] = [
+  // Signing in is how a token is obtained, so these cannot require one.
+  '/auth/login',
   '/auth/google',
   // Public invite preview: /groupinvitation/{token} and nothing else on that
   // controller. A regex rather than a substring because plain matching cannot
