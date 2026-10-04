@@ -60,6 +60,27 @@ export class LoginComponent {
     addIcons({ chevronBackOutline, eyeOffOutline, eyeOutline, lockClosedOutline, mailOutline });
   }
 
+  /** Errors stay hidden until the field has been used. */
+  isInvalid(name: keyof typeof this.form.controls): boolean {
+    const control = this.form.controls[name];
+
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  errorFor(name: keyof typeof this.form.controls): string | null {
+    if (!this.isInvalid(name)) return null;
+
+    const control = this.form.controls[name];
+
+    if (control.hasError('required')) {
+      return name === 'email' ? 'Email is required.' : 'Password is required.';
+    }
+
+    if (control.hasError('email')) return 'Enter a valid email address.';
+
+    return null;
+  }
+
   goBack() {
     this.navController.navigateBack('/welcome');
   }
@@ -100,7 +121,9 @@ export class LoginComponent {
   }
 
   goToRegister() {
-    // Navigates to the register page once that page exists.
+    this.router.navigate(['register'], {
+      queryParams: this.returnUrl ? { returnUrl: this.returnUrl } : {},
+    });
   }
 
   loginWithGoogle() {

@@ -1,0 +1,53 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Create account - layout shared with the login page, plus the name row
+// ─────────────────────────────────────────────────────────────────────────────
+
+@use '../../styles/auth-page';
+
+:host {
+  /* Five fields instead of two, so the brand block gives up some of its room. */
+  .auth-heading {
+    margin-top: 16px;
+  }
+
+  .auth-title {
+    font-size: 28px;
+  }
+
+  .auth-subtitle {
+    font-size: 15px;
+  }
+
+  .auth-form {
+    margin-top: 26px;
+  }
+
+  /*
+   * Each half is a cell holding the field and its error line, so an error
+   * under one name cannot push the other out of line.
+   */
+  .auth-name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 10px;
+
+    /* The row is a field in its own right as far as vertical rhythm goes. */
+    + .auth-field {
+      margin-top: 10px;
+    }
+  }
+
+  .auth-divider {
+    margin-top: 22px;
+  }
+
+  app-google-sign-in-button {
+    margin-top: 18px;
+  }
+
+  .auth-switch {
+    margin-top: 22px;
+    margin-bottom: 8px;
+  }
+}

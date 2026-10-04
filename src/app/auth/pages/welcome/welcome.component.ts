@@ -66,7 +66,11 @@ export class WelcomeComponent {
     });
   }
 
-  goToRegister() {}
+  goToRegister() {
+    this.router.navigate(['register'], {
+      queryParams: this.returnUrl ? { returnUrl: this.returnUrl } : {},
+    });
+  }
 
   /**
    * Two very different failures land here: the native dialog refusing to open

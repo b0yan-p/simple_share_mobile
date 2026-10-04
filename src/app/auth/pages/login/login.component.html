@@ -21,7 +21,7 @@
       </section>
 
       <form class="auth-form" [formGroup]="form" (ngSubmit)="login()">
-        <div class="auth-field">
+        <div class="auth-field" [class.is-invalid]="isInvalid('email')">
           <ion-icon class="auth-field__icon" name="mail-outline" aria-hidden="true"></ion-icon>
 
           <ion-input
@@ -36,7 +36,11 @@
           />
         </div>
 
-        <div class="auth-field">
+        @if (errorFor('email'); as error) {
+          <p class="auth-error">{{ error }}</p>
+        }
+
+        <div class="auth-field" [class.is-invalid]="isInvalid('password')">
           <ion-icon
             class="auth-field__icon"
             name="lock-closed-outline"
@@ -66,6 +70,10 @@
             ></ion-icon>
           </button>
         </div>
+
+        @if (errorFor('password'); as error) {
+          <p class="auth-error">{{ error }}</p>
+        }
 
         <button class="auth-forgot" type="button" (click)="forgotPassword()">
           Forgot password?

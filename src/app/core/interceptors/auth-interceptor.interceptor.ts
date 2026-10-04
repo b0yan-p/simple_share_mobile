@@ -6,6 +6,7 @@ import { TokenStorageService } from 'src/app/auth/services/token-storage.service
 
 const SKIP_AUTH: (string | RegExp)[] = [
   // Signing in is how a token is obtained, so these cannot require one.
+  '/auth/register',
   '/auth/login',
   '/auth/google',
   // Public invite preview: /groupinvitation/{token} and nothing else on that

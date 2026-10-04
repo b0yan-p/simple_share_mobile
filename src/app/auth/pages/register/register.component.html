@@ -1,0 +1,175 @@
+<ion-content [fullscreen]="true">
+  <div class="auth-page">
+    <header class="auth-header">
+      <button class="auth-back" type="button" aria-label="Go back" (click)="goBack()">
+        <ion-icon name="chevron-back-outline" aria-hidden="true"></ion-icon>
+      </button>
+    </header>
+
+    <main class="auth-content">
+      <div class="auth-brand">
+        <!-- Decorative because the wordmark below already contains the brand name -->
+        <img class="auth-logo" src="/assets/images/logo.png" alt="" />
+        <p class="auth-wordmark">Simple<span>Share</span></p>
+      </div>
+
+      <section class="auth-heading">
+        <h1 class="auth-title">Create your account</h1>
+
+        <p class="auth-subtitle">
+          Join SimpleShare and start splitting expenses with the people you care about.
+        </p>
+      </section>
+
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="register()">
+        <div class="auth-name-row">
+          <div class="auth-name-cell">
+            <div class="auth-field" [class.is-invalid]="isInvalid('firstName')">
+              <ion-icon class="auth-field__icon" name="person-outline" aria-hidden="true" />
+              <ion-input
+                class="auth-field__input"
+                type="text"
+                autocomplete="given-name"
+                enterkeyhint="next"
+                placeholder="First name"
+                aria-label="First name"
+                formControlName="firstName"
+              />
+            </div>
+
+            @if (errorFor('firstName'); as error) {
+              <p class="auth-error">{{ error }}</p>
+            }
+          </div>
+
+          <div class="auth-name-cell">
+            <div class="auth-field" [class.is-invalid]="isInvalid('lastName')">
+              <ion-icon class="auth-field__icon" name="person-outline" aria-hidden="true" />
+              <ion-input
+                class="auth-field__input"
+                type="text"
+                autocomplete="family-name"
+                enterkeyhint="next"
+                placeholder="Last name"
+                aria-label="Last name"
+                formControlName="lastName"
+              />
+            </div>
+
+            @if (errorFor('lastName'); as error) {
+              <p class="auth-error">{{ error }}</p>
+            }
+          </div>
+        </div>
+
+        <div class="auth-field" [class.is-invalid]="isInvalid('email')">
+          <ion-icon class="auth-field__icon" name="mail-outline" aria-hidden="true" />
+          <ion-input
+            class="auth-field__input"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            enterkeyhint="next"
+            placeholder="Email"
+            aria-label="Email"
+            formControlName="email"
+          />
+        </div>
+
+        @if (errorFor('email'); as error) {
+          <p class="auth-error">{{ error }}</p>
+        }
+
+        <div class="auth-field" [class.is-invalid]="isInvalid('password')">
+          <ion-icon class="auth-field__icon" name="lock-closed-outline" aria-hidden="true" />
+          <ion-input
+            class="auth-field__input"
+            [type]="passwordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+            enterkeyhint="next"
+            placeholder="Password"
+            aria-label="Password"
+            formControlName="password"
+          />
+
+          <button
+            class="auth-field__toggle"
+            type="button"
+            [attr.aria-label]="passwordVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="passwordVisible()"
+            (click)="togglePassword()"
+          >
+            <ion-icon
+              [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        @if (errorFor('password'); as error) {
+          <p class="auth-error">{{ error }}</p>
+        }
+
+        <div class="auth-field" [class.is-invalid]="isInvalid('repeatPassword')">
+          <ion-icon class="auth-field__icon" name="lock-closed-outline" aria-hidden="true" />
+          <ion-input
+            class="auth-field__input"
+            [type]="repeatPasswordVisible() ? 'text' : 'password'"
+            autocomplete="new-password"
+            enterkeyhint="go"
+            placeholder="Repeat password"
+            aria-label="Repeat password"
+            formControlName="repeatPassword"
+          />
+
+          <button
+            class="auth-field__toggle"
+            type="button"
+            [attr.aria-label]="repeatPasswordVisible() ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="repeatPasswordVisible()"
+            (click)="toggleRepeatPassword()"
+          >
+            <ion-icon
+              [name]="repeatPasswordVisible() ? 'eye-off-outline' : 'eye-outline'"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        @if (errorFor('repeatPassword'); as error) {
+          <p class="auth-error">{{ error }}</p>
+        }
+
+        <button
+          class="auth-submit"
+          type="submit"
+          [disabled]="loading()"
+          [attr.aria-busy]="loading()"
+        >
+          @if (loading()) {
+            <ion-spinner name="crescent" />
+          } @else {
+            Create account
+          }
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span class="auth-divider__line"></span>
+        <span class="auth-divider__label">or</span>
+        <span class="auth-divider__line"></span>
+      </div>
+
+      <app-google-sign-in-button
+        theme="light"
+        [loading]="googleLoading()"
+        (pressed)="loginWithGoogle()"
+      />
+
+      <p class="auth-switch">
+        Already have an account?
+        <button class="auth-switch__link" type="button" (click)="goToLogin()">Log in</button>
+      </p>
+    </main>
+  </div>
+</ion-content>
