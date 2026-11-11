@@ -4,15 +4,13 @@
 
 export const environment = {
   production: false,
+  // baseAPIUrl: 'https://1dnnt4tf-5169.euw.devtunnels.ms/api',
   baseAPIUrl: 'http://localhost:5169/api',
   clientUrl: 'http://localhost:4200',
 
   // Web OAuth client id - the audience the backend accepts. Not a secret: an
   // idToken is worthless until the backend validates it.
   googleClientId: '414539377468-0h230vr1k6ul4no49jjlelevs0enkvh4.apps.googleusercontent.com',
-
-  // baseAPIUrl: 'https://api.shareorb.app/api',
-  // clientUrl: 'https://api.shareorb.app',
 };
 
 /*

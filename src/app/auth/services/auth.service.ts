@@ -4,10 +4,13 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, first, Observable, of, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ConfirmEmailInput } from '../models/confirm-email-input.model';
+import { ConfirmEmailResult } from '../models/confirm-email-result.model';
 import { GoogleLoginInput } from '../models/google-login-input.model';
 import { LoginInput } from '../models/login-input.model';
 import { LoginUser } from '../models/login-user.model';
 import { RegisterInput } from '../models/register-input.model';
+import { RegisterResult } from '../models/register-result.model';
 import { GoogleAuthService } from './google-auth.service';
 import { TokenStorageService } from './token-storage.service';
 
@@ -21,16 +24,36 @@ export class AuthService {
   private router = inject(Router);
 
   private registerAPI = `${environment.baseAPIUrl}/auth/register`;
+  private confirmEmailAPI = `${environment.baseAPIUrl}/auth/confirm-email`;
+  private resendVerificationAPI = `${environment.baseAPIUrl}/auth/resend-verification`;
   private loginAPI = `${environment.baseAPIUrl}/auth/login`;
   private googleLoginAPI = `${environment.baseAPIUrl}/auth/google`;
 
-  /** Registering signs the user straight in - the API answers with a session. */
-  public register(input: RegisterInput): Observable<boolean> {
-    return this.http.post<LoginUser>(this.registerAPI, input).pipe(
-      first(),
-      switchMap((res) => this.tokenStorage.setUser(res)),
-      switchMap((res) => this.tokenStorage.setAccessToken(res.token)),
-    );
+  /**
+   * Registering does not sign the user in: the API creates the account
+   * unconfirmed, mails a link and answers without a token, so there is nothing
+   * to store. Sending the same address again while it is still unconfirmed
+   * resends the link and leaves the password and profile alone.
+   */
+  public register(input: RegisterInput): Observable<RegisterResult> {
+    return this.http.post<RegisterResult>(this.registerAPI, input).pipe(first());
+  }
+
+  /**
+   * Asks for the confirmation link again. Answers the same way whether or not
+   * the address is one that needs confirming, so nothing here can be used to
+   * find out who is registered.
+   */
+  public resendVerification(email: string): Observable<unknown> {
+    return this.http.post(this.resendVerificationAPI, { email }).pipe(first());
+  }
+
+  /**
+   * Spends the token from the emailed link. The verification page sends this
+   * POST automatically when opened with a complete link.
+   */
+  public confirmEmail(input: ConfirmEmailInput): Observable<ConfirmEmailResult> {
+    return this.http.post<ConfirmEmailResult>(this.confirmEmailAPI, input).pipe(first());
   }
 
   public login(input: LoginInput): Observable<boolean> {

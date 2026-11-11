@@ -1,0 +1,232 @@
+:host {
+  color: #201943;
+
+  ion-content {
+    --background: #f8f6ff;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}
+
+.check-email-page {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: calc(env(safe-area-inset-top, 0px) + clamp(32px, 13dvh, 110px)) 20px
+    calc(env(safe-area-inset-bottom, 0px) + 140px);
+  background:
+    radial-gradient(ellipse 270px 260px at 50% 32%, #ede5fb66, transparent 100%),
+    linear-gradient(to bottom, #f8f6ff00 65%, #fdfcff 100%);
+}
+
+.check-email-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 430px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.verification-illustration {
+  display: block;
+  width: 240px;
+  height: 180px;
+  object-fit: contain;
+}
+
+h1 {
+  margin: 38px 0 0;
+  color: #201943;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+  letter-spacing: -0.6px;
+}
+
+p {
+  margin: 0;
+  color: #625d7c;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.delivery-message {
+  margin-top: 14px;
+}
+
+.email-address {
+  max-width: 100%;
+  margin-top: 2px;
+  color: #201943;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.instructions {
+  max-width: 320px;
+  margin-top: 22px;
+}
+
+.resend-area {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 28px;
+}
+
+.resend-action {
+  width: 100%;
+  --padding-start: 16px;
+  --padding-end: 16px;
+
+  span {
+    white-space: normal;
+    line-height: 20px;
+  }
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    margin-right: 8px;
+    color: currentColor;
+  }
+}
+
+// Keep visible feedback bounded; no space is reserved when there is no message.
+.resend-feedback {
+  margin-top: 8px;
+  height: 40px;
+  overflow-y: auto;
+
+  p {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .error-message {
+    color: #a33b59;
+  }
+}
+
+.login-action {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 12px;
+}
+
+.sky-decoration {
+  position: absolute;
+  z-index: 0;
+  inset: auto 0 0;
+  height: 145px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+  bottom: -20px;
+  width: 200px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(#eee2ff, #fff 70%);
+  box-shadow: 0 -3px 16px #d9bfff40;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(165deg, #e9d9ff, #faf5ff 45%, #fff 75%);
+  }
+
+  &::before {
+    width: 115px;
+    height: 110px;
+    top: -43px;
+    left: 6px;
+  }
+
+  &::after {
+    width: 100px;
+    height: 85px;
+    top: -18px;
+    right: 0;
+  }
+}
+
+.cloud-left {
+  left: -65px;
+}
+
+.cloud-right {
+  right: -65px;
+  transform: scaleX(-1);
+}
+
+.cloud-middle-left {
+  left: calc(50% - 145px);
+  bottom: -16px;
+  transform: scale(0.75);
+  transform-origin: bottom center;
+}
+
+.cloud-middle-right {
+  left: calc(50% - 55px);
+  bottom: -14px;
+  transform: scale(0.6) scaleX(-1);
+  transform-origin: bottom center;
+}
+
+.star,
+.dot {
+  position: absolute;
+  color: rgba(var(--ss-primary-rgb), 0.5);
+}
+
+.star-one {
+  left: 24%;
+  top: 8px;
+  font-size: 15px;
+}
+.star-two {
+  right: 18%;
+  top: 30px;
+  font-size: 12px;
+}
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(var(--ss-primary-rgb), 0.35);
+}
+.dot-one {
+  left: 16%;
+  top: 36px;
+}
+.dot-two {
+  right: 35%;
+  top: 60px;
+}
+
+@media (max-height: 700px) {
+  .check-email-page {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 28px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  }
+
+  h1 {
+    margin-top: 24px;
+  }
+  .sky-decoration {
+    display: none;
+  }
+}

@@ -1,0 +1,85 @@
+<ion-content [fullscreen]="true">
+  <main class="check-email-page" aria-labelledby="check-email-title">
+    <div class="check-email-content">
+      <img
+        class="verification-illustration"
+        src="assets/images/email-verification-planet.png"
+        alt="A smiling lavender planet holding an envelope"
+      />
+
+      <h1 id="check-email-title">Check your email</h1>
+
+      @if (email) {
+        <p class="delivery-message">We sent a verification link to</p>
+        <p class="email-address">{{ email }}</p>
+      } @else {
+        <p class="delivery-message">Check the inbox you used to register.</p>
+      }
+
+      <p class="instructions">Open the email and follow the link to verify your account.</p>
+
+      <div class="resend-area">
+        <ion-button
+          class="resend-action"
+          color="primary"
+          expand="block"
+          type="button"
+          [disabled]="!email || sending() || cooldown() > 0"
+          [attr.aria-busy]="sending()"
+          [attr.aria-describedby]="resendError() || resendSuccess() ? 'resend-feedback' : null"
+          (click)="resend()"
+        >
+          @if (sending()) {
+            <ion-spinner name="crescent" aria-hidden="true" />
+            <span>Sending verification email…</span>
+          } @else if (cooldown() > 0) {
+            <span>Resend available in {{ cooldown() }}s</span>
+          } @else {
+            <span>Resend verification email</span>
+          }
+        </ion-button>
+
+        @if (resendError(); as error) {
+          <div
+            id="resend-feedback"
+            class="resend-feedback"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <p class="error-message">{{ error }}</p>
+          </div>
+        } @else if (resendSuccess()) {
+          <div
+            id="resend-feedback"
+            class="resend-feedback"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <p>If your email needs verifying, a new link is on its way.</p>
+          </div>
+        }
+      </div>
+
+      <ion-button
+        class="login-action"
+        fill="outline"
+        expand="block"
+        type="button"
+        (click)="goToLogin()"
+      >
+        Back to log in
+      </ion-button>
+    </div>
+
+    <div class="sky-decoration" aria-hidden="true">
+      <span class="star star-one">✦</span>
+      <span class="star star-two">✦</span>
+      <span class="dot dot-one"></span>
+      <span class="dot dot-two"></span>
+      <span class="cloud cloud-left"></span>
+      <span class="cloud cloud-right"></span>
+      <span class="cloud cloud-middle-left"></span>
+      <span class="cloud cloud-middle-right"></span>
+    </div>
+  </main>
+</ion-content>

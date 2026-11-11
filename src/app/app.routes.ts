@@ -19,6 +19,25 @@ export const routes: Routes = [
       ),
   },
   {
+    // Unguarded for the same reason as verify-email: the user is mid-signup and
+    // has no session yet, and guestGuard would bounce the one case where they do.
+    path: 'check-email',
+    loadComponent: () =>
+      import('./auth/pages/check-email/check-email.component').then(
+        (c) => c.CheckEmailComponent,
+      ),
+  },
+  {
+    // Top level and unguarded: it is reached from an email, by someone who is
+    // by definition not signed in yet - guestGuard would bounce the one case
+    // where they already are.
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./auth/pages/verify-email/verify-email.component').then(
+        (c) => c.VerifyEmailComponent,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     canActivateChild: [authGuard],

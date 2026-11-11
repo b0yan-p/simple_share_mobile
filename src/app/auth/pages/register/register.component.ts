@@ -125,10 +125,14 @@ export class RegisterComponent {
       .register(this.form.getRawValue())
       .pipe(first())
       .subscribe({
-        next: () => {
+        next: (result) => {
           this.loading.set(false);
-          // navigateByUrl, not navigate: returnUrl is a whole URL, not a segment.
-          this.router.navigateByUrl(this.returnUrl ?? '/home', { replaceUrl: true });
+          // Registering no longer signs anyone in, so there is nowhere in the
+          // app to go - the account is unusable until the link is followed.
+          this.router.navigate(['check-email'], {
+            queryParams: { email: result.email },
+            replaceUrl: true,
+          });
         },
         error: (err) => {
           this.loading.set(false);

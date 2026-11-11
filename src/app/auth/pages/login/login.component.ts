@@ -111,6 +111,16 @@ export class LoginComponent {
           this.loading.set(false);
 
           console.error('Login failed', err);
+
+          // Not a dead end: the account exists and the password was right, it
+          // is only waiting on a confirmation the user may never have received.
+          if (this.errorCode(err) === 'email_not_confirmed') {
+            this.router.navigate(['check-email'], {
+              queryParams: { email: this.form.getRawValue().email },
+            });
+            return;
+          }
+
           this.toastService.errorToast(this.errorMessage(err, 'Login failed'));
         },
       });
@@ -151,6 +161,13 @@ export class LoginComponent {
           this.toastService.errorToast(this.errorMessage(err, 'Google sign-in failed'));
         },
       });
+  }
+
+  /** The `code` extension on problem+json - the string the app branches on. */
+  private errorCode(err: unknown): string | null {
+    return err instanceof HttpErrorResponse && typeof err.error?.code === 'string'
+      ? err.error.code
+      : null;
   }
 
   /**

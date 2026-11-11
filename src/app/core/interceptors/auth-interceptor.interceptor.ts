@@ -9,6 +9,11 @@ const SKIP_AUTH: (string | RegExp)[] = [
   '/auth/register',
   '/auth/login',
   '/auth/google',
+  // Email confirmation happens before there is ever a session: the resend form
+  // is reached from a refused login, and the confirmation link is followed out
+  // of an inbox. Without these the interceptor logs the visitor out instead.
+  '/auth/resend-verification',
+  '/auth/confirm-email',
   // Public invite preview: /groupinvitation/{token} and nothing else on that
   // controller. A regex rather than a substring because plain matching cannot
   // tell it apart from /groupinvitation/group/{id} or /groupinvitation/{token}/join,

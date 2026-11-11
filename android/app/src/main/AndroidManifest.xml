@@ -11,6 +11,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:host="api.shareorb.app" android:pathPrefix="/join" android:scheme="https" />
+                <data android:host="api.shareorb.app" android:pathPrefix="/verify-email" android:scheme="https" />
             </intent-filter>
         </activity>
         <provider android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true" android:name="androidx.core.content.FileProvider">

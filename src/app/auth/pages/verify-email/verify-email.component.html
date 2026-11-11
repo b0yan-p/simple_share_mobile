@@ -1,0 +1,60 @@
+<ion-content [fullscreen]="true">
+  <main class="verify-page" aria-labelledby="verify-title">
+    <section class="verification-content" aria-busy="true">
+      <div class="planet-scene">
+        <img
+          class="verification-planet"
+          src="assets/images/email-verification-planet.png"
+          alt=""
+          width="260"
+          height="260"
+        />
+        <span class="planet-star planet-star-left" aria-hidden="true">✦</span>
+        <span class="planet-star planet-star-right" aria-hidden="true">✦</span>
+        <span class="planet-dot" aria-hidden="true"></span>
+      </div>
+
+      @if (!linkComplete) {
+        <h1>Link unavailable</h1>
+        <p>This confirmation link is incomplete. Open it straight from the email.</p>
+      } @else if (stage() === 'confirmed') {
+        <h1>Email confirmed</h1>
+        <p>You can log in now.</p>
+        <ion-button
+          class="login-action"
+          color="primary"
+          expand="block"
+          type="button"
+          (click)="goToLogin()"
+        >
+          Go to log in
+        </ion-button>
+      } @else if (stage() === 'failed') {
+        <h1>Could not confirm your email</h1>
+        @if (error(); as message) {
+          <p class="verify-error" role="alert">{{ message }}</p>
+        }
+        <ion-button
+          class="retry-action"
+          color="primary"
+          expand="block"
+          type="button"
+          (click)="confirm()"
+        >
+          Try again
+        </ion-button>
+      } @else {
+        <h1 id="verify-title">Confirming your email</h1>
+        <p role="status">Please wait while we verify your account.</p>
+        <ion-spinner name="crescent" color="primary" />
+      }
+    </section>
+
+    <div class="verification-sky" aria-hidden="true">
+      <span class="sky-star sky-star-left">✦</span>
+      <span class="sky-star sky-star-right">✦</span>
+      <span class="sky-dot sky-dot-left"></span>
+      <span class="sky-dot sky-dot-right"></span>
+    </div>
+  </main>
+</ion-content>
