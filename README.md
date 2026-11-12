@@ -98,7 +98,7 @@ open app/build/outputs/apk/debug
 Cijela komanda
 
 ```
-npx ng build --configuration production && nvm use 22 && npx cap sync android && cd android && ./gradlew assembleDebug
+npx ng build --configuration production && nvm use 22 && npx cap sync android && cd android && ./gradlew assembleDebug && open app/build/outputs/apk/debug
 ```
 
 APK završi na:
