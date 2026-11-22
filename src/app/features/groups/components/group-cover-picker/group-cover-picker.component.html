@@ -1,0 +1,48 @@
+<div class="cover-heading">
+  <span class="field-label" id="group-cover-label">Group cover</span>
+  @if (hasPrevious() || hasNext()) {
+    <div class="cover-navigation">
+      <button
+        type="button"
+        aria-label="Previous covers"
+        aria-controls="group-cover-options"
+        [disabled]="!hasPrevious()"
+        (click)="scrollCovers(-1)"
+      >
+        <ion-icon name="chevron-back-outline" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next covers"
+        aria-controls="group-cover-options"
+        [disabled]="!hasNext()"
+        (click)="scrollCovers(1)"
+      >
+        <ion-icon name="chevron-forward-outline" aria-hidden="true" />
+      </button>
+    </div>
+  }
+</div>
+<div class="cover-scroll" [class.has-previous]="hasPrevious()" [class.has-next]="hasNext()">
+  <div
+    #strip
+    class="cover-strip"
+    id="group-cover-options"
+    role="group"
+    aria-labelledby="group-cover-label"
+    (scroll)="updateScrollPosition(strip)"
+  >
+    @for (cover of covers(); track cover.key) {
+      <button
+        type="button"
+        class="cover-option"
+        [class.is-selected]="cover.key === value()"
+        [attr.aria-pressed]="cover.key === value()"
+        [attr.aria-label]="cover.label"
+        (click)="select(cover.key)"
+      >
+        <img [src]="cover.thumbnailSrc" alt="" width="60" height="60" decoding="async" />
+      </button>
+    }
+  </div>
+</div>

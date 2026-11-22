@@ -33,4 +33,5 @@ export class GroupOverviewHeaderComponent {
   );
 
   viewMembers = output<void>();
+  coverImageError = output<string>();
 }

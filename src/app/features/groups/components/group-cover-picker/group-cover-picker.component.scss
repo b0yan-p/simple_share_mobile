@@ -1,0 +1,131 @@
+:host {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cover-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-label {
+  color: var(--ss-text-heading);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cover-navigation {
+  display: flex;
+  gap: 4px;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--ss-primary-subtle);
+    color: var(--ss-primary);
+    font-size: 20px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--ss-border-focus);
+      outline-offset: -2px;
+    }
+  }
+}
+
+.cover-scroll {
+  position: relative;
+  overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  &::before {
+    left: 0;
+    background: linear-gradient(to left, transparent, var(--ss-bg));
+  }
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to right, transparent, var(--ss-bg));
+  }
+
+  &.has-previous::before,
+  &.has-next::after {
+    opacity: 1;
+  }
+}
+
+.cover-strip {
+  display: flex;
+  gap: 4px;
+  padding: 4px 2px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.cover-option {
+  display: grid;
+  place-items: center;
+  flex: 0 0 72px;
+  height: 72px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+
+  img {
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &.is-selected {
+    border-color: var(--ss-primary);
+  }
+
+  &:active {
+    background: var(--ss-primary-subtle);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ss-border-focus);
+    outline-offset: -2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover-scroll::before,
+  .cover-scroll::after,
+  .cover-option {
+    transition: none;
+  }
+}

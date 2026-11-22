@@ -1,10 +1,10 @@
 import { GroupType } from './group-type.model';
 export interface GroupOverview {
   type?: GroupType;
+  coverImageKey?: string | null;
   currency: string;
   id: string;
   name: string;
-  coverImageUrl?: string | null;
   myDebtSummary: MyDebtSummary;
   memberCount: number;
   currentMemberId: string;

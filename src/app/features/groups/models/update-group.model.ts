@@ -5,6 +5,7 @@ export class UpdateGroup implements BaseModel {
   id!: string;
   name!: string;
   type?: GroupType;
+  coverImageKey!: string;
   currency?: string;
   simplifyDebts?: boolean;
 }

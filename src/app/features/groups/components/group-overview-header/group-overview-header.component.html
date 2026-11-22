@@ -1,4 +1,9 @@
-<img class="cover" [src]="coverImageUrl()" alt="" />
+<img
+  class="cover"
+  [src]="coverImageUrl()"
+  alt=""
+  (error)="coverImageError.emit(coverImageUrl())"
+/>
 <div class="group-card">
   <strong>{{ group().name }}</strong>
   <span>{{ groupTypeTitle() }}</span>

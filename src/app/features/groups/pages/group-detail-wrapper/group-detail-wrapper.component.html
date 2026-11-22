@@ -1,6 +1,12 @@
 @let shell = shell$ | async;
 @let group = shell?.group ?? null;
-@let coverImageUrl = group?.coverImageUrl?.trim() || defaultCoverImageUrl;
+@let coverImage = shell?.coverImage;
+@let coverImageUrl =
+  coverImage
+    ? networkService.isOnline() && failedCoverUrl() !== coverImage.src
+      ? coverImage.src
+      : coverImage.thumbnailSrc
+    : '';
 
 <ion-header #toolbar class="ion-no-border" [class.cover-toolbar]="group">
   <ion-toolbar>
@@ -10,7 +16,11 @@
     <ion-title class="small">
       <span class="compact-title">
         @if (group) {
-          <img [src]="coverImageUrl" alt="" />
+          <img
+            [src]="coverImageUrl"
+            alt=""
+            (error)="coverImageUrl === coverImage?.src && failedCoverUrl.set(coverImageUrl)"
+          />
         }
         <span>{{ group?.name ?? 'Group' }}</span>
       </span>
@@ -58,6 +68,7 @@
       [coverImageUrl]="coverImageUrl"
       [members]="members"
       [group]="group"
+      (coverImageError)="$event === coverImage?.src && failedCoverUrl.set($event)"
       (viewMembers)="openMembers(group.currentMemberId)"
     />
   }

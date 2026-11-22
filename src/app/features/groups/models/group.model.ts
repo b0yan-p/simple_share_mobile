@@ -3,6 +3,7 @@ import { BaseModel } from 'src/app/core/models/base-model';
 
 export class GroupListItem {
   type?: GroupType;
+  coverImageKey?: string | null;
   currency!: string;
   id!: string;
   name!: string;
@@ -15,6 +16,7 @@ export class GroupListItem {
 
 export class Group implements BaseModel {
   type?: GroupType;
+  coverImageKey?: string | null;
   currency!: string;
   currencyLocked!: boolean;
   canChangeCurrency!: boolean;

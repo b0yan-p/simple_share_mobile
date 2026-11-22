@@ -1,5 +1,13 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, effect, ElementRef, inject, OnInit, viewChild } from '@angular/core';
+import {
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
@@ -47,6 +55,7 @@ import { GroupBalanceComponent } from '../../components/group-balance/group-bala
 import { GroupMembersModalComponent } from '../../components/group-members-modal/group-members-modal.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
 import { SettleUpBalancePickerComponent } from '../../components/settle-up-balance-picker/settle-up-balance-picker.component';
+import { resolveGroupCover } from '../../models/group-cover-catalog';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { GroupFacade } from '../../services/group-facade.service';
@@ -87,8 +96,6 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
   ],
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
-  protected readonly defaultCoverImageUrl = 'assets/images/group-cover/banja-luka-sunset.png';
-
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private groupFacade = inject(GroupFacade);
@@ -98,6 +105,7 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private modalController = inject(ModalController);
   readonly store = inject(GroupDetailStore);
   protected networkService = inject(NetworkService);
+  protected readonly failedCoverUrl = signal('');
 
   private readonly content = viewChild(IonContent);
   private readonly contentElement = viewChild(IonContent, { read: ElementRef<HTMLElement> });
@@ -145,7 +153,14 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
           .pipe(catchError(() => of([] as GroupMember[]))),
       }),
     ),
-    tap(({ members }) => (this.members = members)),
+    tap(({ members }) => {
+      this.members = members;
+      this.failedCoverUrl.set('');
+    }),
+    map((shell) => ({
+      ...shell,
+      coverImage: shell.group && resolveGroupCover(shell.group.type, shell.group.coverImageKey),
+    })),
     tap(() => this.shellSettled.next()),
     shareReplay({ bufferSize: 1, refCount: true }),
   );

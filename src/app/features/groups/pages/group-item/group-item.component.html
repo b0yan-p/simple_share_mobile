@@ -48,7 +48,13 @@
 
     <app-group-type-picker
       [value]="form.controls.type.value"
-      (valueChange)="form.controls.type.setValue($event); form.controls.type.markAsDirty()"
+      (valueChange)="changeGroupType($event)"
+    />
+
+    <app-group-cover-picker
+      [groupType]="form.controls.type.value"
+      [value]="form.controls.coverImageKey.value"
+      (valueChange)="selectCover($event)"
     />
 
     <div class="setting-row">
