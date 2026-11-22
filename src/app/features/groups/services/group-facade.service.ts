@@ -56,6 +56,8 @@ export class GroupFacade {
    */
   private readonly groupsSettled = new Subject<void>();
   private readonly recentSettled = new Subject<void>();
+  private readonly groupUpdated = new Subject<string>();
+  readonly groupUpdated$ = this.groupUpdated.asObservable();
 
   // #region load methods
   /**
@@ -325,7 +327,10 @@ export class GroupFacade {
     this.ui.itemLoading.set(true);
     return this.groupApi.updateGroup(payload).pipe(
       finalize(() => this.ui.itemLoading.set(false)),
-      tap(() => this.reloadGroupLists()),
+      tap((group) => {
+        this.reloadGroupLists();
+        this.groupUpdated.next(group.id);
+      }),
     );
   }
 

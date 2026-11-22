@@ -19,6 +19,8 @@ import { addIcons } from 'ionicons';
 import { peopleOutline, informationCircleOutline, gitNetworkOutline } from 'ionicons/icons';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
+import { GroupTypePickerComponent } from '../../components/group-type-picker/group-type-picker.component';
+import { GroupType } from '../../models/group-type.model';
 import { CreateGroup } from '../../models/create-group.model';
 import { UpdateGroup } from '../../models/update-group.model';
 import { GroupFacade } from '../../services/group-facade.service';
@@ -30,6 +32,7 @@ import { GroupService } from '../../services/group.service';
   styleUrls: ['./group-item.component.scss'],
   imports: [
     CurrencyPickerComponent,
+    GroupTypePickerComponent,
     IonButton,
     IonIcon,
     IonToggle,
@@ -56,6 +59,7 @@ export class GroupItemComponent implements OnInit {
   currencyLocked = false;
 
   form = new FormGroup({
+    type: new FormControl(GroupType.Other, { nonNullable: true }),
     id: new FormControl(),
     currency: new FormControl('EUR', { nonNullable: true, validators: [Validators.required] }),
     name: new FormControl<string>('', [Validators.required]),
@@ -73,7 +77,7 @@ export class GroupItemComponent implements OnInit {
       next: (data) => {
         console.log(data);
         this.itemId = data.id;
-        this.form.patchValue(data);
+        this.form.patchValue({ ...data, type: data.type ?? GroupType.Other });
         this.currencyLocked = !!data.currencyLocked;
         if (data.id !== 'new' && !data.canChangeCurrency) this.form.controls.currency.disable();
       },

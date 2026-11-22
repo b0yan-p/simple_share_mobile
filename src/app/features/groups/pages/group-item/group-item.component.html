@@ -46,6 +46,11 @@
       </p>
     </div>
 
+    <app-group-type-picker
+      [value]="form.controls.type.value"
+      (valueChange)="form.controls.type.setValue($event); form.controls.type.markAsDirty()"
+    />
+
     <div class="setting-row">
       <ion-toggle
         formControlName="simplifyDebts"

@@ -1,6 +1,8 @@
+import { GroupType } from './group-type.model';
 import { BaseModel } from 'src/app/core/models/base-model';
 
 export class GroupListItem {
+  type?: GroupType;
   currency!: string;
   id!: string;
   name!: string;
@@ -12,6 +14,7 @@ export class GroupListItem {
 }
 
 export class Group implements BaseModel {
+  type?: GroupType;
   currency!: string;
   currencyLocked!: boolean;
   canChangeCurrency!: boolean;

@@ -1,0 +1,124 @@
+:host {
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  color: var(--ss-text-heading);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.type-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid var(--ss-border-input);
+  border-radius: 14px;
+  background: var(--ss-surface);
+  color: var(--ss-text-heading);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--ss-border-focus);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    background: var(--ss-primary-subtle);
+  }
+}
+
+.type-trigger {
+  padding: 12px 14px;
+}
+
+.type-icon {
+  flex: none;
+  padding: 9px;
+  border-radius: 11px;
+  background: var(--ss-primary-subtle);
+  color: var(--ss-primary);
+  font-size: 20px;
+}
+
+.type-copy {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+
+.type-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.type-description {
+  color: var(--ss-text);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.chevron {
+  flex: none;
+  color: var(--ss-text);
+  font-size: 18px;
+}
+
+.group-type-modal {
+  --height: min(480px, 90%);
+  --background: var(--ss-bg);
+}
+
+ion-toolbar,
+ion-content {
+  --background: var(--ss-bg);
+}
+
+.close-icon {
+  font-size: 22px;
+}
+
+.sheet-subtitle {
+  margin: 0;
+  padding: 0 24px 16px;
+  color: var(--ss-text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.type-options {
+  display: grid;
+  gap: 8px;
+  padding: 4px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.type-option {
+  min-height: 64px;
+  padding: 10px 14px;
+
+  &.is-selected {
+    border-color: var(--ss-primary-border);
+    background: var(--ss-surface-selected);
+  }
+}
+
+.selection-indicator {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  height: 22px;
+  border: 1px solid var(--ss-text-placeholder);
+  border-radius: 50%;
+  color: var(--ss-text-on-primary);
+  font-size: 15px;
+
+  .is-selected & {
+    border-color: var(--ss-primary);
+    background: var(--ss-primary);
+  }
+}

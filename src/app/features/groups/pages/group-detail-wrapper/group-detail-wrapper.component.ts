@@ -156,6 +156,10 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   );
 
   constructor() {
+    this.groupFacade.groupUpdated$.pipe(takeUntilDestroyed()).subscribe((groupId) => {
+      if (groupId === this.route.snapshot.params['id']) this.refreshOverview();
+    });
+
     effect((onCleanup) => {
       const header = this.toolbar()?.nativeElement;
       const content = this.contentElement()?.nativeElement;

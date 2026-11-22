@@ -1,4 +1,6 @@
+import { GroupType } from './group-type.model';
 export interface GroupOverview {
+  type?: GroupType;
   currency: string;
   id: string;
   name: string;

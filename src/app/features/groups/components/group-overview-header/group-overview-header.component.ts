@@ -4,6 +4,7 @@ import { IonIcon, IonRippleEffect } from '@ionic/angular/standalone';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupOverview } from '../../models/group-overview.model';
+import { GROUP_TYPE_TITLES, GroupType } from '../../models/group-type.model';
 
 @Component({
   selector: 'app-group-overview-header',
@@ -17,6 +18,11 @@ export class GroupOverviewHeaderComponent {
   group = input.required<GroupOverview>();
   coverImageUrl = input.required<string>();
   members = input<GroupMember[]>();
+
+  readonly groupTypeTitle = computed(
+    () =>
+      GROUP_TYPE_TITLES[this.group().type ?? GroupType.Other] ?? GROUP_TYPE_TITLES[GroupType.Other],
+  );
 
   reducedMembers = computed(
     () => this.members()?.slice(0, this.REDUCED_NUMBER_OF_MEMBERS) ?? [],
