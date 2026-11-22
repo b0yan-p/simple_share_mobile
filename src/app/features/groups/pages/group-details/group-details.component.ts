@@ -18,7 +18,7 @@ import { GroupOverview } from '../../models/group-overview.model';
 })
 export class GroupDetailsComponent {
   readonly group = input<GroupOverview | null>(null);
-  readonly openBalance = output<void>();
+  readonly openSettleUp = output<void>();
 
   protected readonly icons = {
     arrowDownOutline,

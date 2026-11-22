@@ -92,7 +92,7 @@ export class ExpenseDraftStore {
       key,
       groupId,
       currency,
-      expenseId: crypto.randomUUID(),
+      expenseId: createExpenseId(),
       financialChanged: false,
       description: '',
       expenseDate: localCalendarDate(),
@@ -206,6 +206,22 @@ export class ExpenseDraftStore {
       })),
     };
   }
+}
+
+function createExpenseId(): string {
+  // getRandomValues is also available over HTTP, where randomUUID may be missing.
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return [
+    hex.slice(0, 8),
+    hex.slice(8, 12),
+    hex.slice(12, 16),
+    hex.slice(16, 20),
+    hex.slice(20),
+  ].join('-');
 }
 
 /** Sum of the amounts that will actually be sent for this allocation. */

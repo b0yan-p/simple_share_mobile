@@ -1,0 +1,115 @@
+@if (selection(); as selected) {
+  <app-settle-up-modal
+    [fromMemberId]="selected.debt.debtorMemberId"
+    [toMemberId]="selected.debt.creditorMemberId"
+    [fromLabel]="selected.outgoing ? 'You' : selected.debt.debtorDisplayName"
+    [toLabel]="selected.outgoing ? selected.debt.creditorDisplayName : 'You'"
+    [fromIsCurrentUser]="selected.outgoing"
+    [toIsCurrentUser]="!selected.outgoing"
+    [defaultAmount]="selected.debt.amount"
+    [groupId]="groupId"
+    [currency]="balance()!.currency"
+    [showBack]="true"
+    (back)="selection.set(null)"
+    (submittingChange)="onSubmittingChange($event)"
+  />
+} @else {
+  <ion-header class="ion-no-border">
+    <ion-toolbar class="picker-toolbar">
+      <div class="picker-heading">
+        <!-- <span class="heading-icon" aria-hidden="true">
+          <ion-icon [icon]="icons.swapHorizontalOutline" />
+        </span> -->
+        <div>
+          <h1>Settle up</h1>
+          <p>Select the balance you want to settle.</p>
+        </div>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button fill="clear" aria-label="Close" (click)="dismiss()">
+          <ion-icon [icon]="icons.closeOutline" slot="icon-only" />
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <div class="picker-body">
+      @switch (loadState()) {
+        @case ('loading') {
+          <div class="picker-status" role="status">
+            <ion-spinner name="crescent" aria-hidden="true" />
+            <span>Loading balances…</span>
+          </div>
+        }
+        @case ('error') {
+          <div class="picker-status">
+            <p role="alert">Could not load your balances.</p>
+            <ion-button fill="outline" (click)="loadBalances()">Try again</ion-button>
+          </div>
+        }
+        @case ('ready') {
+          @for (section of sections(); track section.title) {
+            <section
+              class="balance-section"
+              [class.incoming]="!section.outgoing"
+              [attr.aria-label]="section.title"
+            >
+              <div class="section-heading">
+                <h2>
+                  <span class="direction-icon" aria-hidden="true">
+                    <ion-icon
+                      [icon]="section.outgoing ? icons.arrowUpOutline : icons.arrowDownOutline"
+                    />
+                  </span>
+                  {{ section.title }}
+                </h2>
+                <span class="balance-count">
+                  {{ section.debts.length }}
+                  {{ section.debts.length === 1 ? 'balance' : 'balances' }}
+                </span>
+              </div>
+
+              <div class="balance-list">
+                @for (debt of section.debts; track debt) {
+                  @let name =
+                    section.outgoing ? debt.creditorDisplayName : debt.debtorDisplayName;
+                  <button
+                    type="button"
+                    class="balance-row"
+                    (click)="selection.set({ debt, outgoing: section.outgoing })"
+                  >
+                    <app-avatar
+                      [src]="null"
+                      [name]="name"
+                      [colorKey]="
+                        section.outgoing ? debt.creditorMemberId : debt.debtorMemberId
+                      "
+                      [size]="40"
+                      aria-hidden="true"
+                    />
+                    <span class="balance-details">
+                      <span class="payment-label">
+                        {{ section.outgoing ? 'You pay ' + name : name + ' pays you' }}
+                      </span>
+                      <span class="payment-amount">
+                        {{ debt.amount | number: '1.2-2' }} {{ balance()?.currency }}
+                      </span>
+                    </span>
+                    <ion-icon
+                      class="row-chevron"
+                      [icon]="icons.chevronForwardOutline"
+                      aria-hidden="true"
+                    />
+                  </button>
+                }
+              </div>
+            </section>
+          } @empty {
+            <p class="picker-status" role="status">You're all settled up.</p>
+          }
+        }
+      }
+    </div>
+  </ion-content>
+}

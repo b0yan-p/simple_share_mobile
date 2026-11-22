@@ -46,6 +46,7 @@ import { AddMemberModalComponent } from '../../components/add-member-modal/add-m
 import { GroupBalanceComponent } from '../../components/group-balance/group-balance.component';
 import { GroupMembersModalComponent } from '../../components/group-members-modal/group-members-modal.component';
 import { GroupOverviewHeaderComponent } from '../../components/group-overview-header/group-overview-header.component';
+import { SettleUpBalancePickerComponent } from '../../components/settle-up-balance-picker/settle-up-balance-picker.component';
 import { GroupMember } from '../../models/group-member.model';
 import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { GroupFacade } from '../../services/group-facade.service';
@@ -118,6 +119,7 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   }
 
   private refresh$ = new BehaviorSubject<void>(undefined);
+  private settleUpOpen = false;
 
   /** Nexted once the overview + members pair for the current cycle has landed. */
   private readonly shellSettled = new Subject<void>();
@@ -216,6 +218,43 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
     const target = this.scrollTopForTabSwitch();
     this.store.activeTab.set(tab);
     this.restoreScroll(target);
+  }
+
+  async openSettleUp(): Promise<void> {
+    if (this.settleUpOpen) return;
+
+    const groupId = this.route.snapshot.params['id'];
+    this.settleUpOpen = true;
+
+    try {
+      const modal = await this.modalController.create({
+        component: SettleUpBalancePickerComponent,
+        componentProps: {
+          groupId,
+          onSubmittingChange: (submitting: boolean): void => {
+            modal.canDismiss = !submitting;
+          },
+        },
+        cssClass: 'settle-up-picker',
+        htmlAttributes: { 'aria-label': 'Settle up' },
+        breakpoints: [0, 0.85],
+        initialBreakpoint: 0.85,
+      });
+
+      await modal.present();
+      const { data, role } = await modal.onDidDismiss();
+
+      if (role === 'confirm' && data?.success && this.route.snapshot.params['id'] === groupId) {
+        this.refreshOverview();
+        this.balanceFacade.loadBalances(groupId).subscribe();
+      }
+    } finally {
+      this.settleUpOpen = false;
+    }
+  }
+
+  refreshOverview(): void {
+    this.refresh$.next();
   }
 
   private scrollTopForTabSwitch(): number {

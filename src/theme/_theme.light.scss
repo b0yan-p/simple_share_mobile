@@ -85,6 +85,12 @@
   --ss-negative-bg: #{p.$lp-coral-50};
   --ss-negative-border: #{p.$lp-coral-200};
 
+  // Group balances
+  --ss-balance-owe: #{p.$lp-balance-owe};
+  --ss-balance-owe-bg: #{p.$lp-balance-owe-bg};
+  --ss-balance-owed: #{p.$lp-balance-owed};
+  --ss-balance-owed-bg: #{p.$lp-balance-owed-bg};
+
   // Warning
   --ss-warning: #{p.$lp-warning};
   --ss-warning-text: #{p.$lp-warning-text};

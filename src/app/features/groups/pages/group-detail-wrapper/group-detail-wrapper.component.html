@@ -89,13 +89,13 @@
     <div class="tab-content" [class.ion-padding]="store.activeTab() !== 'expenses'">
       @switch (store.activeTab()) {
         @case ('overview') {
-          <app-group-details [group]="group" (openBalance)="selectTab('balance')" />
+          <app-group-details [group]="group" (openSettleUp)="openSettleUp()" />
         }
         @case ('expenses') {
           <app-expense-list />
         }
         @case ('balance') {
-          <app-group-balance />
+          <app-group-balance (paymentRecorded)="refreshOverview()" />
         }
       }
     </div>

@@ -138,14 +138,14 @@ small {
 }
 .debt {
   padding-inline-end: 6px;
-  --amount: #d95038;
-  --tint: #fcece6;
+  --amount: var(--ss-balance-owe);
+  --tint: var(--ss-balance-owe-bg);
 }
 .credit {
   padding-inline-start: 10px;
   border-inline-start: 1px solid #e2def4;
-  --amount: #308952;
-  --tint: #e5f3ea;
+  --amount: var(--ss-balance-owed);
+  --tint: var(--ss-balance-owed-bg);
 }
 .balance-arrow {
   display: grid;

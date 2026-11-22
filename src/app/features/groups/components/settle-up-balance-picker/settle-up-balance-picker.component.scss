@@ -1,0 +1,187 @@
+@use '../../../../../theme/variables' as c;
+
+:host,
+app-settle-up-modal {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.picker-toolbar {
+  --background: var(--ss-bg);
+  --padding-top: 24px;
+  --padding-start: 20px;
+  --padding-end: 8px;
+
+  ion-buttons {
+    align-self: flex-start;
+  }
+}
+
+ion-content {
+  --background: var(--ss-bg);
+}
+
+.picker-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h1 {
+    margin: 0;
+    color: var(--ss-header-color);
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--ss-text);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+.heading-icon,
+.direction-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+.heading-icon {
+  color: var(--ss-primary);
+  background: linear-gradient(155deg, var(--ss-primary-subtle), var(--ss-primary-border));
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  font-size: 30px;
+}
+
+.picker-body {
+  padding: 26px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.balance-section {
+  --direction-color: var(--ss-balance-owe);
+  --direction-bg: var(--ss-balance-owe-bg);
+
+  &.incoming {
+    --direction-color: var(--ss-balance-owed);
+    --direction-bg: var(--ss-balance-owed-bg);
+  }
+
+  & + & {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--ss-primary-border);
+  }
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--ss-header-color);
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.balance-count {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ss-primary-border);
+  color: var(--ss-text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.balance-list {
+  display: grid;
+  gap: 8px;
+}
+
+.balance-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 68px;
+  padding: 10px 14px;
+  border: 1px solid c.$borders;
+  border-radius: 16px;
+  background: var(--ss-surface);
+  box-shadow: 0 2px 6px rgba(c.$primary, 0.08);
+  text-align: start;
+  cursor: pointer;
+
+  &:active {
+    background: var(--ss-surface-selected);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ss-primary);
+    outline-offset: 2px;
+  }
+}
+
+.direction-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--direction-bg);
+  color: var(--direction-color);
+  font-size: 19px;
+
+  ion-icon {
+    transform: rotate(45deg);
+  }
+}
+
+.balance-details {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.payment-label {
+  color: var(--ss-header-color);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.payment-amount {
+  color: var(--direction-color);
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-chevron {
+  color: var(--ss-primary);
+  font-size: 18px;
+}
+
+.picker-status {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  color: var(--ss-text);
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}

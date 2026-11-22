@@ -2,7 +2,7 @@ import { AMOUNT_MAX } from 'src/app/features/expenses/utils/expense.constants';
 import { hasTwoDecimalPrecision } from 'src/app/features/expenses/utils/money.util';
 import { localCalendarDate } from 'src/app/shared/utils/calendar-date';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -22,13 +22,14 @@ import {
 import { addIcons } from 'ionicons';
 import {
   alertCircleOutline,
+  arrowBackOutline,
   calendarOutline,
   checkmarkCircle,
   chevronForwardOutline,
   closeOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
-import { concatMap, startWith } from 'rxjs';
+import { catchError, concatMap, of, startWith } from 'rxjs';
 import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { ExpenseService } from 'src/app/features/expenses/services/expense.service';
 import { fromMinor, toMinor } from 'src/app/features/expenses/utils/money.util';
@@ -68,6 +69,9 @@ export class SettleUpModalComponent implements OnInit {
   @Input() toIsCurrentUser = false;
   @Input({ required: true }) defaultAmount!: number;
   @Input({ required: true }) groupId!: string;
+  @Input() showBack = false;
+  readonly back = output<void>();
+  readonly submittingChange = output<boolean>();
 
   private modalController = inject(ModalController);
   private expenseService = inject(ExpenseService);
@@ -134,6 +138,7 @@ export class SettleUpModalComponent implements OnInit {
   constructor() {
     addIcons({
       alertCircleOutline,
+      arrowBackOutline,
       calendarOutline,
       checkmarkCircle,
       chevronForwardOutline,
@@ -182,6 +187,7 @@ export class SettleUpModalComponent implements OnInit {
   submit(): void {
     if (this.form.invalid || !this.canSubmit() || this.submitting) return;
     this.submitting = true;
+    this.submittingChange.emit(true);
     this.error = false;
 
     const { amount, date } = this.form.value;
@@ -192,14 +198,25 @@ export class SettleUpModalComponent implements OnInit {
         amount: amount!,
         date: date!.slice(0, 10),
       })
-      .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
+      .pipe(
+        concatMap(() =>
+          this.expenseFacade.refreshExpenses(this.groupId).pipe(
+            catchError((error) => {
+              console.warn('[API ERROR] refreshing expenses after settlement', error);
+              return of(void 0);
+            }),
+          ),
+        ),
+      )
       .subscribe({
         next: () => {
           this.submitting = false;
+          this.submittingChange.emit(false);
           this.modalController.dismiss({ success: true }, 'confirm');
         },
         error: () => {
           this.submitting = false;
+          this.submittingChange.emit(false);
           this.error = true;
         },
       });

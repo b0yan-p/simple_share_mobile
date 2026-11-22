@@ -1,8 +1,20 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
+    @if (showBack) {
+      <ion-buttons slot="start">
+        <ion-button
+          fill="clear"
+          aria-label="Back to balances"
+          [disabled]="submitting"
+          (click)="back.emit()"
+        >
+          <ion-icon name="arrow-back-outline" slot="icon-only" />
+        </ion-button>
+      </ion-buttons>
+    }
     <ion-title>Settle up</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" aria-label="Close" (click)="dismiss()">
+      <ion-button fill="clear" aria-label="Close" [disabled]="submitting" (click)="dismiss()">
         <ion-icon name="close-outline" slot="icon-only" class="close-icon" />
       </ion-button>
     </ion-buttons>
@@ -62,6 +74,7 @@
               placeholder="0.00"
               inputmode="decimal"
               step="0.01"
+              [readonly]="submitting"
               [attr.aria-label]="'Payment amount in ' + currency"
             />
             <!-- Fixed suffix: the settlement always uses the group's currency. -->
@@ -125,6 +138,7 @@
         type="button"
         id="open-settle-date-picker"
         class="detail-row"
+        [disabled]="submitting"
         [attr.aria-label]="
           'Payment date ' + (form.value.date | date: 'EE, dd MMM yyyy') + '. Change the date.'
         "
@@ -182,7 +196,13 @@
           }
         </ion-button>
 
-        <ion-button expand="block" fill="clear" class="cancel-btn" (click)="dismiss()">
+        <ion-button
+          expand="block"
+          fill="clear"
+          class="cancel-btn"
+          [disabled]="submitting"
+          (click)="dismiss()"
+        >
           Cancel
         </ion-button>
       </div>

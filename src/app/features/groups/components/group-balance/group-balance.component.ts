@@ -1,5 +1,5 @@
 import { DecimalPipe, NgClass } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonIcon, IonSpinner, ModalController } from '@ionic/angular/standalone';
@@ -28,6 +28,7 @@ export class GroupBalanceComponent implements OnInit {
   readonly balance = this.balanceFacade.store.balance;
   readonly loading = this.balanceFacade.store.loading;
   readonly groupId = this.balanceFacade.store.groupId;
+  readonly paymentRecorded = output<void>();
 
   expandedMemberId = signal<string | null>(null);
 
@@ -103,6 +104,7 @@ export class GroupBalanceComponent implements OnInit {
 
     if (role === 'confirm' && data?.success) {
       this.balanceFacade.loadBalances(this.groupId() ?? '').subscribe();
+      this.paymentRecorded.emit();
     }
   }
 }
