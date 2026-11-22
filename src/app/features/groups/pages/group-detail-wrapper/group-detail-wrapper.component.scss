@@ -3,8 +3,12 @@
 :host {
   .tab-segment {
     --background: transparent;
-    border-bottom: 1px solid c.$borders;
-    width: 100%;
+    border: 1px solid c.$borders;
+    border-radius: 999px;
+    padding: 3px;
+    margin-inline: 12px;
+    margin-bottom: 0;
+    width: calc(100% - 24px);
   }
 
   .add-expense {
@@ -13,18 +17,38 @@
     bottom: 24px;
   }
 
-  ion-segment-button {
+  .tab-segment ion-segment-button {
     --color: #{c.$text};
-    --color-checked: #{c.$primary};
-    --background-checked: transparent;
-    --indicator-color: #{c.$primary};
-    --indicator-height: 2px;
-    --border-radius: 0;
-    min-height: 44px;
+    --color-checked: white;
+    --background-checked: #7a68ea;
+    --indicator-color: transparent;
+    --indicator-box-shadow: none;
+    --indicator-transition: none;
+    --ripple-color: color-mix(in srgb, var(--ss-primary) 70%, transparent);
+    --transition: none;
+    --border-width: 0;
+    --border-radius: 999px;
+    border-radius: var(--border-radius);
+    min-width: 0;
+    height: 40px;
+    min-height: 40px;
+    margin-block: 0;
     font-size: 13px;
     font-weight: 500;
     letter-spacing: 0.02em;
     text-transform: none;
+
+    &::part(native) {
+      height: 100%;
+      padding-block: 0;
+      border-radius: inherit;
+      overflow: hidden;
+    }
+
+    ion-label {
+      margin: 0;
+      line-height: 1.25;
+    }
   }
 }
 
@@ -32,4 +56,77 @@
   ion-item {
     --min-height: 44px;
   }
+}
+
+.cover-toolbar {
+  position: absolute;
+  inset: 0 0 auto;
+  background: color-mix(
+    in srgb,
+    var(--ss-surface) calc(var(--cover-progress, 0) * 100%),
+    transparent
+  );
+
+  ion-toolbar {
+    --background: transparent;
+  }
+
+  &:not(.cover-toolbar-collapsed) {
+    --header-action-color: white;
+
+    ion-back-button,
+    #group-menu-trigger {
+      --background: rgba(28, 21, 50, 0.72);
+      --border-radius: 999px;
+      margin-inline: 5px;
+    }
+  }
+
+  ion-title {
+    opacity: var(--cover-progress, 0);
+  }
+}
+
+.compact-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  img {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    object-fit: cover;
+  }
+
+  span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.cover-toolbar + ion-content {
+  --sticky-tabs-top: var(--group-toolbar-height, 0px);
+}
+
+.tab-body {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100% - var(--sticky-tabs-top, 0px));
+}
+
+.tab-swipe-content {
+  flex: 1;
+  touch-action: pan-y pinch-zoom;
+}
+
+.sticky-tabs {
+  position: sticky;
+  top: var(--sticky-tabs-top, 0px);
+  z-index: 2;
+  display: flow-root;
+  padding-block: 8px 16px;
+  background: var(--ion-background-color, var(--ss-surface));
 }

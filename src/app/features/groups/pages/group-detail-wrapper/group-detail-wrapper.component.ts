@@ -1,8 +1,17 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, effect, inject, OnInit, untracked, viewChild } from '@angular/core';
+import {
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  NgZone,
+  OnInit,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
+  createGesture,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -53,6 +62,10 @@ import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupDetailStore, GroupDetailTab } from '../../store/group-detail-store';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
+const GROUP_TABS: readonly GroupDetailTab[] = ['overview', 'expenses', 'balance'];
+const SWIPE_EDGE_INSET = 32;
+const TAB_SWIPE_DISTANCE = 55;
+
 @Component({
   selector: 'app-group-detail-wrapper',
   templateUrl: './group-detail-wrapper.component.html',
@@ -86,6 +99,8 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
   ],
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
+  protected readonly defaultCoverImageUrl = 'assets/images/group-cover/banja-luka-sunset.png';
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private groupFacade = inject(GroupFacade);
@@ -93,11 +108,29 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private expenseFacade = inject(ExpenseFacade);
   private balanceFacade = inject(GroupBalanceFacade);
   private modalController = inject(ModalController);
+  private readonly zone = inject(NgZone);
   readonly store = inject(GroupDetailStore);
   protected networkService = inject(NetworkService);
 
   private readonly content = viewChild(IonContent);
+  private readonly contentElement = viewChild(IonContent, { read: ElementRef<HTMLElement> });
   private scrollEl?: HTMLElement;
+
+  private readonly toolbar = viewChild('toolbar', { read: ElementRef<HTMLElement> });
+  private readonly cover = viewChild('cover', { read: ElementRef<HTMLElement> });
+  private readonly tabBody = viewChild<ElementRef<HTMLElement>>('tabBody');
+  private readonly tabSwipeContent = viewChild<ElementRef<HTMLElement>>('tabSwipeContent');
+
+  updateCover(scrollTop: number): void {
+    const header = this.toolbar()?.nativeElement;
+    const cover = this.cover()?.nativeElement;
+    if (!header || !cover) return;
+
+    const distance = Math.max(1, cover.offsetHeight - header.offsetHeight);
+    const progress = Math.max(0, Math.min(1, scrollTop / distance));
+    header.style.setProperty('--cover-progress', String(progress));
+    header.classList.toggle('cover-toolbar-collapsed', progress === 1);
+  }
 
   private refresh$ = new BehaviorSubject<void>(undefined);
 
@@ -136,6 +169,64 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   );
 
   constructor() {
+    effect((onCleanup) => {
+      const element = this.tabSwipeContent()?.nativeElement;
+      if (!element) return;
+
+      const gesture = this.zone.runOutsideAngular(() => {
+        const swipe = createGesture({
+          el: element,
+          gestureName: 'group-detail-tab-swipe',
+          direction: 'x',
+          threshold: 18,
+          maxAngle: 30,
+          canStart: ({ event, startX }) => {
+            if (!(event instanceof TouchEvent) || event.touches.length !== 1) return false;
+
+            const viewportWidth = element.ownerDocument.documentElement.clientWidth;
+            return (
+              startX > SWIPE_EDGE_INSET &&
+              startX < viewportWidth - SWIPE_EDGE_INSET &&
+              !event
+                .composedPath()
+                .some(
+                  (target) => target instanceof Element && target.matches('ion-item-sliding'),
+                )
+            );
+          },
+          onEnd: ({ event, deltaX, deltaY }) => {
+            if (
+              event.type !== 'touchend' ||
+              Math.abs(deltaX) < TAB_SWIPE_DISTANCE ||
+              Math.abs(deltaY) >= Math.abs(deltaX)
+            )
+              return;
+
+            const currentIndex = GROUP_TABS.indexOf(this.store.activeTab());
+            const nextTab = GROUP_TABS[currentIndex + (deltaX < 0 ? 1 : -1)];
+            if (nextTab) this.zone.run(() => this.selectTab(nextTab));
+          },
+        });
+        swipe.enable();
+        return swipe;
+      });
+      onCleanup(() => gesture.destroy());
+    });
+
+    effect((onCleanup) => {
+      const header = this.toolbar()?.nativeElement;
+      const content = this.contentElement()?.nativeElement;
+      if (!header || !content) return;
+
+      const syncToolbarHeight = () => {
+        content.style.setProperty('--group-toolbar-height', `${header.offsetHeight}px`);
+      };
+      syncToolbarHeight();
+      const observer = new ResizeObserver(syncToolbarHeight);
+      observer.observe(header);
+      onCleanup(() => observer.disconnect());
+    });
+
     // The view query only resolves after the first render, which is later than
     // ionViewWillEnter. Grab the scroll element and restore the moment it shows up.
     effect(() => {
@@ -144,7 +235,7 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
 
       void content.getScrollElement().then((el) => {
         this.scrollEl = el;
-        this.restoreScroll(untracked(() => this.store.activeTab()));
+        this.restoreScroll(this.store.scrollTop());
       });
     });
   }
@@ -170,31 +261,42 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
 
   /** Re-entering from a pushed page (expense detail) — go back to where we were. */
   ionViewWillEnter(): void {
-    this.restoreScroll(this.store.activeTab());
+    this.restoreScroll(this.store.scrollTop());
   }
 
   ionViewWillLeave(): void {
-    this.saveScroll(this.store.activeTab());
+    if (this.scrollEl) this.store.scrollTop.set(this.scrollEl.scrollTop);
   }
 
   selectTab(tab: GroupDetailTab): void {
     const previous = this.store.activeTab();
     if (previous === tab) return;
 
-    this.saveScroll(previous);
+    const target = this.scrollTopForTabSwitch();
     this.store.activeTab.set(tab);
-    this.restoreScroll(tab);
+    this.restoreScroll(target);
   }
 
-  /** Synchronous on purpose: it has to read scrollTop before @switch re-renders. */
-  private saveScroll(tab: GroupDetailTab): void {
-    if (this.scrollEl) this.store.setScrollTop(tab, this.scrollEl.scrollTop);
+  private scrollTopForTabSwitch(): number {
+    const header = this.toolbar()?.nativeElement;
+    const body = this.tabBody()?.nativeElement;
+    const scroll = this.scrollEl;
+    if (!header || !body || !scroll) return 0;
+
+    const stickyTop = this.cover() ? header.offsetHeight : 0;
+    const tabPosition = body.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
+    const pinnedScrollTop = scroll.scrollTop + tabPosition - stickyTop;
+    return Math.max(0, Math.min(scroll.scrollTop, pinnedScrollTop));
   }
 
   /** Deferred: @switch has to render the incoming tab before it has any height. */
-  private restoreScroll(tab: GroupDetailTab): void {
-    const target = this.store.scrollTopFor(tab);
-    requestAnimationFrame(() => void this.content()?.scrollToPoint(0, target, 0));
+  private restoreScroll(target: number): void {
+    requestAnimationFrame(() => {
+      if (!this.scrollEl) return;
+
+      this.scrollEl.scrollTop = target;
+      this.updateCover(this.scrollEl.scrollTop);
+    });
   }
 
   /** The group form doubles as the edit screen — same route the list uses. */

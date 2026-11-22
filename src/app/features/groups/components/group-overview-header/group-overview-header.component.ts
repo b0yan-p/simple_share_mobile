@@ -15,6 +15,7 @@ export class GroupOverviewHeaderComponent {
   readonly REDUCED_NUMBER_OF_MEMBERS: number = 3;
 
   group = input.required<GroupOverview>();
+  coverImageUrl = input.required<string>();
   members = input<GroupMember[]>();
 
   reducedMembers = computed(
@@ -25,10 +26,5 @@ export class GroupOverviewHeaderComponent {
     Math.max(0, (this.members()?.length ?? 0) - this.REDUCED_NUMBER_OF_MEMBERS),
   );
 
-  addMembers = output<void>();
   viewMembers = output<void>();
-
-  totalPaid = input<number>(0);
-  totalOwed = input<number>(0);
-  totalBalance = input<number>(0);
 }

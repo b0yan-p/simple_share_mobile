@@ -1,22 +1,54 @@
 @use './../../../../../theme/variables.scss' as c;
 
 :host {
+  display: block;
+  padding-bottom: 16px;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  height: calc(clamp(164px, 43vw, 236px) + var(--ion-safe-area-top, 0px));
+  object-fit: cover;
+}
+
+.group-card {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  width: calc(100% - 24px);
+  margin: -42px 12px 0;
+  padding: 16px 18px 12px;
+  border-radius: 20px 38% 20px 20px / 20px 72px 20px 20px;
+  background: white;
+  color: #221c38;
+  text-align: start;
+  box-shadow:
+    0 -10px 30px 3px rgb(255 255 255 / 34%),
+    0 -4px 15px 0 rgb(255 255 255 / 14%),
+    var(--ss-shadow-sm);
+}
+
+.group-card > strong {
+  color: var(--ss-header-color);
+  padding-inline-end: 18%;
+  font-size: 1.35rem;
+  overflow-wrap: anywhere;
+}
+
+.group-card > span {
+  color: #665f76;
+  font-size: 0.875rem;
+}
+
+.members-row {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--ss-border);
+}
 
-  margin: 16px;
-
-  .text-one-line {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .min-width {
-    min-width: 0;
-  }
-
+:host {
   .avatar-negative-margin {
     margin-left: -14px;
   }
@@ -66,140 +98,5 @@
     flex-shrink: 0;
     font-size: 18px;
     color: c.$text;
-  }
-
-  .border-bottom {
-    border-bottom: 1px solid var(--ss-border);
-  }
-
-  .stats-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    &__header {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      padding-inline: 2px;
-    }
-
-    &__eyebrow {
-      color: var(--ss-text-heading);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      line-height: 1.2;
-      text-transform: uppercase;
-    }
-
-    &__subtitle {
-      margin: 0;
-      color: var(--ss-text-secondary, var(--ss-text));
-      font-size: 12px;
-      line-height: 1.35;
-    }
-  }
-
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--ss-space-2);
-
-    // padding-top: 20px;
-    // border-top: 1px solid var(--ss-border);
-  }
-
-  .stats-card {
-    min-width: 0;
-    padding: 12px;
-    overflow: hidden;
-
-    background: var(--stats-surface);
-    border: 1.5px solid var(--stats-border);
-    border-radius: var(--ss-radius-lg);
-    box-shadow: var(--ss-shadow-sm);
-
-    &__heading {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 12px;
-      color: var(--stats-color);
-    }
-
-    &__icon {
-      display: grid;
-      flex: 0 0 24px;
-      width: 24px;
-      height: 24px;
-      place-items: center;
-
-      background: var(--stats-icon-background);
-      border-radius: var(--ss-radius-md);
-
-      ion-icon {
-        font-size: 15px;
-        stroke-width: 2px;
-      }
-    }
-
-    &__label {
-      overflow: hidden;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      line-height: 1.2;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    &__amount {
-      color: var(--ss-text-heading);
-      font-size: clamp(16px, 4.5vw, 21px);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      white-space: nowrap;
-    }
-
-    &__currency {
-      color: var(--ss-text);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-
-    &--positive {
-      --stats-color: var(--ss-positive);
-      --stats-border: color-mix(in srgb, var(--ss-positive) 38%, white);
-      --stats-surface: color-mix(in srgb, var(--ss-positive) 10%, transparent);
-      --stats-icon-background: color-mix(in srgb, var(--ss-positive) 28%, transparent);
-    }
-
-    &--paid {
-      --stats-color: var(--ss-primary);
-      --stats-border: color-mix(in srgb, var(--ss-primary) 38%, white);
-      --stats-surface: color-mix(in srgb, var(--ss-primary) 10%, transparent);
-      --stats-icon-background: color-mix(in srgb, var(--ss-primary) 28%, transparent);
-    }
-
-    &--negative {
-      --stats-color: var(--ss-negative);
-      --stats-border: color-mix(in srgb, var(--ss-negative) 38%, white);
-      --stats-surface: color-mix(in srgb, var(--ss-negative) 10%, transparent);
-      --stats-icon-background: color-mix(in srgb, var(--ss-negative) 28%, transparent);
-    }
-  }
-
-  @media (max-width: 360px) {
-    .stats {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .stats-card--paid {
-      grid-column: 1 / -1;
-      grid-row: 1;
-    }
   }
 }

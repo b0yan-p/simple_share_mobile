@@ -8,9 +8,6 @@
   </div>
 }
 
-<!-- Filter row -->
-<app-expenses-filter [(value)]="activeFilter" />
-
 @if (hasExpenses()) {
   @for (group of filteredGroups(); track group.id) {
     <!-- Month section heading -->

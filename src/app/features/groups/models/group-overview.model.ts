@@ -2,6 +2,7 @@ export interface GroupOverview {
   currency: string;
   id: string;
   name: string;
+  coverImageUrl?: string | null;
   myDebtSummary: MyDebtSummary;
   memberCount: number;
   currentMemberId: string;

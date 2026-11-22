@@ -1,6 +1,7 @@
 @use '../variables' as c;
 
 ion-header {
+  --header-action-color: var(--ss-header-color);
   -webkit-box-shadow: none !important;
   box-shadow: none;
   border-bottom: none;
@@ -10,13 +11,25 @@ ion-header {
     --border-width: 0;
     --box-shadow: none;
 
-    ion-buttons ion-back-button {
-      --color: var(--ss-primary);
+    ion-back-button {
+      --color: var(--header-action-color);
+      --ion-toolbar-color: var(--header-action-color);
+
+      &::part(icon) {
+        color: var(--header-action-color);
+      }
+    }
+
+    ion-buttons ion-button[fill='clear'] {
+      --color: var(--header-action-color);
+
+      ion-icon {
+        color: var(--header-action-color);
+      }
     }
 
     ion-title {
-      color: var(--ion-text-color);
-      color: var(--ss-primary);
+      color: var(--ss-header-color);
 
       &.small {
         font-size: 16px;

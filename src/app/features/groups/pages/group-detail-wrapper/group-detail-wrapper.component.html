@@ -1,14 +1,22 @@
 @let shell = shell$ | async;
 @let group = shell?.group ?? null;
+@let coverImageUrl = group?.coverImageUrl?.trim() || defaultCoverImageUrl;
 
-<ion-header>
+<ion-header #toolbar class="ion-no-border" [class.cover-toolbar]="group">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="groups" size="small" color="primary" />
+      <ion-back-button defaultHref="groups" size="small" />
     </ion-buttons>
-    <ion-title class="small">Group</ion-title>
+    <ion-title class="small">
+      <span class="compact-title">
+        @if (group) {
+          <img [src]="coverImageUrl" alt="" />
+        }
+        <span>{{ group?.name ?? 'Group' }}</span>
+      </span>
+    </ion-title>
     <ion-buttons slot="end">
-      <ion-button id="group-menu-trigger" fill="clear" size="small" color="primary">
+      <ion-button aria-label="Group options" id="group-menu-trigger" fill="clear" size="small">
         <ion-icon name="ellipsis-vertical" slot="icon-only" />
       </ion-button>
       <ion-popover
@@ -39,66 +47,67 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [scrollEvents]="true" (ionScroll)="updateCover($event.detail.scrollTop)">
   <ion-refresher slot="fixed" [appRefresh]="onRefresh">
     <ion-refresher-content />
   </ion-refresher>
 
+  @if (group) {
+    <app-group-overview-header
+      #cover
+      [coverImageUrl]="coverImageUrl"
+      [members]="members"
+      [group]="group"
+      (viewMembers)="openMembers(group.currentMemberId)"
+    />
+  }
   @if (!networkService.isOnline()) {
     <app-offline-warning />
   }
 
-  <!-- Overview header. Guarded because GroupOverviewHeaderComponent.group is
-       input.required and the bindings read group.myDebtSummary — offline with no
-       cached overview the header is simply omitted, the tabs still render. 
-  -->
-  @if (group) {
-    <app-group-overview-header
-      [members]="members"
-      [group]="group"
-      [totalPaid]="group.myDebtSummary.paidTotal"
-      [totalOwed]="group.myDebtSummary.owedTotal"
-      [totalBalance]="group.myDebtSummary.net"
-      (addMembers)="openAddMembers()"
-      (viewMembers)="openMembers(group.currentMemberId)"
-    />
-  }
+  <div #tabBody class="tab-body">
+    <div class="sticky-tabs">
+      <ion-segment
+        class="tab-segment"
+        [value]="store.activeTab()"
+        (click)="$event.stopPropagation()"
+        (ionChange)="selectTab($any($event).detail.value)"
+      >
+        <ion-segment-button value="overview">
+          <ion-label>Overview</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="expenses">
+          <ion-label>Expenses</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="balance">
+          <ion-label>Balance</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
 
-  <!-- Tab Segment -->
-  <ion-segment
-    class="tab-segment"
-    [value]="store.activeTab()"
-    (ionChange)="selectTab($any($event).detail.value)"
-  >
-    <ion-segment-button value="overview">
-      <ion-label>Overview</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="expenses">
-      <ion-label>Expenses</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="balance">
-      <ion-label>Balance</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+    <div
+      #tabSwipeContent
+      class="tab-swipe-content"
+      [class.ion-padding]="store.activeTab() !== 'expenses'"
+    >
+      @switch (store.activeTab()) {
+        @case ('overview') {
+          <app-group-details [group]="group" (openBalance)="selectTab('balance')" />
+        }
+        @case ('expenses') {
+          <app-expense-list />
+        }
+        @case ('balance') {
+          <app-group-balance />
+        }
+      }
+    </div>
 
-  <div [class.ion-padding]="store.activeTab() !== 'expenses'">
-    @switch (store.activeTab()) {
-      @case ('overview') {
-        <app-group-details [group]="group" (openBalance)="selectTab('balance')" />
-      }
-      @case ('expenses') {
-        <app-expense-list />
-      }
-      @case ('balance') {
-        <app-group-balance />
-      }
+    @if (store.activeTab() === 'overview' || store.activeTab() === 'expenses') {
+      <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
+        <ion-icon name="add-outline" />
+        <span>Add expense</span>
+      </ion-button>
     }
   </div>
-
-  @if (store.activeTab() === 'overview' || store.activeTab() === 'expenses') {
-    <ion-button color="primary" class="add-expense" [routerLink]="['..', 'expenses', 'new']">
-      <ion-icon name="add-outline" />
-      <span>Add expense</span>
-    </ion-button>
-  }
 </ion-content>

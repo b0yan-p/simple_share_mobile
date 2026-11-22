@@ -27,7 +27,6 @@ import { PaginateDirective } from 'src/app/shared/directives/paginate.directive'
 import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpensePaginatorService } from '../../services/expense-paginator.service';
-import { ExpensesFilterComponent } from '../expenses-filter/expenses-filter.component';
 import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending-expenses-sheet.component';
 
 @Component({
@@ -48,7 +47,6 @@ import { PendingExpensesSheetComponent } from '../pending-expenses-sheet/pending
     IonSpinner,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    ExpensesFilterComponent,
     EmptyStateComponent,
     PaginateDirective,
   ],

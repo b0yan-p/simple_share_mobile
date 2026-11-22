@@ -14,8 +14,8 @@ export class GroupDetailStore {
   readonly groupId = signal<string | null>(null);
   readonly activeTab = signal<GroupDetailTab>('overview');
 
-  /** scrollTop of the shared ion-content, kept per tab. */
-  private readonly scrollTops = signal<Partial<Record<GroupDetailTab, number>>>({});
+  /** Position to restore when returning from another screen. */
+  readonly scrollTop = signal(0);
 
   /** Opening a different group starts fresh; re-entering the same one keeps everything. */
   enter(groupId: string): void {
@@ -23,14 +23,6 @@ export class GroupDetailStore {
 
     this.groupId.set(groupId);
     this.activeTab.set('overview');
-    this.scrollTops.set({});
-  }
-
-  scrollTopFor(tab: GroupDetailTab): number {
-    return this.scrollTops()[tab] ?? 0;
-  }
-
-  setScrollTop(tab: GroupDetailTab, value: number): void {
-    this.scrollTops.update((current) => ({ ...current, [tab]: value }));
+    this.scrollTop.set(0);
   }
 }
