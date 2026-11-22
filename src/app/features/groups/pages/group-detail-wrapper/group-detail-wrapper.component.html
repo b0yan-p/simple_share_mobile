@@ -70,6 +70,7 @@
       <ion-segment
         class="tab-segment"
         [value]="store.activeTab()"
+        [swipeGesture]="false"
         (click)="$event.stopPropagation()"
         (ionChange)="selectTab($any($event).detail.value)"
       >
@@ -85,11 +86,7 @@
       </ion-segment>
     </div>
 
-    <div
-      #tabSwipeContent
-      class="tab-swipe-content"
-      [class.ion-padding]="store.activeTab() !== 'expenses'"
-    >
+    <div class="tab-content" [class.ion-padding]="store.activeTab() !== 'expenses'">
       @switch (store.activeTab()) {
         @case ('overview') {
           <app-group-details [group]="group" (openBalance)="selectTab('balance')" />

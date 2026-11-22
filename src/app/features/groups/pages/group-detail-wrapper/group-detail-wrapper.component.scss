@@ -76,7 +76,7 @@
 
     ion-back-button,
     #group-menu-trigger {
-      --background: rgba(28, 21, 50, 0.72);
+      --background: rgba(28, 21, 50, 0.625);
       --border-radius: 999px;
       margin-inline: 5px;
     }
@@ -117,9 +117,8 @@
   min-height: calc(100% - var(--sticky-tabs-top, 0px));
 }
 
-.tab-swipe-content {
+.tab-content {
   flex: 1;
-  touch-action: pan-y pinch-zoom;
 }
 
 .sticky-tabs {

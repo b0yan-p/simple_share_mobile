@@ -1,96 +1,49 @@
-<ion-grid>
-  @if (group(); as group) {
-    <!-- Debt overview card -->
-    <!-- <div class="surface-card-title">Your balance</div> -->
-    <div class="bdd-flex bdd-ai-center bdd-jc-space-between bdd-mb-1">
-      <small class="card-title">Your share</small>
-      <ion-button fill="outline" class="btn-sm" size="small" (click)="openBalance.emit()">
-        Settle up
-      </ion-button>
+@if (group(); as group) {
+  @let net = group.myDebtSummary.net;
+  @let balances = totals();
+  @let unsettled = balances.owe > 0 || balances.owed > 0;
+
+  <section class="balance-card" aria-label="Your balance">
+    <h2>Your balance</h2>
+    <div class="net">
+      <strong>{{ net | number: '1.2-2' }} {{ group.currency }}</strong>
+      <small class="font-w-500">{{
+        net < 0 ? 'You owe' : net > 0 ? 'You are owed' : 'Net balance is zero'
+      }}</small>
     </div>
-    <ion-row
-      class="surface-card balance-overview"
-      style="position: relative"
-      (click)="openBalance.emit()"
-    >
-      <div class="bdd-flex bdd-jc-space-between bdd-ai-center bdd-gap-1">
-        @let net = group.myDebtSummary.net;
-
-        <div class="amount" [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }">
-          @if (net > 0) {
-            <span class="plus-sign">+</span>
-          }
-          <span [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }"> {{ net }} </span>
-          <span
-            class="font-18 font-w-400"
-            [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }"
-          >
-            {{ group.currency }}
-          </span>
-        </div>
-
-        @if (net >= 0) {
-          <app-chip title="You get" severity="success" />
-        } @else if (net < 0) {
-          <app-chip title="You owe" severity="error" />
-        } @else {
-          <app-chip title="Settled up" severity="success" />
-        }
-      </div>
-
-      <div
-        class="user-net-status bdd-flex bdd-gap-1 bdd-ai-cenetr bdd-jc-space-between bdd-ai-center"
-        [ngClass]="{
-          'user-net-status--positive': net > 0,
-          'user-net-status--negative': net < 0,
-        }"
-      >
-        <!-- I Get -->
-        <div class="bdd-flex bdd-gap-1 bdd-ai-center">
-          <span class="balance-sub-card balance-sub-card--positive" aria-hidden="true">
-            <ion-icon name="arrow-down-outline" />
-          </span>
-          <div class="bdd-flex bdd-flex-col">
-            <small>You paid</small>
-            <div class="c-success">
-              <span class="font-18 font-w-500">
-                {{ group.myDebtSummary.paidTotal }}
-              </span>
-              <span class="font-14">{{ group.currency }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="divider"></div>
-
-        <!-- I Owe -->
-        <div class="bdd-flex bdd-gap-1 bdd-ai-center">
-          <span class="balance-sub-card balance-sub-card--negative" aria-hidden="true">
-            <ion-icon name="arrow-up-outline" />
-          </span>
-          <div class="bdd-flex bdd-flex-col">
-            <small>You owe</small>
-            <div class="c-error">
-              <span class="font-18 font-w-500">
-                {{ group.myDebtSummary.owedTotal }}
-              </span>
-              <span class="font-14">{{ group.currency }}</span>
-            </div>
-          </div>
+    <div class="breakdown">
+      <div class="debt">
+        <span class="balance-arrow" aria-hidden="true">
+          <ion-icon [icon]="icons.arrowUpOutline" />
+        </span>
+        <div>
+          <small>You owe</small><b>{{ balances.owe | number: '1.2-2' }} {{ group.currency }}</b>
         </div>
       </div>
-    </ion-row>
-
-    <!-- TODO show this option on show more. Note: reloading the overview is the
-         wrapper's job now, so re-enabling this needs a new output up to it —
-         the local refresh() this used to call is gone. -->
-    <!-- <ion-row>
-      <app-group-balance-overview
-        [data]="group.myDebtSummary"
-        [groupId]="group.id"
-        [currentMemberId]="group.currentMemberId"
-      />
-    </ion-row> -->
-  }
-</ion-grid>
+      <div class="credit">
+        <span class="balance-arrow" aria-hidden="true">
+          <ion-icon [icon]="icons.arrowDownOutline" />
+        </span>
+        <div>
+          <small>You are owed</small
+          ><b>{{ balances.owed | number: '1.2-2' }} {{ group.currency }}</b>
+        </div>
+      </div>
+    </div>
+  </section>
+  <button
+    type="button"
+    class="settlements"
+    [disabled]="!unsettled"
+    (click)="openBalance.emit()"
+  >
+    <ion-icon [icon]="icons.walletOutline" aria-hidden="true" />
+    <span>
+      <b>Your settlements </b>
+      <small>{{ unsettled ? 'You have unsettled balances.' : "You're all settled up." }}</small>
+    </span>
+    @if (unsettled) {
+      <span class="action">Settle up <ion-icon [icon]="icons.chevronForwardOutline" /></span>
+    }
+  </button>
+}

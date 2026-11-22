@@ -1,156 +1,195 @@
-@use './../../../../../theme/variables.scss' as c;
-
 :host {
-  .divider {
-    width: 2px;
-    height: 32px;
-    border-right: 1px solid var(--ss-border);
-  }
-
-  // ─── Overview card ───
-  .balance-overview {
-    display: flex;
-    gap: 16px;
-    justify-content: space-between;
-    cursor: pointer;
-
-    &:active {
-      opacity: 0.75;
-    }
-
-    // background: url('./../../../../../assets/icons/svg/grid.svg');
-
-    .user-net-status {
-      padding: 8px 12px;
-      border-radius: var(--ss-radius-md);
-      border: 1px solid var(--ss-border);
-
-      &--positive {
-        // background-color: color-mix(in srgb, var(--ss-positive) 10%, transparent);
-      }
-
-      &--negative {
-        // background-color: color-mix(in srgb, var(--ss-negative) 10%, transparent);
-      }
-    }
-
-    .balance-sub-card {
-      display: grid;
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      place-items: center;
-
-      color: var(--stats-color);
-      background: var(--stats-icon-background);
-      border-radius: var(--ss-radius-md);
-
-      ion-icon {
-        font-size: 15px;
-        stroke-width: 2px;
-      }
-
-      &--positive {
-        --stats-color: var(--ss-positive);
-        --stats-icon-background: color-mix(in srgb, var(--ss-positive) 28%, transparent);
-      }
-
-      &--negative {
-        --stats-color: var(--ss-negative);
-        --stats-icon-background: color-mix(in srgb, var(--ss-negative) 28%, transparent);
-      }
-    }
-  }
-
-  .amount {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    font-size: 24px;
-    line-height: 28px;
-    font-weight: 500;
-    color: c.$success;
-
-    .plus-sign {
-      line-height: 32px;
-      display: inline-block;
-      margin-bottom: 5px;
-    }
-  }
+  display: grid;
+  gap: 12px;
+  padding-bottom: 64px;
+  --secondary: #585378;
 }
 
-.donut-chart {
-  --get: 111;
-  --owe: 249;
-  --gap: 4;
-  --size: 90px;
-  --ring: 12px;
-
-  width: 52px;
-  aspect-ratio: 1;
-  border-radius: 100%;
+.balance-card,
+.settlements {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid #f3f1fb;
+  border-radius: 20px;
+  background: linear-gradient(115deg, #fff, #faf9ff);
+  box-shadow: 0 5px 12px rgba(84, 60, 171, 0.12);
+  color: var(--ss-header-color);
+}
 
-  &::after {
+.balance-card {
+  padding: 10px 15px 18px;
+
+  &::before {
     content: '';
     position: absolute;
-    inset: var(--ring);
-    background: c.$surface;
-    border-radius: 50%;
-  }
-
-  .seg-green {
-    position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background: conic-gradient(
-      c.$success 0deg,
-      c.$success calc(var(--get) * 1deg - var(--gap) * 1deg),
-      transparent calc(var(--get) * 1deg - var(--gap) * 1deg),
-      transparent 360deg
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 62% 110% at 107% 119%,
+      #efedfd 76%,
+      #e4dffb 77% 99%,
+      transparent 100%
     );
-    filter: drop-shadow(0 0 4px rgba(30, 255, 122, 0.7));
-  }
-
-  .seg-red {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: conic-gradient(
-      transparent 0deg,
-      transparent calc(var(--get) * 1deg),
-      c.$error calc(var(--get) * 1deg),
-      c.$error calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
-      transparent calc((var(--get) + var(--owe) - var(--gap)) * 1deg),
-      transparent 360deg
-    );
-    filter: drop-shadow(0 0 3px rgba(c.$error, 0.6));
+    mask-image: linear-gradient(to bottom, black 20%, transparent 89%);
   }
 }
 
-.legends {
+h2,
+.action,
+.breakdown > div {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+}
 
-  .legend {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+h2 {
+  margin: 0;
+  padding-block-start: 6px;
+  padding-inline-start: 5px;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ss-header-color);
+}
 
-    & > div:first-child {
-      width: 10px;
-      height: 10px;
-      border-radius: 100%;
+.scale-badge,
+.balance-arrow,
+.settlements > ion-icon {
+  border-radius: 12px;
+}
 
-      &.green {
-        background-color: c.$success;
-      }
+.scale-badge,
+.settlements > ion-icon {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 35px;
+  height: 35px;
+  background: var(--ss-primary-subtle);
+  color: var(--ss-primary);
+}
 
-      &.warn {
-        background-color: c.$error;
-      }
-    }
+.scale-badge svg {
+  width: 20px;
+  height: 20px;
+
+  path {
+    stroke: var(--ss-primary);
   }
+}
+
+.net {
+  position: relative;
+  margin: 14px 0 23px 14px;
+  padding-inline-start: 17px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    border-radius: var(--ss-radius-full);
+    background: var(--ss-primary);
+  }
+}
+
+.net strong {
+  display: block;
+  color: var(--ss-header-color);
+  font-size: 28px;
+  line-height: 1.13;
+  font-weight: 750;
+}
+
+small {
+  display: block;
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.3;
+}
+.net small {
+  color: #696872;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.breakdown > div {
+  gap: clamp(5px, 1.8vw, 10px);
+}
+.breakdown > div > div {
+  min-width: 0;
+}
+.breakdown b,
+.net strong {
+  overflow-wrap: anywhere;
+}
+.breakdown b {
+  display: block;
+  color: var(--amount);
+  font-size: clamp(15px, 4.35vw, 19px);
+  line-height: 1.25;
+}
+.debt {
+  padding-inline-end: 6px;
+  --amount: #d95038;
+  --tint: #fcece6;
+}
+.credit {
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid #e2def4;
+  --amount: #308952;
+  --tint: #e5f3ea;
+}
+.balance-arrow {
+  display: grid;
+  place-items: center;
+  flex: none;
+  font-size: 19px;
+  padding: 6px;
+  background: var(--tint);
+
+  ion-icon {
+    color: var(--amount);
+    transform: rotate(45deg);
+  }
+}
+
+.settlements {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: start;
+  font: inherit;
+}
+.settlements > ion-icon {
+  width: 26px;
+  height: 26px;
+  padding: 7px;
+}
+.settlements b {
+  color: var(--ss-header-color);
+  font-size: 15px;
+}
+.settlements small {
+  margin-top: 2px;
+}
+.action {
+  color: var(--ss-primary);
+  font-size: 14px;
+  font-weight: 700;
+  gap: 3px;
+  white-space: nowrap;
+}
+.action ion-icon {
+  color: inherit;
 }

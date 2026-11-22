@@ -1,17 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import {
-  Component,
-  effect,
-  ElementRef,
-  inject,
-  NgZone,
-  OnInit,
-  viewChild,
-} from '@angular/core';
+import { Component, effect, ElementRef, inject, OnInit, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
-  createGesture,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -62,10 +53,6 @@ import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupDetailStore, GroupDetailTab } from '../../store/group-detail-store';
 import { GroupDetailsComponent } from '../group-details/group-details.component';
 
-const GROUP_TABS: readonly GroupDetailTab[] = ['overview', 'expenses', 'balance'];
-const SWIPE_EDGE_INSET = 32;
-const TAB_SWIPE_DISTANCE = 55;
-
 @Component({
   selector: 'app-group-detail-wrapper',
   templateUrl: './group-detail-wrapper.component.html',
@@ -108,7 +95,6 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private expenseFacade = inject(ExpenseFacade);
   private balanceFacade = inject(GroupBalanceFacade);
   private modalController = inject(ModalController);
-  private readonly zone = inject(NgZone);
   readonly store = inject(GroupDetailStore);
   protected networkService = inject(NetworkService);
 
@@ -119,7 +105,6 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   private readonly toolbar = viewChild('toolbar', { read: ElementRef<HTMLElement> });
   private readonly cover = viewChild('cover', { read: ElementRef<HTMLElement> });
   private readonly tabBody = viewChild<ElementRef<HTMLElement>>('tabBody');
-  private readonly tabSwipeContent = viewChild<ElementRef<HTMLElement>>('tabSwipeContent');
 
   updateCover(scrollTop: number): void {
     const header = this.toolbar()?.nativeElement;
@@ -169,50 +154,6 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   );
 
   constructor() {
-    effect((onCleanup) => {
-      const element = this.tabSwipeContent()?.nativeElement;
-      if (!element) return;
-
-      const gesture = this.zone.runOutsideAngular(() => {
-        const swipe = createGesture({
-          el: element,
-          gestureName: 'group-detail-tab-swipe',
-          direction: 'x',
-          threshold: 18,
-          maxAngle: 30,
-          canStart: ({ event, startX }) => {
-            if (!(event instanceof TouchEvent) || event.touches.length !== 1) return false;
-
-            const viewportWidth = element.ownerDocument.documentElement.clientWidth;
-            return (
-              startX > SWIPE_EDGE_INSET &&
-              startX < viewportWidth - SWIPE_EDGE_INSET &&
-              !event
-                .composedPath()
-                .some(
-                  (target) => target instanceof Element && target.matches('ion-item-sliding'),
-                )
-            );
-          },
-          onEnd: ({ event, deltaX, deltaY }) => {
-            if (
-              event.type !== 'touchend' ||
-              Math.abs(deltaX) < TAB_SWIPE_DISTANCE ||
-              Math.abs(deltaY) >= Math.abs(deltaX)
-            )
-              return;
-
-            const currentIndex = GROUP_TABS.indexOf(this.store.activeTab());
-            const nextTab = GROUP_TABS[currentIndex + (deltaX < 0 ? 1 : -1)];
-            if (nextTab) this.zone.run(() => this.selectTab(nextTab));
-          },
-        });
-        swipe.enable();
-        return swipe;
-      });
-      onCleanup(() => gesture.destroy());
-    });
-
     effect((onCleanup) => {
       const header = this.toolbar()?.nativeElement;
       const content = this.contentElement()?.nativeElement;
