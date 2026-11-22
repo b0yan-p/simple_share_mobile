@@ -91,6 +91,7 @@ export class GroupBalanceComponent implements OnInit {
         toIsCurrentUser,
         defaultAmount: edge.amount,
         groupId: this.groupId() ?? '',
+        currency: this.balance()?.currency,
       },
       breakpoints: [0, 0.85],
       initialBreakpoint: 0.85,

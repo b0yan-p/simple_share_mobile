@@ -83,7 +83,7 @@
     flex: 1;
     min-width: 0;
     // The global ion-input rule pads 14px top and bottom, which on a 40px
-    // figure is pure dead height — the card's own padding is the gutter here.
+    // figure is pure dead height , the card's own padding is the gutter here.
     --padding-start: 0;
     --padding-end: 0;
     --padding-top: 0;
@@ -95,35 +95,8 @@
     color: c.$text-light;
   }
 
-  .currency-chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  app-currency-picker {
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0 14px;
-    border-radius: 12px;
-    background: var(--ss-primary-subtle);
-    color: var(--ss-primary);
-    font-size: 18px;
-    font-weight: 600;
-
-    // Hairline separating the currency from the amount, as in the design.
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: -7px;
-      top: 4px;
-      bottom: 4px;
-      width: 1px;
-      background: c.$borders;
-    }
-
-    ion-icon {
-      font-size: 16px;
-    }
   }
 
   // ─── White rounded rows (description, date, payment rows) ───
@@ -370,7 +343,7 @@
 
   // ─── Date picker modal ───
   // It presents full-screen, and Ionic only reserves the status-bar inset for a
-  // toolbar inside a routed page shell — inside a modal template it does not,
+  // toolbar inside a routed page shell , inside a modal template it does not,
   // so the header would sit under the notch / clock. Reserve it here.
   ion-modal.date-modal {
     ion-header ion-toolbar {

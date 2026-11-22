@@ -44,6 +44,17 @@ export class ExpenseIdbService {
     return from(this.idb.db.put(this.pendingExpensesStore, expense)).pipe(map(() => void 0));
   }
 
+  recordPendingError(tempId: string, lastError: string): Observable<void> {
+    return from(this.updatePendingError(tempId, lastError));
+  }
+
+  private async updatePendingError(tempId: string, lastError: string): Promise<void> {
+    const tx = this.idb.db.transaction(this.pendingExpensesStore, 'readwrite');
+    const pending = await tx.store.get(tempId);
+    if (pending) await tx.store.put({ ...pending, lastError });
+    await tx.done;
+  }
+
   getPendingExpenses(): Observable<PendingExpense[]> {
     return from(this.idb.db.getAll(this.pendingExpensesStore));
   }

@@ -62,6 +62,7 @@ export class MemberActionsSheetComponent {
    */
   @Input() netBalance: number | null = null;
   @Input() canRemove = false;
+  @Input({ required: true }) currency!: string;
 
   private modalController = inject(ModalController);
   private alertController = inject(AlertController);

@@ -39,6 +39,15 @@ ion-modal.modal-sheet {
   }
 }
 
+ion-modal.currency-picker-modal {
+  --height: 85%;
+  align-items: flex-end;
+
+  ion-content::part(scroll) {
+    overscroll-behavior-y: contain;
+  }
+}
+
 // ─── Full-screen dialog ──────────────────────────────────────────────
 // Opened without `breakpoints`, so it is a plain modal rather than a sheet: it
 // fills the viewport and carries a back arrow instead of a drag handle.

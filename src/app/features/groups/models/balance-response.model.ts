@@ -15,6 +15,7 @@ export interface DebtEdge {
 }
 
 export interface BalanceResponse {
+  currency: string;
   groupId: string;
   currentMemberId: string;
   members: MemberBalance[];

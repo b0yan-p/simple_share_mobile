@@ -18,6 +18,7 @@ export interface GroupsCacheEntry {
 
 export interface PendingExpense {
   tempId: string;
+  lastError?: string;
   groupId: string;
   payload: CreateExpenseRequest;
   createdAt: string;

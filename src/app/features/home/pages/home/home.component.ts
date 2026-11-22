@@ -53,16 +53,6 @@ export class HomeComponent implements OnInit, ViewWillEnter {
   balanceSummary = signal<BalanceSummary | null>(null);
   balanceLoading = signal(false);
 
-  balanceLabel = computed(() => {
-    const net = this.balanceSummary()?.net ?? 0;
-
-    if (net === 0) return 'Settled up';
-
-    return net > 0 ? 'You are owed' : 'You owe';
-  });
-
-  balanceAmount = computed(() => Math.abs(this.balanceSummary()?.net ?? 0));
-
   ngOnInit() {
     if (!this.tokenStorage.user()) {
       this.tokenStorage.getUser().subscribe();

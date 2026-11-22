@@ -35,8 +35,10 @@ export interface Allocation {
 export interface ExpenseDraft {
   /** Route identity of the expense being drafted — see `draftKey()`. */
   key: string;
+  expenseId: string;
   groupId: string;
   currency: string;
+  financialChanged: boolean;
   description: string;
   expenseDate: string;
   totalMinor: number;

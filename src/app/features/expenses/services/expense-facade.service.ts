@@ -3,7 +3,7 @@ import {
   catchError,
   concatMap,
   filter,
-  forkJoin,
+  defer,
   from,
   map,
   merge,
@@ -236,14 +236,16 @@ export class ExpenseFacade {
     payload: CreateExpenseRequest,
   ): Observable<{ id: string; queued: boolean }> {
     if (!this.networkService.isOnline()) {
-      const tempId = crypto.randomUUID();
+      const tempId = payload.clientExpenseId;
       return this.idb
         .savePendingExpense({ tempId, groupId, payload, createdAt: new Date().toISOString() })
         .pipe(map(() => ({ id: tempId, queued: true })));
     }
 
     return this.expenseApi.createExpense(groupId, payload).pipe(
-      concatMap((res) => this.refreshExpenses(groupId).pipe(map(() => res))),
+      concatMap((res) =>
+        this.afterAcceptance(() => this.refreshExpenses(groupId)).pipe(map(() => res)),
+      ),
       map((res) => ({ ...res, queued: false })),
     );
   }
@@ -312,24 +314,50 @@ export class ExpenseFacade {
 
   syncPendingExpenses(): Observable<void> {
     return this.idb.getPendingExpenses().pipe(
+      catchError((error) => {
+        console.error('[SYNC] Could not read pending expenses', error);
+        this.toastService.warnToast('Could not read pending expenses on this device.');
+        return of([] as PendingExpense[]);
+      }),
       switchMap((pending) => {
         if (!pending.length) return of(void 0);
 
         return from(pending).pipe(
           concatMap((item) =>
-            this.expenseApi.createExpense(item.groupId, item.payload).pipe(
-              switchMap(() =>
-                forkJoin([
-                  this.idb.deletePendingExpense(item.tempId),
-                  this.invalidateExpenses(item.groupId),
-                ]),
+            this.expenseApi
+              .createExpense(item.groupId, { ...item.payload, clientExpenseId: item.tempId })
+              .pipe(
+                map(() => true),
+                catchError((err) =>
+                  this.idb
+                    .recordPendingError(
+                      item.tempId,
+                      err?.error?.detail ?? 'Failed to sync. Edit or retry.',
+                    )
+                    .pipe(
+                      map(() => false),
+                      catchError((storageError) => {
+                        console.error('[SYNC] Could not record pending error', storageError);
+                        this.toastService.warnToast(
+                          'Could not save the sync error on this device.',
+                        );
+                        return of(false);
+                      }),
+                    ),
+                ),
+                concatMap((accepted) =>
+                  accepted
+                    ? this.afterAcceptance(() =>
+                        this.idb.deletePendingExpense(item.tempId),
+                      ).pipe(
+                        concatMap(() =>
+                          this.afterAcceptance(() => this.invalidateExpenses(item.groupId)),
+                        ),
+                        map(() => true),
+                      )
+                    : of(false),
+                ),
               ),
-              map(() => true),
-              catchError((err) => {
-                console.error('[SYNC] Failed to sync pending expense', item.tempId, err);
-                return of(false);
-              }),
-            ),
           ),
           toArray(),
           tap((results) => {
@@ -364,10 +392,13 @@ export class ExpenseFacade {
     return this.idb.deleteExpenses(groupId);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  selectExpense(_expenseId: string) {}
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  removeExpenseFromState(_expenseId: string) {}
-  // #endregion
+  private afterAcceptance(operation: () => Observable<void>): Observable<void> {
+    return defer(operation).pipe(
+      catchError((error) => {
+        console.error('[EXPENSE] Local update failed after server acceptance', error);
+        this.toastService.warnToast('Expense saved. Local data could not be refreshed.');
+        return of(void 0);
+      }),
+    );
+  }
 }

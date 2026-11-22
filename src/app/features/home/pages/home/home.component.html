@@ -25,11 +25,7 @@
     @if (networkService.isOnline()) {
       <div class="bdd-mr-1">
         <img
-          [src]="
-            (balanceSummary()?.net ?? 0) >= 0
-              ? '/assets/images/logo.png'
-              : '/assets/images/logo_sad.png'
-          "
+          [src]="true ? '/assets/images/logo.png' : '/assets/images/logo_sad.png'"
           alt="logo"
           class="logo"
         />
@@ -37,10 +33,17 @@
       </div>
       <div class="bdd-mx-a">
         @if (balanceSummary(); as summary) {
-          <p>{{ balanceLabel() }}</p>
-          <p class="amount">
-            {{ balanceAmount() | number: '1.2-2' }} <span class="font-24">BAM</span>
-          </p>
+          @for (bucket of summary.balances; track bucket.currency) {
+            <p>
+              {{ bucket.net > 0 ? 'You are owed' : bucket.net < 0 ? 'You owe' : 'Net settled' }}
+            </p>
+            <p class="amount">
+              {{ (bucket.net < 0 ? -bucket.net : bucket.net) | number: '1.2-2' }}
+              <span class="font-24">{{ bucket.currency }}</span>
+            </p>
+          } @empty {
+            <p class="amount">Settled up</p>
+          }
           @if (summary.groupCount > 0) {
             <p>
               across {{ summary.groupCount }}

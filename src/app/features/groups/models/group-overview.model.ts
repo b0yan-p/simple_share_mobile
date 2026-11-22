@@ -1,4 +1,5 @@
 export interface GroupOverview {
+  currency: string;
   id: string;
   name: string;
   myDebtSummary: MyDebtSummary;

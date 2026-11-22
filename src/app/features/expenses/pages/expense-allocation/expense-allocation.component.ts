@@ -34,8 +34,7 @@ import {
   distribute,
   ExpenseDraftStore,
 } from '../../services/expense-draft.store';
-import { CURRENCY } from '../../utils/expense.constants';
-import { fromMinor, toMinor } from '../../utils/money.util';
+import { fromMinor, toMinor, hasTwoDecimalPrecision } from '../../utils/money.util';
 
 /**
  * Editor for one of the two allocations of the expense draft — "Who paid" and
@@ -73,10 +72,13 @@ export class ExpenseAllocationComponent implements ViewWillEnter {
   private readonly store = inject(ExpenseDraftStore);
   private readonly ui = inject(UiService);
 
-  readonly currency = CURRENCY;
+  get currency(): string {
+    return this.store.currency();
+  }
   readonly kind = signal<AllocationKind>('payers');
   readonly mode = signal<AllocationMode>('equal');
   readonly entries = signal<AllocationEntry[]>([]);
+  readonly invalidPrecision = signal(new Set<string>());
 
   readonly totalMinor = this.store.totalMinor;
 
@@ -97,6 +99,7 @@ export class ExpenseAllocationComponent implements ViewWillEnter {
   /** Mirrors the acceptance rules for `Done`: someone pays, and it adds up. */
   readonly canSubmit = computed(
     () =>
+      !this.entries().some((x) => x.selected && this.invalidPrecision().has(x.memberId)) &&
       this.selectedCount() > 0 &&
       this.hasContributor() &&
       !this.hasNegative() &&
@@ -111,6 +114,7 @@ export class ExpenseAllocationComponent implements ViewWillEnter {
 
   ionViewWillEnter(): void {
     this.ui.tabBarVisible.set(false);
+    this.invalidPrecision.set(new Set());
 
     const params = this.route.snapshot.params;
     const groupId = params['id'];
@@ -144,7 +148,10 @@ export class ExpenseAllocationComponent implements ViewWillEnter {
 
   setMode(mode: AllocationMode): void {
     this.mode.set(mode);
-    if (mode === 'equal') this.redistribute();
+    if (mode === 'equal') {
+      this.invalidPrecision.set(new Set());
+      this.redistribute();
+    }
   }
 
   toggle(entry: AllocationEntry): void {
@@ -159,7 +166,14 @@ export class ExpenseAllocationComponent implements ViewWillEnter {
   }
 
   onAmountInput(entry: AllocationEntry, value: string | number | null | undefined): void {
-    const amountMinor = Math.max(0, toMinor(Number(value ?? 0)));
+    const amount = Number(value ?? 0);
+    this.invalidPrecision.update((current) => {
+      const next = new Set(current);
+      if (!hasTwoDecimalPrecision(amount)) next.add(entry.memberId);
+      else next.delete(entry.memberId);
+      return next;
+    });
+    const amountMinor = Math.max(0, toMinor(amount));
     this.patch(entry.memberId, (current) => ({ ...current, amountMinor }));
   }
 

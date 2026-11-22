@@ -1,3 +1,6 @@
+import { AMOUNT_MAX } from 'src/app/features/expenses/utils/expense.constants';
+import { hasTwoDecimalPrecision } from 'src/app/features/expenses/utils/money.util';
+import { localCalendarDate } from 'src/app/shared/utils/calendar-date';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, Input, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -28,11 +31,11 @@ import {
 import { concatMap, startWith } from 'rxjs';
 import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { ExpenseService } from 'src/app/features/expenses/services/expense.service';
-import { CURRENCY } from 'src/app/features/expenses/utils/expense.constants';
 import { fromMinor, toMinor } from 'src/app/features/expenses/utils/money.util';
 
 /** How the entered amount relates to the outstanding balance. */
-type AmountState = 'missing' | 'nonPositive' | 'exceeds' | 'settles' | 'partial';
+type AmountState =
+  'missing' | 'nonPositive' | 'exceeds' | 'settles' | 'partial' | 'limit' | 'precision';
 
 @Component({
   selector: 'app-settle-up-modal',
@@ -70,7 +73,9 @@ export class SettleUpModalComponent implements OnInit {
   private expenseService = inject(ExpenseService);
   private expenseFacade = inject(ExpenseFacade);
 
-  readonly currency = CURRENCY;
+  @Input({ required: true }) currency!: string;
+  readonly maxDate = localCalendarDate();
+  readonly amountMax = AMOUNT_MAX;
 
   submitting = false;
   error = false;
@@ -89,7 +94,7 @@ export class SettleUpModalComponent implements OnInit {
 
   form = new FormGroup({
     amount: new FormControl<number | null>(null, [Validators.required, Validators.min(0.01)]),
-    date: new FormControl<string>(new Date().toISOString(), [Validators.required]),
+    date: new FormControl<string>(localCalendarDate(), [Validators.required]),
   });
 
   private amountValue = toSignal(this.form.controls.amount.valueChanges.pipe(startWith(null)), {
@@ -105,6 +110,9 @@ export class SettleUpModalComponent implements OnInit {
   });
 
   readonly amountState = computed<AmountState>(() => {
+    const value = this.amountValue();
+    if (value != null && value > AMOUNT_MAX) return 'limit';
+    if (value != null && !hasTwoDecimalPrecision(value)) return 'precision';
     const minor = this.amountMinor();
     if (minor == null) return 'missing';
     if (minor <= 0) return 'nonPositive';
@@ -146,7 +154,7 @@ export class SettleUpModalComponent implements OnInit {
         : null;
     });
 
-    this.form.patchValue({ amount: this.defaultAmount });
+    this.form.patchValue({ amount: Math.min(this.defaultAmount, AMOUNT_MAX) });
 
     this.fromInitials = this.initialsOf(this.fromLabel);
     this.toInitials = this.initialsOf(this.toLabel);
@@ -164,7 +172,7 @@ export class SettleUpModalComponent implements OnInit {
 
   /** Restores the full outstanding balance into the amount field. */
   payFullAmount(): void {
-    this.form.controls.amount.setValue(this.outstandingAmount());
+    this.form.controls.amount.setValue(Math.min(this.outstandingAmount(), AMOUNT_MAX));
   }
 
   dismiss(): void {
@@ -182,7 +190,7 @@ export class SettleUpModalComponent implements OnInit {
         fromMemberId: this.fromMemberId,
         toMemberId: this.toMemberId,
         amount: amount!,
-        date: new Date(date!).toISOString(),
+        date: date!.slice(0, 10),
       })
       .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
       .subscribe({

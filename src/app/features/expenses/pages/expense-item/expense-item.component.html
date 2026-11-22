@@ -45,15 +45,18 @@
             [max]="amountMax"
             [attr.aria-label]="'Expense amount in ' + currency"
           />
-          <!-- Single supported currency today: shown as the selector from the
-               design, but inert until more currencies exist. -->
-          <div class="currency-chip" aria-hidden="true">
-            <span>{{ currency }}</span>
-            <ion-icon name="chevron-down-outline" />
-          </div>
+          <app-currency-picker
+            label="Expense currency"
+            [compact]="true"
+            [value]="currency"
+            (valueChange)="changeCurrency($event)"
+          />
         </div>
       </div>
 
+      @if (form.controls.totalAmount.hasError('amountPrecision')) {
+        <p class="validation-hint" role="alert">Use at most two decimal places.</p>
+      }
       @if (form.controls.totalAmount.hasError('max')) {
         <div class="validation-hint" role="alert">
           <ion-icon name="alert-circle-outline" aria-hidden="true" />
@@ -130,6 +133,7 @@
               size="cover"
               [showDefaultButtons]="true"
               presentation="date"
+              [max]="maxDate"
               formControlName="expenseDate"
             />
           </ion-content>

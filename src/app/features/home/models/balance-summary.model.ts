@@ -1,8 +1,11 @@
-/** The current user's standing across every group, as returned by GET /balance/me. */
-export interface BalanceSummary {
+export interface CurrencyBalance {
+  currency: string;
   owedToMeTotal: number;
   iOweTotal: number;
   net: number;
-  /** Groups where the user still has an open debt - not the count of all their groups. */
   groupCount: number;
+}
+export interface BalanceSummary {
+  groupCount: number;
+  balances: CurrencyBalance[];
 }

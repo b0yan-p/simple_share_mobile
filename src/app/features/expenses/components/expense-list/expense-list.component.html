@@ -47,7 +47,7 @@
               <!-- Amount + personal status -->
               <div class="expense-item__amount">
                 <span class="expense-item__total">
-                  {{ expense.amount | number: '1.2-2' }} BAM
+                  {{ expense.originalAmount | number: '1.2-2' }} {{ expense.originalCurrency }}
                 </span>
                 <small
                   class="expense-item__status"
@@ -60,9 +60,9 @@
                   @if (settled) {
                     settled
                   } @else if (owe) {
-                    you owe {{ expense.net * -1 | number: '1.2-2' }}
+                    you owe {{ expense.net * -1 | number: '1.2-2' }} {{ expense.groupCurrency }}
                   } @else {
-                    you get {{ expense.net | number: '1.2-2' }}
+                    you get {{ expense.net | number: '1.2-2' }} {{ expense.groupCurrency }}
                   }
                 </small>
               </div>

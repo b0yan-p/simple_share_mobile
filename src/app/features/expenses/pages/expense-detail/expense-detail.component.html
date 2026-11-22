@@ -57,9 +57,14 @@
           </div>
 
           <div class="expense-hero__amount">
-            {{ exp.amount | number: '1.2-2' }}
-            <span class="expense-hero__currency"> {{ currency }}</span>
+            {{ exp.originalAmount | number: '1.2-2' }}
+            <span class="expense-hero__currency"> {{ exp.originalCurrency }}</span>
           </div>
+          @if (exp.originalCurrency !== exp.groupCurrency) {
+            <small class="c-text"
+              >≈ {{ exp.amount | number: '1.2-2' }} {{ exp.groupCurrency }}</small
+            >
+          }
           <div class="expense-hero__description">{{ exp.description }}</div>
           <div class="expense-hero__date">
             <ion-icon name="calendar-outline" />
@@ -109,8 +114,13 @@
                 <span class="c-light font-w-500">{{ payer.memberName }}</span>
               </div>
               <span class="row-amount"
-                >{{ payer.amount | number: '1.2-2' }} {{ currency }}</span
-              >
+                >{{ payer.originalAmount | number: '1.2-2' }} {{ exp.originalCurrency }}
+                @if (exp.originalCurrency !== exp.groupCurrency) {
+                  <small class="c-text">
+                    <br />{{ payer.amount | number: '1.2-2' }} {{ exp.groupCurrency }}
+                  </small>
+                }
+              </span>
             </div>
             @if (!$last) {
               <div class="meta-divider"></div>
@@ -136,8 +146,14 @@
                   <span class="c-light font-w-500">{{ split.memberName }}</span>
                 </div>
                 <span class="row-amount"
-                  >{{ split.amount | number: '1.2-2' }} {{ currency }}</span
-                >
+                  >{{ split.originalAmount | number: '1.2-2' }} {{ exp.originalCurrency }}
+                  @if (exp.originalCurrency !== exp.groupCurrency) {
+                    <small class="c-text">
+                      <br />
+                      {{ split.amount | number: '1.2-2' }} {{ exp.groupCurrency }}
+                    </small>
+                  }
+                </span>
               </div>
               @if (!$last) {
                 <div class="meta-divider"></div>

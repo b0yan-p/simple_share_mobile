@@ -1,6 +1,7 @@
 import { BaseModel } from 'src/app/core/models/base-model';
 
 export class GroupListItem {
+  currency!: string;
   id!: string;
   name!: string;
   simplifyDebts!: boolean;
@@ -11,6 +12,9 @@ export class GroupListItem {
 }
 
 export class Group implements BaseModel {
+  currency!: string;
+  currencyLocked!: boolean;
+  canChangeCurrency!: boolean;
   id!: string;
   name!: string;
   simplifyDebts?: boolean;

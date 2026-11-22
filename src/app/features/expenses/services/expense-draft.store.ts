@@ -1,3 +1,4 @@
+import { localCalendarDate } from 'src/app/shared/utils/calendar-date';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
@@ -69,7 +70,7 @@ export class ExpenseDraftStore {
    * Starts a brand-new expense: the current user pays everything, and everyone
    * in the group splits it equally.
    */
-  start(key: string, groupId: string, members: GroupMember[]): void {
+  start(key: string, groupId: string, members: GroupMember[], currency: string): void {
     const currentUserId = this.currentUserId();
 
     const payers: Allocation = {
@@ -90,9 +91,11 @@ export class ExpenseDraftStore {
     this.state.set({
       key,
       groupId,
-      currency: CURRENCY,
+      currency,
+      expenseId: crypto.randomUUID(),
+      financialChanged: false,
       description: '',
-      expenseDate: new Date().toISOString(),
+      expenseDate: localCalendarDate(),
       totalMinor: 0,
       payers: distribute(payers, 0),
       splits: distribute(splits, 0),
@@ -105,9 +108,11 @@ export class ExpenseDraftStore {
     groupId: string,
     members: GroupMember[],
     expense: {
+      id: string;
       description: string;
       expenseDate: string;
       totalAmount: number;
+      currency: string;
       payments: MemberAmountEntry[];
       splits: MemberAmountEntry[];
     },
@@ -117,7 +122,9 @@ export class ExpenseDraftStore {
     this.state.set({
       key,
       groupId,
-      currency: CURRENCY,
+      expenseId: expense.id,
+      currency: expense.currency,
+      financialChanged: false,
       description: expense.description,
       expenseDate: expense.expenseDate,
       totalMinor,
@@ -127,7 +134,17 @@ export class ExpenseDraftStore {
   }
 
   patchDetails(details: Partial<Pick<ExpenseDraft, 'description' | 'expenseDate'>>): void {
-    this.state.update((draft) => (draft ? { ...draft, ...details } : draft));
+    this.state.update((draft) =>
+      draft
+        ? {
+            ...draft,
+            ...details,
+            financialChanged:
+              draft.financialChanged ||
+              (details.expenseDate !== undefined && details.expenseDate !== draft.expenseDate),
+          }
+        : draft,
+    );
   }
 
   /**
@@ -142,6 +159,7 @@ export class ExpenseDraftStore {
       return {
         ...draft,
         totalMinor,
+        financialChanged: true,
         payers: draft.payers.modified
           ? distribute(draft.payers, totalMinor)
           : distribute(this.defaultPayers(draft.payers), totalMinor),
@@ -153,7 +171,21 @@ export class ExpenseDraftStore {
   /** Commits an editor screen's result and marks that allocation as the user's. */
   commit(kind: AllocationKind, allocation: Allocation): void {
     this.state.update((draft) =>
-      draft ? { ...draft, [kind]: { ...allocation, modified: true } } : draft,
+      draft
+        ? { ...draft, financialChanged: true, [kind]: { ...allocation, modified: true } }
+        : draft,
+    );
+  }
+
+  markFinancialChanged(): void {
+    this.state.update((draft) => (draft ? { ...draft, financialChanged: true } : draft));
+  }
+
+  setCurrency(currency: string): void {
+    this.state.update((draft) =>
+      draft && draft.currency !== currency
+        ? { ...draft, currency, financialChanged: true }
+        : draft,
     );
   }
 

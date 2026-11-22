@@ -115,6 +115,9 @@
       </div>
     }
 
+    @if (invalidPrecision().size > 0) {
+      <p class="validation-hint" role="alert">Use at most two decimal places.</p>
+    }
     <div class="total-indicator" [class.total-indicator--valid]="canSubmit()">
       <span>{{ totalLabel() }}</span>
       <span>

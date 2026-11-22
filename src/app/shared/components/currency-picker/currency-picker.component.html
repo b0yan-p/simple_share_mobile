@@ -1,0 +1,95 @@
+<button
+  type="button"
+  class="currency-trigger"
+  [class.currency-trigger--compact]="compact()"
+  [disabled]="disabled()"
+  [attr.aria-label]="label() + ': ' + value()"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="opened()"
+  (click)="open()"
+>
+  @if (!compact()) {
+    <ion-icon class="currency-tile" name="cash-outline" aria-hidden="true" />
+  }
+  <span class="currency-trigger__text">
+    @if (!compact()) {
+      <span class="field-label">{{ label() }}</span>
+    }
+    <span class="currency-code">{{ value() }}</span>
+    @if (!compact()) {
+      <span class="currency-name">{{ selectedName() }}</span>
+    }
+  </span>
+  @if (!compact() && disabled()) {
+    <span class="locked-badge"
+      ><ion-icon name="lock-closed-outline" aria-hidden="true" />Locked</span
+    >
+  } @else {
+    <ion-icon
+      [name]="compact() ? 'chevron-down-outline' : 'chevron-forward-outline'"
+      aria-hidden="true"
+    />
+  }
+</button>
+
+<ion-modal
+  class="modal-sheet currency-picker-modal"
+  [isOpen]="opened()"
+  (didDismiss)="opened.set(false)"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-title>Select currency</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            fill="clear"
+            aria-label="Close currency selection"
+            (click)="opened.set(false)"
+          >
+            <ion-icon
+              slot="icon-only"
+              class="close-icon"
+              name="close-outline"
+              aria-hidden="true"
+            />
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+      <div class="search-row">
+        <ion-searchbar
+          aria-label="Search currencies"
+          placeholder="Search code or currency name"
+          [value]="query()"
+          (ionInput)="query.set($event.detail.value ?? '')"
+        />
+      </div>
+    </ion-header>
+    <ion-content>
+      <div class="currency-list" role="group" aria-label="Currencies">
+        @for (item of filtered(); track item.code) {
+          <button
+            type="button"
+            class="currency-option"
+            [class.is-selected]="item.code === value()"
+            [attr.aria-pressed]="item.code === value()"
+            (click)="select(item.code)"
+          >
+            <span class="currency-option__text">
+              <span class="currency-code">{{ item.code }}</span>
+              <span class="currency-name">{{ item.name }}</span>
+            </span>
+            <ion-icon
+              [name]="item.code === value() ? 'checkmark-circle' : 'ellipse-outline'"
+              aria-hidden="true"
+            />
+          </button>
+        } @empty {
+          <p class="empty-message" role="status">
+            No currencies found. Try another code or name.
+          </p>
+        }
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -1,16 +1,25 @@
+/** Internal draft allocation, expressed in original currency. */
 export interface MemberAmountEntry {
   memberId: string;
   amount: number;
 }
-
-export interface CreateExpenseRequest {
-  description: string;
-  expenseDate: string;
-  totalAmount: number;
-  payments: MemberAmountEntry[];
-  splits: MemberAmountEntry[];
+export interface OriginalAllocation {
+  memberId: string;
+  originalAmount: number;
 }
-
-export interface UpdateExpenseRequest extends CreateExpenseRequest {
+export interface ExpenseFinancialInput {
+  expenseDate: string;
+  originalAmount: number;
+  originalCurrency: string;
+  payments: OriginalAllocation[];
+  splits: OriginalAllocation[];
+}
+export interface CreateExpenseRequest extends ExpenseFinancialInput {
+  clientExpenseId: string;
+  description: string;
+}
+export interface UpdateExpenseRequest {
   id: string;
+  description?: string;
+  financial?: ExpenseFinancialInput;
 }

@@ -41,7 +41,8 @@
                   'c-text': member.net === 0,
                 }"
               >
-                {{ member.net > 0 ? '+' : '' }}{{ member.net | number: '1.2-2' }} BAM
+                {{ member.net > 0 ? '+' : '' }}{{ member.net | number: '1.2-2' }}
+                {{ balance()?.currency }}
               </span>
             </div>
 
@@ -89,7 +90,9 @@
 
                     <!-- Arrow + amount -->
                     <div class="edge-flow">
-                      <span class="edge-amount"> {{ edge.amount | number: '1.2-2' }} BAM </span>
+                      <span class="edge-amount">
+                        {{ edge.amount | number: '1.2-2' }} {{ balance()?.currency }}
+                      </span>
                       <div class="arrow-track">
                         <div class="arrow-line"></div>
                         <div class="arrow-head"></div>

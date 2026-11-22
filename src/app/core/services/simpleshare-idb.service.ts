@@ -13,13 +13,22 @@ export class SimpleShareIdbService {
     if (this.db) return of(void 0);
 
     return from(
-      openDB<SimpleShareDB>('simpleshare-db', 3, {
-        upgrade(db) {
-          db.createObjectStore('expenses');
-          db.createObjectStore('pending_expenses', { keyPath: 'tempId' });
-          db.createObjectStore('group_members');
-          db.createObjectStore('groups');
-          db.createObjectStore('group_overview');
+      openDB<SimpleShareDB>('simpleshare-db', 4, {
+        upgrade(db, oldVersion, _newVersion, transaction) {
+          for (const name of [
+            'expenses',
+            'pending_expenses',
+            'group_members',
+            'groups',
+            'group_overview',
+          ] as const) {
+            if (!db.objectStoreNames.contains(name)) {
+              if (name === 'pending_expenses')
+                db.createObjectStore(name, { keyPath: 'tempId' });
+              else db.createObjectStore(name);
+            } else if (oldVersion < 4 && name !== 'group_members')
+              transaction.objectStore(name).clear();
+          }
         },
       }),
     ).pipe(

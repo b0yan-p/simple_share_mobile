@@ -1,4 +1,9 @@
 export interface ExpenseDetail {
+  groupCurrency: string;
+  originalCurrency: string;
+  originalAmount: number;
+  exchangeRate: number;
+  exchangeRateDate: string | null;
   id: string;
   description: string;
   expenseDate: string;
@@ -17,6 +22,7 @@ export interface ExpenseLogInfo {
 }
 
 export interface ExpenseMemberAmount {
+  originalAmount: number;
   memberId: string;
   memberName: string;
   amount: number;

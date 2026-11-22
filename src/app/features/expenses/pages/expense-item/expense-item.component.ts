@@ -1,3 +1,6 @@
+import { localCalendarDate } from 'src/app/shared/utils/calendar-date';
+import { CurrencyPickerComponent } from 'src/app/shared/components/currency-picker/currency-picker.component';
+import { GroupFacade } from 'src/app/features/groups/services/group-facade.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -35,7 +38,7 @@ import {
   timeOutline,
   walletOutline,
 } from 'ionicons/icons';
-import { concatMap, first, from } from 'rxjs';
+import { concatMap, first, from, forkJoin } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
@@ -46,13 +49,8 @@ import { AllocationKind, draftKey, expensePath } from '../../models/expense-draf
 import { ExpenseDraftStore } from '../../services/expense-draft.store';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
-import {
-  AMOUNT_MAX,
-  AMOUNT_MIN,
-  CURRENCY,
-  DESCRIPTION_MAX_LENGTH,
-} from '../../utils/expense.constants';
-import { fromMinor, toMinor } from '../../utils/money.util';
+import { AMOUNT_MAX, AMOUNT_MIN, DESCRIPTION_MAX_LENGTH } from '../../utils/expense.constants';
+import { fromMinor, toMinor, hasTwoDecimalPrecision } from '../../utils/money.util';
 
 /**
  * Add / Edit Expense. The page owns the whole expense draft: amount, description
@@ -65,6 +63,7 @@ import { fromMinor, toMinor } from '../../utils/money.util';
   templateUrl: './expense-item.component.html',
   styleUrls: ['./expense-item.component.scss'],
   imports: [
+    CurrencyPickerComponent,
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
@@ -94,7 +93,14 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
   readonly draftStore = inject(ExpenseDraftStore);
   readonly uiService = inject(UiService);
 
-  readonly currency = CURRENCY;
+  private readonly groupFacade = inject(GroupFacade);
+  readonly maxDate = localCalendarDate();
+  get currency(): string {
+    return this.draftStore.currency();
+  }
+  changeCurrency(value: string): void {
+    this.draftStore.setCurrency(value);
+  }
   readonly amountMax = AMOUNT_MAX;
   readonly descriptionMaxLength = DESCRIPTION_MAX_LENGTH;
 
@@ -106,7 +112,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
 
   /** Members could not be loaded from either the network or the cache. */
   readonly membersError = signal(false);
-  /** One save request at a time — guards against double taps on the CTA. */
+  /** One save request at a time , guards against double taps on the CTA. */
   readonly saving = signal(false);
 
   private readonly formValid = signal(false);
@@ -125,14 +131,16 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
       Validators.required,
       Validators.min(AMOUNT_MIN),
       Validators.max(AMOUNT_MAX),
+      (control) =>
+        control.value == null || hasTwoDecimalPrecision(Number(control.value))
+          ? null
+          : { amountPrecision: true },
     ]),
     description: new FormControl<string>('', [
       Validators.required,
       Validators.maxLength(DESCRIPTION_MAX_LENGTH),
     ]),
-    expenseDate: new FormControl<string | null>(new Date().toISOString(), [
-      Validators.required,
-    ]),
+    expenseDate: new FormControl<string | null>(localCalendarDate(), [Validators.required]),
   });
 
   readonly totalMinor = this.draftStore.totalMinor;
@@ -144,13 +152,13 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
   readonly payerError = computed(() => this.totalMinor() > 0 && !this.draftStore.payerValid());
   readonly splitError = computed(() => this.totalMinor() > 0 && !this.draftStore.splitValid());
 
-  readonly canSave = computed(
-    () =>
-      this.formValid() &&
-      this.draftStore.payerValid() &&
-      this.draftStore.splitValid() &&
-      !this.saving(),
-  );
+  readonly canSave = computed(() => {
+    this.formTick();
+    if (this.saving()) return false;
+    if (this.editMode && !this.draftStore.draft()?.financialChanged)
+      return this.form.controls.description.valid;
+    return this.formValid() && this.draftStore.payerValid() && this.draftStore.splitValid();
+  });
 
   /** Inline description error, shown only once the user has engaged with it. */
   readonly descriptionError = computed(() => {
@@ -185,7 +193,10 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
 
     this.form.controls.totalAmount.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe((amount) => this.draftStore.setTotalMinor(toMinor(amount)));
+      .subscribe((amount) => {
+        this.draftStore.setTotalMinor(toMinor(amount));
+        this.draftStore.markFinancialChanged();
+      });
 
     this.form.controls.description.valueChanges
       .pipe(takeUntilDestroyed())
@@ -196,7 +207,9 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.form.controls.expenseDate.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe((expenseDate) =>
-        this.draftStore.patchDetails({ expenseDate: expenseDate ?? new Date().toISOString() }),
+        this.draftStore.patchDetails({
+          expenseDate: expenseDate?.slice(0, 10) ?? localCalendarDate(),
+        }),
       );
 
     this.form.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
@@ -218,7 +231,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.editMode = !!this.expenseId;
     this.pendingMode = !!this.pendingTempId;
 
-    // Returning from the payer / split editor — the draft (and therefore the
+    // Returning from the payer / split editor , the draft (and therefore the
     // members and the amounts) is already in place, so leave it alone.
     if (this.draftStore.isFor(this.currentDraftKey())) {
       this.focusAmountOnEnter = false;
@@ -229,7 +242,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.focusAmountOnEnter = !this.editMode && !this.pendingMode;
 
     this.draftStore.clear();
-    this.form.reset({ expenseDate: new Date().toISOString() });
+    this.form.reset({ expenseDate: localCalendarDate() });
     this.formValid.set(this.form.valid);
     this.formTick.update((tick) => tick + 1);
     this.loadMembers();
@@ -237,7 +250,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
 
   /**
    * Ionic fires this once the page transition has finished, which is the point
-   * the input is mounted and actually focusable — no setTimeout guessing at how
+   * the input is mounted and actually focusable , no setTimeout guessing at how
    * long the animation takes.
    */
   ionViewDidEnter(): void {
@@ -267,13 +280,20 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
   loadMembers(): void {
     this.membersError.set(false);
 
-    this.groupMemberFacade.getGroupMembers(this.groupId).subscribe({
-      next: (members) => {
+    forkJoin({
+      members: this.groupMemberFacade.getGroupMembers(this.groupId),
+      group: this.groupFacade.loadGroupOverview(this.groupId),
+    }).subscribe({
+      next: ({ members, group }) => {
+        if (!group?.currency) {
+          this.membersError.set(true);
+          return;
+        }
         const key = this.currentDraftKey();
 
         if (this.pendingMode) this.loadPendingExpenseData(key, members);
         else if (this.editMode) this.loadExpenseData(key, members);
-        else this.draftStore.start(key, this.groupId, members);
+        else this.draftStore.start(key, this.groupId, members, group.currency);
 
         this.syncFormFromDraft();
       },
@@ -315,18 +335,22 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.uiService.itemLoading.set(true);
 
     const basePayload: CreateExpenseRequest = {
+      clientExpenseId: draft.expenseId,
       description: draft.description,
-      expenseDate: draft.expenseDate,
-      totalAmount: fromMinor(draft.totalMinor),
+      expenseDate: draft.expenseDate.slice(0, 10),
+      originalAmount: fromMinor(draft.totalMinor),
+      originalCurrency: draft.currency,
       payments: toMemberAmounts(draft.payers.entries),
       splits: toMemberAmounts(draft.splits.entries),
     };
 
-    const onError = (err: { error?: { message?: string } }) => {
+    const onError = (err: { error?: { detail?: string; message?: string } }) => {
       // The draft is deliberately left intact so the user can retry.
       this.saving.set(false);
       this.uiService.itemLoading.set(false);
-      this.toastService.errorToast(err?.error?.message ?? 'Failed to save expense');
+      this.toastService.errorToast(
+        err?.error?.detail ?? err?.error?.message ?? 'Failed to save expense',
+      );
     };
 
     if (this.pendingMode) {
@@ -340,10 +364,24 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
           error: onError,
         });
     } else if (this.editMode) {
-      // The legacy service does not touch the cache, so drop it explicitly —
+      // The legacy service does not touch the cache, so drop it explicitly ,
       // otherwise the list would keep serving the pre-edit rows.
       this.expenseService
-        .updateExpense(this.groupId, { ...basePayload, id: this.expenseId })
+        .updateExpense(this.groupId, {
+          id: this.expenseId,
+          description: draft.description,
+          ...(draft.financialChanged
+            ? {
+                financial: {
+                  expenseDate: basePayload.expenseDate,
+                  originalAmount: basePayload.originalAmount,
+                  originalCurrency: basePayload.originalCurrency,
+                  payments: basePayload.payments,
+                  splits: basePayload.splits,
+                },
+              }
+            : {}),
+        })
         .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
         .subscribe({
           next: () => {
@@ -407,7 +445,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
       {
         totalAmount: draft.totalMinor ? fromMinor(draft.totalMinor) : null,
         description: draft.description,
-        expenseDate: draft.expenseDate,
+        expenseDate: draft.expenseDate.slice(0, 10),
       },
       { emitEvent: false },
     );
@@ -421,11 +459,19 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
         if (!pending) return;
 
         this.draftStore.hydrate(key, this.groupId, members, {
+          id: pending.tempId,
           description: pending.payload.description,
           expenseDate: pending.payload.expenseDate,
-          totalAmount: pending.payload.totalAmount,
-          payments: pending.payload.payments,
-          splits: pending.payload.splits,
+          totalAmount: pending.payload.originalAmount,
+          currency: pending.payload.originalCurrency,
+          payments: pending.payload.payments.map((x) => ({
+            memberId: x.memberId,
+            amount: x.originalAmount,
+          })),
+          splits: pending.payload.splits.map((x) => ({
+            memberId: x.memberId,
+            amount: x.originalAmount,
+          })),
         });
         this.syncFormFromDraft();
       },
@@ -437,11 +483,19 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.expenseService.getExpense(this.groupId, this.expenseId).subscribe({
       next: (expense) => {
         this.draftStore.hydrate(key, this.groupId, members, {
+          id: expense.id,
           description: expense.description,
           expenseDate: expense.expenseDate,
-          totalAmount: expense.amount,
-          payments: expense.paidBy,
-          splits: expense.splittedBy,
+          totalAmount: expense.originalAmount,
+          currency: expense.originalCurrency,
+          payments: expense.paidBy.map((x) => ({
+            memberId: x.memberId,
+            amount: x.originalAmount,
+          })),
+          splits: expense.splittedBy.map((x) => ({
+            memberId: x.memberId,
+            amount: x.originalAmount,
+          })),
         });
         this.syncFormFromDraft();
       },
@@ -455,5 +509,8 @@ function toMemberAmounts(
 ) {
   return entries
     .filter((entry) => entry.selected && entry.amountMinor > 0)
-    .map((entry) => ({ memberId: entry.memberId, amount: fromMinor(entry.amountMinor) }));
+    .map((entry) => ({
+      memberId: entry.memberId,
+      originalAmount: fromMinor(entry.amountMinor),
+    }));
 }

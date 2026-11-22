@@ -25,7 +25,7 @@
             class="font-18 font-w-400"
             [ngClass]="{ 'c-success': net >= 0, 'c-error': net < 0 }"
           >
-            BAM
+            {{ group.currency }}
           </span>
         </div>
 
@@ -56,7 +56,7 @@
               <span class="font-18 font-w-500">
                 {{ group.myDebtSummary.paidTotal }}
               </span>
-              <span class="font-14">BAM</span>
+              <span class="font-14">{{ group.currency }}</span>
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@
               <span class="font-18 font-w-500">
                 {{ group.myDebtSummary.owedTotal }}
               </span>
-              <span class="font-14">BAM</span>
+              <span class="font-14">{{ group.currency }}</span>
             </div>
           </div>
         </div>

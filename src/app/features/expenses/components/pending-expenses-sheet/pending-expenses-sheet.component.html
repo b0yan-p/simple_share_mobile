@@ -21,9 +21,15 @@
           <div class="pending-card__main">
             <ion-icon name="time-outline" class="pending-card__icon" />
             <div class="pending-card__info">
-              <span class="pending-card__description">{{ item.payload.description }}</span>
+              <span class="pending-card__description"
+                >{{ item.payload.description }}
+                @if (item.lastError) {
+                  <p role="alert">{{ item.lastError }}</p>
+                }
+              </span>
               <span class="pending-card__meta">
-                {{ item.payload.totalAmount | number: '1.2-2' }} BAM &nbsp;·&nbsp;
+                {{ item.payload.originalAmount | number: '1.2-2' }}
+                {{ item.payload.originalCurrency }} &nbsp;·&nbsp;
                 {{ item.createdAt | date: 'dd MMM yyyy' }}
               </span>
             </div>

@@ -12,7 +12,7 @@ export function mapGroupListItems(items: GroupListItem[]): GroupListItem[] {
       item.netBalance === 0
         ? 'Settled Up'
         : item.netBalance > 0
-          ? `You are Owed BAM ${item.netBalance.toFixed(2)}`
-          : `You Owe BAM ${Math.abs(item.netBalance).toFixed(2)}`,
+          ? `You are Owed ${item.currency} ${item.netBalance.toFixed(2)}`
+          : `You Owe ${item.currency} ${Math.abs(item.netBalance).toFixed(2)}`,
   }));
 }

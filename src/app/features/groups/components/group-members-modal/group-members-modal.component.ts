@@ -66,6 +66,7 @@ export class GroupMembersModalComponent implements OnInit {
   /** Whether anything changed, so the caller knows to refresh its own list. */
   private changed = signal(false);
 
+  private currency = '';
   private netByMemberId = signal(new Map<string, number>());
 
   withoutAccountCount = computed(() => this.members().filter((m) => isVirtualMember(m)).length);
@@ -131,6 +132,7 @@ export class GroupMembersModalComponent implements OnInit {
         componentProps: {
           groupId: this.groupId,
           member,
+          currency: this.currency,
           netBalance: this.netByMemberId().get(member.memberId) ?? null,
           canRemove: this.viewerIsOwner() && member.memberId !== this.currentMemberId,
         },
@@ -167,6 +169,7 @@ export class GroupMembersModalComponent implements OnInit {
     }).pipe(
       tap(({ members, balances }) => {
         this.members.set(members ?? []);
+        this.currency = balances?.currency ?? '';
         this.netByMemberId.set(
           new Map((balances?.members ?? []).map((b) => [b.memberId, b.net])),
         );

@@ -52,3 +52,8 @@ export function splitEquallyMinor(totalMinor: number, count: number): number[] {
 export function sumMinor(values: readonly number[]): number {
   return values.reduce((sum, value) => sum + value, 0);
 }
+
+/** Universal two-decimal input policy, independent of a currency's native minor units. */
+export function hasTwoDecimalPrecision(value: number): boolean {
+  return Number.isFinite(value) && Math.abs(value * 100 - Math.round(value * 100)) < 0.0000001;
+}

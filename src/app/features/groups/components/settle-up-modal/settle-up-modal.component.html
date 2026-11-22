@@ -73,6 +73,15 @@
 
         <!-- ─── Payment result ─── -->
         @switch (amountState()) {
+          @case ('limit') {
+            <p class="result result--error" role="alert">
+              Payment cannot exceed {{ amountMax | number: '1.2-2' }} {{ currency }}. You can
+              record a partial payment.
+            </p>
+          }
+          @case ('precision') {
+            <p class="result result--error" role="alert">Use at most two decimal places.</p>
+          }
           @case ('settles') {
             <div class="result result--success" role="status">
               <ion-icon name="checkmark-circle" aria-hidden="true" />
@@ -150,6 +159,7 @@
               size="cover"
               [showDefaultButtons]="true"
               presentation="date"
+              [max]="maxDate"
               formControlName="date"
             />
           </ion-content>

@@ -25,7 +25,6 @@ import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty
 import { ExpenseDetail } from '../../models/expense.model';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { ExpenseService } from '../../services/expense.service';
-import { CURRENCY } from '../../utils/expense.constants';
 
 @Component({
   selector: 'app-expense-detail',
@@ -60,7 +59,9 @@ export class ExpenseDetailComponent implements OnInit {
   private toastService = inject(ToastService);
   private tokenStorage = inject(TokenStorageService);
 
-  readonly currency = CURRENCY;
+  get currency(): string {
+    return this.expense()?.groupCurrency ?? '';
+  }
   expense = signal<ExpenseDetail | null>(null);
   loading = signal(true);
   notFound = signal(false);

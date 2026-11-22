@@ -13,6 +13,7 @@ import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.compo
 export class GroupBalanceOverviewComponent {
   data = input.required<MyDebtSummary>();
   groupId = input.required<string>();
+  currency = input.required<string>();
   currentMemberId = input.required<string>();
   settled = output<void>();
 
@@ -41,6 +42,7 @@ export class GroupBalanceOverviewComponent {
         toIsCurrentUser,
         defaultAmount: edge.amount,
         groupId: this.groupId(),
+        currency: this.currency(),
       },
       breakpoints: [0, 0.85],
       initialBreakpoint: 0.85,

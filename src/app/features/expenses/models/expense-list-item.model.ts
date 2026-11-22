@@ -5,6 +5,9 @@ export interface ExpenseListItem {
 }
 
 export interface ExpenseListItemDetails {
+  groupCurrency: string;
+  originalCurrency: string;
+  originalAmount: number;
   id: string;
   description: string;
   expenseDate: string;
