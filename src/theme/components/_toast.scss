@@ -43,14 +43,14 @@ ion-toast.custom-toast {
     }
   }
 
-  // Error — coral
+  // Error
   &.toast-error {
-    --background: #{p.$lp-tint-coral};
-    --color: #{p.$lp-coral-600};
-    --border-color: #{p.$lp-coral-200};
+    --background: var(--ss-error-bg);
+    --color: var(--ss-error-text);
+    --border-color: var(--ss-error-border);
 
     &::part(icon) {
-      background: #{p.$lp-coral-600};
+      background: var(--ss-error);
     }
   }
 

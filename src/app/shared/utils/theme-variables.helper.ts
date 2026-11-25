@@ -3,5 +3,5 @@ export const colors = {
   primary: '#e0690e',
   success: '#1eff7a',
   warn: '#facc15',
-  error: '#ef4444',
+  error: 'var(--ss-error)',
 };

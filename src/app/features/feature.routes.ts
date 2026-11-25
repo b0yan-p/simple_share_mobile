@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutWrapperComponent } from '../shared/wrappers/layout-wrapper/layout-wrapper.component';
+import type { SettingsComponent } from './settings/pages/settings/settings.component';
 
 export const routes: Routes = [
   {
@@ -124,6 +125,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        canDeactivate: [(page: SettingsComponent) => page.canLeave()],
         loadComponent: () =>
           import('./settings/pages/settings/settings.component').then(
             (m) => m.SettingsComponent,

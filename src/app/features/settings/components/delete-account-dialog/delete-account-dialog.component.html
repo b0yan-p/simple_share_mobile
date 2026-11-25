@@ -1,0 +1,66 @@
+<ion-modal
+  #deleteDialog
+  class="delete-account-modal"
+  [isOpen]="confirmationOpen()"
+  aria-label="Delete account?"
+  (didDismiss)="onConfirmationDismiss($event.detail.role)"
+>
+  <ng-template>
+    <div class="delete-account-dialog">
+      <header class="delete-account-heading">
+        <span class="delete-account-icon" aria-hidden="true">
+          <ion-icon [icon]="trashIcon" />
+        </span>
+        <h2>Delete account?</h2>
+      </header>
+
+      <p class="delete-account-intro">This action is permanent.</p>
+      <ul class="delete-account-consequences">
+        <li>Your account data will be deleted.</li>
+        <li>You’ll lose access to your groups.</li>
+        <li>Group members will still see your display name and past shared expenses.</li>
+        <li>Pending expenses on this device will be lost.</li>
+      </ul>
+
+      <p class="delete-account-warning">
+        <ion-icon [icon]="warningIcon" aria-hidden="true" />
+        <span>You can’t undo this action.</span>
+      </p>
+
+      <div class="delete-account-actions">
+        <ion-button fill="clear" (click)="deleteDialog.dismiss(undefined, 'cancel')">
+          Cancel
+        </ion-button>
+        <ion-button
+          color="danger"
+          class="delete-account-confirm"
+          (click)="deleteDialog.dismiss(undefined, 'confirm')"
+        >
+          Delete account
+        </ion-button>
+      </div>
+    </div>
+  </ng-template>
+</ion-modal>
+
+<ion-modal
+  class="delete-account-modal"
+  [isOpen]="deleting()"
+  [canDismiss]="canDismissProgress"
+  [backdropDismiss]="false"
+  aria-label="Deleting account"
+>
+  <ng-template>
+    <div class="delete-account-dialog delete-account-progress" role="status">
+      <span class="delete-account-icon" aria-hidden="true">
+        <ion-icon [icon]="trashIcon" />
+      </span>
+      <h2>Deleting account</h2>
+      <p>Please wait while we remove your account and sign you out.</p>
+      <span class="delete-account-spinner" aria-hidden="true">
+        <ion-spinner name="circular" color="primary" />
+      </span>
+      <p class="delete-account-progress-note">This may take a few moments.</p>
+    </div>
+  </ng-template>
+</ion-modal>

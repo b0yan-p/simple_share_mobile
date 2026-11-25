@@ -76,17 +76,17 @@
             <ion-icon name="swap-horizontal-outline" />
             <span>Settle up</span>
           </div>
-        } @else if (myNet() < 0) {
+        } @else if (currentMemberId() && myNet() < 0) {
           <div class="status-chip status-chip--error">
             <ion-icon name="wallet-outline" />
             <span>You owe {{ myNet() * -1 | number: '1.2-2' }} {{ currency }}</span>
           </div>
-        } @else if (myNet() > 0) {
+        } @else if (currentMemberId() && myNet() > 0) {
           <div class="status-chip status-chip--success">
             <ion-icon name="wallet-outline" />
             <span>You get {{ myNet() | number: '1.2-2' }} {{ currency }}</span>
           </div>
-        } @else {
+        } @else if (currentMemberId()) {
           <div class="status-chip status-chip--neutral">
             <ion-icon name="checkmark-circle-outline" />
             <span>Settled</span>

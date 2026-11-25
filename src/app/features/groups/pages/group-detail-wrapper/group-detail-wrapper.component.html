@@ -103,7 +103,7 @@
           <app-group-details [group]="group" (openSettleUp)="openSettleUp()" />
         }
         @case ('expenses') {
-          <app-expense-list />
+          <app-expense-list [currentMemberId]="group?.currentMemberId ?? null" />
         }
         @case ('balance') {
           <app-group-balance (paymentRecorded)="refreshOverview()" />

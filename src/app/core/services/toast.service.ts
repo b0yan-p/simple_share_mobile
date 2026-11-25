@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { ToastController } from '@ionic/angular/standalone';
 import { alert, checkmark, close, information } from 'ionicons/icons';
 
 @Injectable({

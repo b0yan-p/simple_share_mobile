@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -18,7 +18,6 @@ import {
 import { addIcons } from 'ionicons';
 import { timeOutline } from 'ionicons/icons';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
-import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
@@ -59,7 +58,7 @@ export class ExpenseListComponent implements OnInit {
   paginator = inject(ExpensePaginatorService);
   ui = inject(UiService);
   private readonly modalController = inject(ModalController);
-  private readonly tokenStorage = inject(TokenStorageService);
+  readonly currentMemberId = input<string | null>(null);
   protected readonly networkService = inject(NetworkService);
 
   readonly timeOutline = timeOutline;
@@ -115,38 +114,17 @@ export class ExpenseListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Ensure the current user signal is populated so "Paid by you" can resolve.
-    if (!this.tokenStorage.user()) {
-      this.tokenStorage.getUser().subscribe();
-    }
-
     this.routeParams$?.subscribe((groupId) => {
       this.facade.loadExpenses(groupId);
       this.loadPendingCount(groupId);
     });
   }
 
-  /**
-   * Renders the payer subtitle. If the sole payer's display name matches the
-   * logged-in user, shows "you"; otherwise the member name or a count.
-   */
   paidByLabel(expense: ExpenseListItemDetails): string {
-    if (expense.paidByMembers.length > 1) {
-      return `${expense.paidByMembers.length} people`;
-    }
-
-    const payer = expense.paidByMembers[0] ?? '';
-    return this.isCurrentUser(payer) ? 'you' : payer;
-  }
-
-  private isCurrentUser(displayName: string): boolean {
-    const me = this.tokenStorage.user();
-    if (!me || !displayName) return false;
-
-    const target = displayName.trim().toLowerCase();
-    return [me.fullName, `${me.firstName} ${me.lastName}`]
-      .filter(Boolean)
-      .some((name) => name.trim().toLowerCase() === target);
+    if (expense.paidByMembers.length > 1) return `${expense.paidByMembers.length} people`;
+    const payer = expense.payers?.[0];
+    if (payer && payer.memberId === this.currentMemberId()) return 'you';
+    return payer?.displayName ?? expense.paidByMembers[0] ?? '';
   }
 
   /** An expense is settled when the current user has no open balance on it. */

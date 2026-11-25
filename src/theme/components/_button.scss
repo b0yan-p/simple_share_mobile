@@ -74,10 +74,11 @@ ion-button.btn-subtle {
 
 // ─── Danger ───────────────────────────────────────────────────────────────────
 ion-button[color='danger'] {
-  --background: var(--ss-negative);
-  --background-activated: #{rgba(c.$error, 0.85)};
-  --background-hover: #{rgba(c.$error, 0.85)};
-  --color: #ffffff;
+  --background: var(--ss-error);
+  --background-activated: var(--ss-error-hover);
+  --background-hover: var(--ss-error-hover);
+  --background-focused: var(--ss-error-hover);
+  --color: var(--ion-color-danger-contrast);
   --box-shadow: 0 2px 8px #{rgba(c.$error, 0.2)};
 }
 

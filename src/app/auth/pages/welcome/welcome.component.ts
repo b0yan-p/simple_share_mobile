@@ -8,6 +8,7 @@ import { GoogleSignInButtonComponent } from 'src/app/shared/components/google-si
 import { addIcons } from 'ionicons';
 import { mailOutline, personAddOutline } from 'ionicons/icons';
 import { first } from 'rxjs';
+import { DeletedAccountCleanup } from '../../services/deleted-account-cleanup.service';
 import { AuthService } from '../../services/auth.service';
 import { isGoogleSignInCancelled } from '../../services/google-auth.service';
 
@@ -29,6 +30,9 @@ export class WelcomeComponent {
   readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
   constructor() {
+    if (inject(DeletedAccountCleanup).consumeSuccess()) {
+      void this.toastService.successToast('Your account has been deleted successfully.');
+    }
     addIcons({ mailOutline, personAddOutline });
   }
 

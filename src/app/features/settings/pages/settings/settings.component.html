@@ -57,7 +57,12 @@
         </h2>
         <ion-list class="settings-list">
           @for (row of section.rows; track row.label; let last = $last) {
-            <ion-item [lines]="last ? 'none' : 'inset'">
+            <ion-item
+              [button]="row.label === 'Delete Account'"
+              [detail]="false"
+              (click)="row.label === 'Delete Account' && deleteAccountDialog.open()"
+              [lines]="last ? 'none' : 'inset'"
+            >
               <ion-icon
                 slot="start"
                 class="row-icon"
@@ -208,3 +213,9 @@
     </ion-content>
   </ng-template>
 </ion-modal>
+
+<app-delete-account-dialog
+  #deleteAccountDialog
+  [deleting]="deleting()"
+  (confirmed)="deleteAccount()"
+/>

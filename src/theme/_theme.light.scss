@@ -2,6 +2,7 @@
 // Light theme — CSS custom properties.
 // Loaded via variables.scss → consumed at runtime by all components.
 // ─────────────────────────────────────────────────────────────────────────────
+@use 'sass:color';
 @use 'palette' as p;
 
 :root {
@@ -18,9 +19,15 @@
   --ion-color-success-contrast: #{p.$lp-text-on-dark};
   --ion-color-warning: #{p.$lp-warning};
   --ion-color-warning-rgb: 250, 204, 21;
-  --ion-color-danger: #{p.$lp-coral-600};
-  --ion-color-danger-rgb: 153, 60, 29;
+  --ion-color-danger: var(--ss-error);
+  --ion-color-danger-rgb:
+    #{color.channel(p.$lp-error, 'red', $space: rgb)},
+    #{color.channel(p.$lp-error, 'green', $space: rgb)},
+    #{color.channel(p.$lp-error, 'blue', $space: rgb)};
   --ion-color-danger-contrast: #{p.$lp-text-on-dark};
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: var(--ss-error-hover);
+  --ion-color-danger-tint: var(--ss-error-bg);
   --ion-color-tertiary: #{p.$lp-purple-200};
 
   --ion-background-color: #{p.$lp-bg};
@@ -79,11 +86,11 @@
   --ss-positive-bg: #{p.$lp-teal-50};
   --ss-positive-border: #{p.$lp-teal-400};
 
-  // Negative (coral)
-  --ss-negative: #{p.$lp-coral-600};
-  --ss-negative-muted: #{p.$lp-coral-200};
-  --ss-negative-bg: #{p.$lp-coral-50};
-  --ss-negative-border: #{p.$lp-coral-200};
+  // Negative
+  --ss-negative: var(--ss-error);
+  --ss-negative-muted: var(--ss-error-border);
+  --ss-negative-bg: var(--ss-error-bg);
+  --ss-negative-border: var(--ss-error-border);
 
   // Group balances
   --ss-balance-owe: #{p.$lp-balance-owe};
@@ -103,15 +110,17 @@
 
   // Error
   --ss-error: #{p.$lp-error};
-  --ss-error-text: #{p.$lp-error-text};
-  --ss-error-bg: #{p.$lp-tint-amber};
+  --ss-error-text: var(--ss-error);
+  --ss-error-bg: #{p.$lp-error-bg};
+  --ss-error-border: #{p.$lp-error-border};
+  --ss-error-hover: #{p.$lp-error-shade};
 
   // Borders
   --ss-border: #{p.$lp-border-card};
   --ss-border-input: #{p.$lp-border-input};
   --ss-border-focus: #{p.$lp-purple-600};
   --ss-border-valid: #{p.$lp-teal-600};
-  --ss-border-error: #{p.$lp-coral-600};
+  --ss-border-error: var(--ss-error);
   --ss-border-selected: #{p.$lp-purple-600};
 
   // Category tints

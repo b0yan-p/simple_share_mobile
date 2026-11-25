@@ -1,4 +1,5 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -29,12 +30,16 @@ import {
   shieldOutline,
   trashOutline,
 } from 'ionicons/icons';
-import { Subscription } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { DeletedAccountCleanup } from 'src/app/auth/services/deleted-account-cleanup.service';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
+import { NetworkService } from 'src/app/core/services/network.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { environment } from 'src/environments/environment';
 
+import { DeleteAccountDialogComponent } from '../../components/delete-account-dialog/delete-account-dialog.component';
 import { ProfileService } from '../../services/profile.service';
 
 @Component({
@@ -43,6 +48,7 @@ import { ProfileService } from '../../services/profile.service';
   styleUrls: ['./settings.component.scss'],
   imports: [
     AvatarComponent,
+    DeleteAccountDialogComponent,
     IonButton,
     IonButtons,
     IonContent,
@@ -63,6 +69,10 @@ export class SettingsComponent {
   protected readonly user = inject(TokenStorageService).user;
   private readonly profiles = inject(ProfileService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cleanup = inject(DeletedAccountCleanup);
+  private readonly toast = inject(ToastService);
+  private readonly network = inject(NetworkService);
+
   private loadRequest?: Subscription;
   protected readonly fullName = computed(() =>
     [this.user()?.firstName, this.user()?.lastName].filter(Boolean).join(' '),
@@ -71,6 +81,7 @@ export class SettingsComponent {
   protected readonly error = signal('');
   protected readonly canDismiss = async () => this.state() !== 'saving';
 
+  protected readonly deleting = signal(false);
   protected readonly editOpen = signal(false);
   protected readonly breakpoints = [0, 1];
   protected readonly form = inject(FormBuilder).nonNullable.group({
@@ -165,6 +176,63 @@ export class SettingsComponent {
           this.error.set('Could not save your profile. Please try again.');
         },
       });
+  }
+
+  canLeave(): boolean {
+    return !this.deleting() || this.cleanup.leaving || !this.user();
+  }
+
+  @HostListener('document:ionBackButton', ['$event'])
+  protectHardwareBack(event: Event): void {
+    if (
+      !this.canLeave() &&
+      event instanceof CustomEvent &&
+      typeof event.detail?.register === 'function'
+    ) {
+      event.detail.register(101, () => {});
+    }
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  protectDeletion(event: BeforeUnloadEvent): void {
+    if (!this.canLeave()) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
+
+  protected async deleteAccount(): Promise<void> {
+    if (this.deleting()) return;
+    if (!this.network.isOnline()) {
+      void this.toast.errorToast('Connect to the internet to delete your account.');
+      return;
+    }
+
+    this.deleting.set(true);
+    try {
+      await firstValueFrom(this.profiles.deleteAccount());
+    } catch (error) {
+      this.deleting.set(false);
+      if (
+        !this.cleanup.pending &&
+        !(error instanceof HttpErrorResponse && error.status === 401)
+      ) {
+        void this.toast.errorToast(
+          error instanceof HttpErrorResponse && error.status === 0
+            ? 'Connection lost. Account deletion could not be confirmed. Please try again.'
+            : 'Could not delete your account. Please try again.',
+        );
+      }
+      return;
+    }
+
+    try {
+      await this.cleanup.finish(true);
+    } catch {
+      // Bootstrap retries the durable cleanup before restoring a session.
+      this.cleanup.leaving = true;
+      window.location.reload();
+    }
   }
 
   protected logout(): void {

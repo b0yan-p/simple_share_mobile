@@ -1,7 +1,8 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
+import { catchError, takeUntil, throwError } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { DeletedAccountCleanup } from 'src/app/auth/services/deleted-account-cleanup.service';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 
 const SKIP_AUTH: (string | RegExp)[] = [
@@ -28,6 +29,7 @@ const skipsAuth = (url: string): boolean =>
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (skipsAuth(req.url)) return next(req);
 
+  const cleanup = inject(DeletedAccountCleanup);
   const tokenService = inject(TokenStorageService);
   const authService = inject(AuthService);
 
@@ -43,10 +45,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   });
 
   return next(authReq).pipe(
+    takeUntil(cleanup.ended),
     catchError((err) => {
       if (err?.status === 401) {
         // fire-and-forget logout
-        authService.logout();
+        if (err.headers?.get('X-Account-Deleted') === 'true') {
+          void cleanup.finish(false).catch(() => window.location.reload());
+        } else {
+          authService.logout();
+        }
       }
       return throwError(() => err);
     }),

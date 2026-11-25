@@ -1,0 +1,145 @@
+.delete-account-modal {
+  --width: min(420px, calc(100% - 32px));
+  --height: fit-content;
+  --max-height: calc(
+    100% - 32px - var(--ion-safe-area-top, 0px) - var(--ion-safe-area-bottom, 0px)
+  );
+  --border-radius: var(--ss-radius-2xl);
+  --background: var(--ss-bg);
+  --box-shadow: var(--ss-shadow-lg);
+  --backdrop-opacity: 0.42;
+}
+
+.delete-account-modal::part(content) {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.delete-account-dialog {
+  padding: clamp(16px, 5vw, 24px);
+  color: var(--ss-text-heading);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.delete-account-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.delete-account-dialog h2 {
+  margin: 0;
+  font-size: clamp(1.375rem, 7vw, 1.875rem);
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.delete-account-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--ss-error-bg);
+  color: var(--ss-error);
+  font-size: 28px;
+}
+
+.delete-account-intro {
+  margin: 14px 0 10px;
+  color: var(--ss-text);
+}
+
+.delete-account-consequences {
+  margin: 0;
+  padding-inline-start: 1.3em;
+
+  li + li {
+    margin-block-start: 5px;
+  }
+}
+
+.delete-account-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 11px 14px;
+  border-radius: var(--ss-radius-xl);
+  background: var(--ss-error-bg);
+  color: var(--ss-error-text);
+  font-weight: 600;
+
+  ion-icon {
+    flex: none;
+    font-size: 22px;
+  }
+}
+
+.delete-account-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 8px;
+  margin-block-start: 20px;
+
+  ion-button {
+    min-width: 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    font-size: 0.9375rem;
+  }
+
+  .delete-account-confirm {
+    --box-shadow: none;
+  }
+}
+
+.delete-account-progress {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 14px;
+  padding-block-end: clamp(24px, 7vw, 32px);
+
+  h2 {
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+  }
+
+  p {
+    grid-column: 2;
+    margin: 0;
+    color: var(--ss-text);
+  }
+
+  .delete-account-progress-note,
+  .delete-account-spinner {
+    margin-block-start: 14px;
+  }
+
+  .delete-account-progress-note {
+    font-style: italic;
+  }
+}
+
+.delete-account-spinner {
+  position: relative;
+  grid-column: 1 / -1;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+
+  &::before {
+    position: absolute;
+    inset: 1px;
+    border: 4px solid var(--ss-primary-border);
+    border-radius: 50%;
+    content: '';
+  }
+
+  ion-spinner {
+    width: 34px;
+    height: 34px;
+  }
+}

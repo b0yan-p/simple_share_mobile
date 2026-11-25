@@ -15,6 +15,7 @@ export interface ExpenseListItemDetails {
   amount: number;
   net: number;
   isSettleUp: boolean;
+  payers?: { memberId: string; displayName: string }[];
   paidByMembers: string[];
 }
 

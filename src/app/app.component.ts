@@ -1,11 +1,12 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { distinctUntilChanged, filter, forkJoin, switchMap } from 'rxjs';
-import { Router } from '@angular/router';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import { distinctUntilChanged, filter, forkJoin, switchMap, takeUntil } from 'rxjs';
+import { DeletedAccountCleanup } from './auth/services/deleted-account-cleanup.service';
 import { NetworkService } from './core/services/network.service';
 import { SimpleShareIdbService } from './core/services/simpleshare-idb.service';
 import { ExpenseFacade } from './features/expenses/services/expense-facade.service';
@@ -17,6 +18,7 @@ import { ExpenseFacade } from './features/expenses/services/expense-facade.servi
 })
 export class AppComponent implements OnInit {
   private readonly networkService = inject(NetworkService);
+  private readonly cleanup = inject(DeletedAccountCleanup);
   private readonly idb = inject(SimpleShareIdbService);
   private readonly expenseFacade = inject(ExpenseFacade);
   private readonly destroyRef = inject(DestroyRef);
@@ -33,6 +35,7 @@ export class AppComponent implements OnInit {
         distinctUntilChanged(),
         filter((isOnline) => isOnline),
         switchMap(() => this.expenseFacade.syncPendingExpenses()),
+        takeUntil(this.cleanup.ended),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe();

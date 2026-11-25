@@ -16,6 +16,10 @@ export class ProfileService {
   private readonly storage = inject(TokenStorageService);
   private readonly url = `${environment.baseAPIUrl}/profile/me`;
 
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(this.url);
+  }
+
   load(): Observable<Profile> {
     return this.refreshCache(this.http.get<Profile>(this.url));
   }

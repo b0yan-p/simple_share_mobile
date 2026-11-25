@@ -2,8 +2,8 @@
 // Palette — Single source of truth for all raw colour values.
 // Never consume these directly in components. Use variables.scss aliases
 // or CSS custom properties (--ss-*) instead.
-// Mirror: src/app/shared/utils/theme-variables.helper.ts
 // ─────────────────────────────────────────────────────────────────────────────
+@use 'sass:color';
 
 // ─── Light palette — Purple ───────────────────────────────────────────────────
 $lp-purple-50: #eeedfe;
@@ -18,11 +18,11 @@ $lp-teal-400: #1d9e75;
 $lp-teal-600: #0f6e56;
 $lp-teal-800: #085041;
 
-// ─── Light palette — Coral (negative / error) ─────────────────────────────────
-$lp-coral-50: #faece7;
-$lp-coral-200: #f0997b;
-$lp-coral-600: #993c1d;
-$lp-coral-800: #712b13;
+// Error and destructive actions
+$lp-error: #c13f3f;
+$lp-error-bg: color.mix($lp-error, #fff, $weight: 12%);
+$lp-error-border: color.mix($lp-error, #fff, $weight: 42%);
+$lp-error-shade: color.scale($lp-error, $lightness: -15%);
 
 // Group balances
 $lp-balance-owe: #d95038;
@@ -62,9 +62,6 @@ $lp-warning-text: #993c1d; // Darkened for WCAG AA on warning-bg
 // $lp-success-text: #22c55e;
 $lp-success: #1d9e75;
 $lp-success-text: #1d9e75;
-
-$lp-error: #ef4444;
-$lp-error-text: #ef4444;
 
 $lp-info: #38bdf8;
 $lp-info-text: #38bdf8;

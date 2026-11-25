@@ -13,6 +13,8 @@ import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { AuthBootstrapService } from './app/auth/services/auth-bootstrap.service';
 import { authInterceptor } from './app/core/interceptors/auth-interceptor.interceptor';
+import { firstValueFrom } from 'rxjs';
+import { DeletedAccountCleanup } from './app/auth/services/deleted-account-cleanup.service';
 import { SimpleShareIdbService } from './app/core/services/simpleshare-idb.service';
 
 bootstrapApplication(AppComponent, {
@@ -25,11 +27,16 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAppInitializer(() => {
       const boot = inject(AuthBootstrapService);
-      return boot.init();
-    }),
-    provideAppInitializer(() => {
+      const cleanup = inject(DeletedAccountCleanup);
       const idb = inject(SimpleShareIdbService);
-      return idb.initialize();
+      return (async () => {
+        if (cleanup.pending) {
+          await cleanup.recover();
+          // Navigation starts a new bootstrap on welcome.
+          return new Promise<void>(() => {});
+        }
+        await Promise.all([firstValueFrom(idb.initialize()), firstValueFrom(boot.init())]);
+      })();
     }),
   ],
 });

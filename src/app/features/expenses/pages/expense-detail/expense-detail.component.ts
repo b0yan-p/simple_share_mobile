@@ -18,8 +18,8 @@ import {
   IonToolbar,
 } from '@ionic/angular/standalone';
 import { concatMap } from 'rxjs';
-import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { GroupFacade } from 'src/app/features/groups/services/group-facade.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ExpenseDetail } from '../../models/expense.model';
@@ -57,7 +57,9 @@ export class ExpenseDetailComponent implements OnInit {
   private expenseService = inject(ExpenseService);
   private expenseFacade = inject(ExpenseFacade);
   private toastService = inject(ToastService);
-  private tokenStorage = inject(TokenStorageService);
+  private groups = inject(GroupFacade);
+
+  readonly currentMemberId = signal<string | null>(null);
 
   get currency(): string {
     return this.expense()?.groupCurrency ?? '';
@@ -71,9 +73,9 @@ export class ExpenseDetailComponent implements OnInit {
     const exp = this.expense();
     if (!exp) return 0;
 
-    const sum = (rows: { memberName: string; amount: number }[]) =>
+    const sum = (rows: { memberId: string; amount: number }[]) =>
       rows
-        .filter((r) => this.isCurrentUser(r.memberName))
+        .filter((r) => r.memberId === this.currentMemberId())
         .reduce((acc, r) => acc + r.amount, 0);
 
     return Math.round((sum(exp.paidBy) - sum(exp.splittedBy)) * 100) / 100;
@@ -93,22 +95,13 @@ export class ExpenseDetailComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    if (!this.tokenStorage.user()) {
-      this.tokenStorage.getUser().subscribe();
-    }
     this.groupId = this.route.snapshot.params['id'];
     this.expenseId = this.route.snapshot.params['expenseId'];
+    this.groups
+      .loadGroupOverview(this.groupId)
+      .subscribe((group) => this.currentMemberId.set(group?.currentMemberId ?? null));
+
     this.loadExpense(this.expenseId);
-  }
-
-  private isCurrentUser(displayName: string): boolean {
-    const me = this.tokenStorage.user();
-    if (!me || !displayName) return false;
-
-    const target = displayName.trim().toLowerCase();
-    return [me.fullName, `${me.firstName} ${me.lastName}`]
-      .filter(Boolean)
-      .some((name) => name.trim().toLowerCase() === target);
   }
 
   navigateToEdit(): void {
