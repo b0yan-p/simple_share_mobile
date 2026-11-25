@@ -10,6 +10,10 @@ export interface Profile {
   displayName: string;
 }
 
+interface ProfileResponse extends Profile {
+  hasPassword: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private readonly http = inject(HttpClient);
@@ -21,14 +25,14 @@ export class ProfileService {
   }
 
   load(): Observable<Profile> {
-    return this.refreshCache(this.http.get<Profile>(this.url));
+    return this.refreshCache(this.http.get<ProfileResponse>(this.url));
   }
 
   save(profile: Profile): Observable<Profile> {
-    return this.refreshCache(this.http.put<Profile>(this.url, profile));
+    return this.refreshCache(this.http.put<ProfileResponse>(this.url, profile));
   }
 
-  private refreshCache(request: Observable<Profile>): Observable<Profile> {
+  private refreshCache(request: Observable<ProfileResponse>): Observable<Profile> {
     const session = this.storage.user();
     return request.pipe(
       switchMap((profile) => {
@@ -40,7 +44,14 @@ export class ProfileService {
         const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
         return this.storage
-          .setUser({ ...session, firstName, lastName, displayName, fullName })
+          .setUser({
+            ...session,
+            hasPassword: profile.hasPassword,
+            firstName,
+            lastName,
+            displayName,
+            fullName,
+          })
           .pipe(map(() => profile));
       }),
     );

@@ -1,0 +1,53 @@
+@use '../../../auth/styles/auth-fields';
+
+.profile-modal {
+  --height: min(530px, 90%);
+  --background: var(--ss-bg);
+
+  ion-toolbar,
+  ion-content {
+    --background: var(--ss-bg);
+  }
+}
+
+.close-icon {
+  font-size: 22px;
+}
+
+.profile-form {
+  @include auth-fields.fields;
+  --auth-purple: #7357e8;
+  gap: 0;
+
+  padding: 8px 24px calc(24px + var(--ion-safe-area-bottom, 0px));
+}
+
+.profile-field {
+  display: grid;
+  gap: 8px;
+
+  .field-label {
+    color: var(--ss-text-heading);
+    font-weight: 600;
+  }
+}
+
+.profile-field + .profile-field {
+  margin-top: 10px;
+}
+
+.sheet-actions {
+  margin-top: 20px;
+  display: grid;
+  gap: 4px;
+}
+
+.confirm-btn {
+  --border-radius: var(--ss-radius-xl);
+  height: 54px;
+}
+
+.cancel-btn {
+  --color: var(--ss-text);
+  font-size: 15px;
+}

@@ -1,12 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonContent,
@@ -27,19 +21,9 @@ import {
 import { first } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { GoogleSignInButtonComponent } from 'src/app/shared/components/google-sign-in-button/google-sign-in-button.component';
+import { PASSWORD_HINT, PASSWORD_PATTERN, passwordsMatch } from '../../password-policy';
 import { AuthService } from '../../services/auth.service';
 import { isGoogleSignInCancelled } from '../../services/google-auth.service';
-
-/** Mirrors the backend's Identity rules (Program.cs): 6+, upper, lower, digit. */
-const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-
-/** Group level, because it compares two controls. */
-function passwordsMatch(group: AbstractControl): ValidationErrors | null {
-  const password = group.get('password')?.value;
-  const repeat = group.get('repeatPassword')?.value;
-
-  return !repeat || password === repeat ? null : { passwordsMismatch: true };
-}
 
 const REQUIRED_MESSAGES: Record<string, string> = {
   firstName: 'First name is required.',
@@ -78,7 +62,7 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       repeatPassword: ['', [Validators.required]],
     },
-    { validators: passwordsMatch },
+    { validators: passwordsMatch('password') },
   );
 
   readonly loading = signal(false);
@@ -162,7 +146,7 @@ export class RegisterComponent {
     if (control.hasError('required')) return REQUIRED_MESSAGES[name];
     if (control.hasError('email')) return 'Enter a valid email address.';
     if (control.hasError('pattern')) {
-      return 'At least 6 characters, with an uppercase letter, a lowercase letter and a number.';
+      return PASSWORD_HINT;
     }
 
     if (name === 'repeatPassword' && this.form.hasError('passwordsMismatch')) {

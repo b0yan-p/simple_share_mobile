@@ -4,6 +4,7 @@ export interface LoginUser {
   lastName: string;
   displayName?: string;
   fullName: string;
+  hasPassword?: boolean;
   token: string;
   email: string;
 }

@@ -56,6 +56,13 @@ export class AuthService {
     return this.http.post<ConfirmEmailResult>(this.confirmEmailAPI, input).pipe(first());
   }
 
+  public changePassword(input: {
+    currentPassword: string;
+    newPassword: string;
+  }): Observable<void> {
+    return this.http.post<void>(`${environment.baseAPIUrl}/auth/change-password`, input);
+  }
+
   public login(input: LoginInput): Observable<boolean> {
     return this.http.post<LoginUser>(this.loginAPI, input).pipe(
       first(),

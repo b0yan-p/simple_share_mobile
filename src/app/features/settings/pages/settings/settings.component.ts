@@ -1,17 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
-  IonButton,
-  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
-  IonInput,
   IonItem,
   IonList,
-  IonModal,
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
@@ -19,7 +14,6 @@ import { addIcons } from 'ionicons';
 import {
   chatbubbleOutline,
   chevronForwardOutline,
-  closeOutline,
   documentTextOutline,
   informationCircleOutline,
   keyOutline,
@@ -30,7 +24,7 @@ import {
   shieldOutline,
   trashOutline,
 } from 'ionicons/icons';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { DeletedAccountCleanup } from 'src/app/auth/services/deleted-account-cleanup.service';
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
@@ -39,6 +33,8 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { environment } from 'src/environments/environment';
 
+import { ChangePasswordDialogComponent } from '../../components/change-password-dialog/change-password-dialog.component';
+import { EditProfileDialogComponent } from '../../components/edit-profile-dialog/edit-profile-dialog.component';
 import { DeleteAccountDialogComponent } from '../../components/delete-account-dialog/delete-account-dialog.component';
 import { ProfileService } from '../../services/profile.service';
 
@@ -48,19 +44,16 @@ import { ProfileService } from '../../services/profile.service';
   styleUrls: ['./settings.component.scss'],
   imports: [
     AvatarComponent,
+    ChangePasswordDialogComponent,
+    EditProfileDialogComponent,
     DeleteAccountDialogComponent,
-    IonButton,
-    IonButtons,
     IonContent,
     IonHeader,
     IonIcon,
-    IonInput,
     IonItem,
     IonList,
-    IonModal,
     IonTitle,
     IonToolbar,
-    ReactiveFormsModule,
   ],
 })
 export class SettingsComponent {
@@ -73,27 +66,18 @@ export class SettingsComponent {
   private readonly toast = inject(ToastService);
   private readonly network = inject(NetworkService);
 
-  private loadRequest?: Subscription;
   protected readonly fullName = computed(() =>
     [this.user()?.firstName, this.user()?.lastName].filter(Boolean).join(' '),
   );
-  protected readonly state = signal<'loading' | 'loadError' | 'ready' | 'saving'>('loading');
-  protected readonly error = signal('');
-  protected readonly canDismiss = async () => this.state() !== 'saving';
-
   protected readonly deleting = signal(false);
-  protected readonly editOpen = signal(false);
-  protected readonly breakpoints = [0, 1];
-  protected readonly form = inject(FormBuilder).nonNullable.group({
-    firstName: '',
-    lastName: '',
-    displayName: '',
-  });
-  protected readonly sections = [
+
+  protected readonly sections = computed(() => [
     {
       title: 'Account',
       rows: [
-        { label: 'Reset Password', icon: 'key-outline' },
+        ...(this.user()?.hasPassword
+          ? [{ label: 'Change password', icon: 'key-outline' }]
+          : []),
         { label: 'Delete Account', icon: 'trash-outline', danger: true },
       ],
     },
@@ -106,13 +90,12 @@ export class SettingsComponent {
         { label: 'About ShareOrb', icon: 'information-circle-outline' },
       ],
     },
-  ];
+  ]);
 
   constructor() {
     addIcons({
       chatbubbleOutline,
       chevronForwardOutline,
-      closeOutline,
       documentTextOutline,
       informationCircleOutline,
       keyOutline,
@@ -125,57 +108,15 @@ export class SettingsComponent {
     });
   }
 
-  protected editProfile(): void {
-    this.editOpen.set(true);
-    this.loadProfile();
-  }
-
-  protected loadProfile(): void {
-    this.loadRequest?.unsubscribe();
-    this.state.set('loading');
-    this.error.set('');
-    this.loadRequest = this.profiles
-      .load()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (profile) => {
-          this.form.reset(profile);
-          this.state.set('ready');
-        },
-        error: () => this.state.set('loadError'),
-      });
-  }
-
-  protected dismissProfile(): void {
-    this.loadRequest?.unsubscribe();
-    this.editOpen.set(false);
-  }
-
-  protected saveProfile(): void {
-    if (this.state() !== 'ready') return;
-    const values = this.form.getRawValue();
-    const firstName = values.firstName.trim();
-    const lastName = values.lastName.trim();
-    const displayName = values.displayName.trim();
-    if (!firstName || displayName.length < 2 || displayName.length > 80) {
-      this.error.set('Enter a first name and a display name between 2 and 80 characters.');
-      return;
+  ionViewWillEnter(): void {
+    if (this.user() && this.user()?.hasPassword === undefined) {
+      this.profiles
+        .load()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          error: () => void this.toast.errorToast('Could not load account settings.'),
+        });
     }
-    this.error.set('');
-    this.state.set('saving');
-    this.profiles
-      .save({ firstName, lastName, displayName })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.state.set('ready');
-          this.editOpen.set(false);
-        },
-        error: () => {
-          this.state.set('ready');
-          this.error.set('Could not save your profile. Please try again.');
-        },
-      });
   }
 
   canLeave(): boolean {
