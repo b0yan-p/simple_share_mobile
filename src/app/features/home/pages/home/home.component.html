@@ -20,55 +20,17 @@
     <p>Here's what's happening</p>
   </section>
 
-  <!-- Total net worth across all groups -->
-  <section class="total-debt-card">
-    @if (networkService.isOnline()) {
-      <div class="bdd-mr-1">
-        <img
-          [src]="true ? '/assets/images/logo.png' : '/assets/images/logo_sad.png'"
-          alt="logo"
-          class="logo"
-        />
-        <div class="shadow"></div>
-      </div>
-      <div class="bdd-mx-a">
-        @if (balanceSummary(); as summary) {
-          @for (bucket of summary.balances; track bucket.currency) {
-            <p>
-              {{ bucket.net > 0 ? 'You are owed' : bucket.net < 0 ? 'You owe' : 'Net settled' }}
-            </p>
-            <p class="amount">
-              {{ (bucket.net < 0 ? -bucket.net : bucket.net) | number: '1.2-2' }}
-              <span class="font-24">{{ bucket.currency }}</span>
-            </p>
-          } @empty {
-            <p class="amount">Settled up</p>
-          }
-          @if (summary.groupCount > 0) {
-            <p>
-              across {{ summary.groupCount }}
-              {{ summary.groupCount === 1 ? 'group' : 'groups' }}
-            </p>
-          }
-        } @else if (balanceLoading()) {
-          <ion-spinner name="crescent" />
-        }
-      </div>
-    } @else {
-      <div>
-        <img
-          [src]="'/assets/images/logo-offline.png'"
-          alt="logo-offline"
-          class="offline-logo"
-        />
-        <div class="shadow-offline"></div>
-      </div>
-      <div class="offline-info">
-        <p class="amount">You're offline</p>
-        <p>But don't worry,</p>
-        <p>You can still add expense</p>
-      </div>
-    }
+  <section class="create-group-card" aria-labelledby="create-group-heading">
+    <div class="create-group-card__illustration" aria-hidden="true">
+      <img src="/assets/images/logo.png" alt="" />
+    </div>
+    <div class="create-group-card__content">
+      <h2 id="create-group-heading">Ready to split?</h2>
+      <p>Create a group to start sharing expenses.</p>
+      <ion-button expand="block" type="button" (click)="openCreateGroup()"
+        >Create group</ion-button
+      >
+    </div>
   </section>
 
   <!-- Recent groups -->

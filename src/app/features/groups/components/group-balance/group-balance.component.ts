@@ -1,11 +1,25 @@
-import { DecimalPipe, NgClass } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, output, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  linkedSignal,
+  OnInit,
+  output,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { IonIcon, IonSpinner, ModalController } from '@ionic/angular/standalone';
 import { switchMap } from 'rxjs';
-import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
-import { DebtEdge } from '../../models/balance-response.model';
+import {
+  checkmarkCircleOutline,
+  chevronDownOutline,
+  chevronForwardOutline,
+  peopleOutline,
+} from 'ionicons/icons';
+import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { BalanceResponse, DebtEdge } from '../../models/balance-response.model';
 import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.component';
 
@@ -14,7 +28,7 @@ import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.compo
   templateUrl: './group-balance.component.html',
   styleUrls: ['./group-balance.component.scss'],
   standalone: true,
-  imports: [NgClass, DecimalPipe, IonIcon, IonSpinner, ChipComponent],
+  imports: [AvatarComponent, DecimalPipe, IonIcon, IonSpinner],
 })
 export class GroupBalanceComponent implements OnInit {
   private balanceFacade = inject(GroupBalanceFacade);
@@ -30,7 +44,40 @@ export class GroupBalanceComponent implements OnInit {
   readonly groupId = this.balanceFacade.store.groupId;
   readonly paymentRecorded = output<void>();
 
-  expandedMemberId = signal<string | null>(null);
+  readonly icons = {
+    chevronDownOutline,
+    chevronForwardOutline,
+    checkmarkCircleOutline,
+    peopleOutline,
+  };
+  readonly sections = computed(() => {
+    const data = this.balance();
+    if (!data) return [];
+    return [
+      {
+        title: 'Your settlements',
+        members: data.members.filter((m) => m.memberId === data.currentMemberId),
+      },
+      {
+        title: 'Other members’ settlements',
+        members: data.members.filter((m) => m.memberId !== data.currentMemberId),
+      },
+    ].filter((section) => section.members.length > 0);
+  });
+
+  readonly expandedMemberId = linkedSignal<BalanceResponse | null, string | null>({
+    source: this.balance,
+    computation: (data, previous) => {
+      if (!data) return null;
+      if (
+        previous?.source?.groupId === data.groupId &&
+        (previous.value === null || data.members.some((m) => m.memberId === previous.value))
+      ) {
+        return previous.value;
+      }
+      return data.members.find((m) => m.memberId === data.currentMemberId)?.memberId ?? null;
+    },
+  });
 
   edgesMap = computed(() => {
     const b = this.balance();
@@ -54,7 +101,7 @@ export class GroupBalanceComponent implements OnInit {
         switchMap((params) => this.balanceFacade.loadBalances(params['id'])),
         takeUntilDestroyed(this.destroy),
       )
-      .subscribe(() => this.expandedMemberId.set(this.balance()?.members[0]?.memberId ?? null));
+      .subscribe();
   }
 
   toggle(memberId: string): void {
@@ -65,17 +112,13 @@ export class GroupBalanceComponent implements OnInit {
     return this.edgesMap().get(memberId) ?? [];
   }
 
-  getInitials(displayName: string): string {
-    return displayName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  debtLabel(edge: DebtEdge, currentMemberId: string): string {
+    if (edge.debtorMemberId === currentMemberId) return `You owe ${edge.creditorDisplayName}`;
+    if (edge.creditorMemberId === currentMemberId) return `${edge.debtorDisplayName} owes you`;
+    return `${edge.debtorDisplayName} owes ${edge.creditorDisplayName}`;
   }
 
-  async openSettleUp(edge: DebtEdge, event: Event): Promise<void> {
-    event.stopPropagation();
+  async openSettleUp(edge: DebtEdge): Promise<void> {
     const currentMemberId = this.balance()?.currentMemberId ?? '';
 
     const fromIsCurrentUser = edge.debtorMemberId === currentMemberId;

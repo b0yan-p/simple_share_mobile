@@ -1,341 +1,144 @@
-@use './../../../../../theme/variables.scss' as c;
-
 :host {
   display: block;
-}
-
-// ─── Loading ──────────────────────────────────────────────────────────────────
-.loading-container {
-  display: flex;
-  justify-content: center;
-  padding: 48px 0;
-}
-
-// ─── Page wrapper ─────────────────────────────────────────────────────────────
-.balance-page {
   padding-bottom: 24px;
+  color: var(--ss-header-color);
 }
-
-// ─── Summary bar ──────────────────────────────────────────────────────────────
-.summary-bar {
-  display: flex;
-  align-items: center;
+section + section {
+  margin-top: 18px;
 }
-
-.summary-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.summary-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: c.$text;
-}
-
-.summary-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: c.$text-light;
-}
-
-.summary-divider {
-  width: 1px;
-  height: 38px;
-  background: c.$borders;
-}
-
-// ─── Members list ─────────────────────────────────────────────────────────────
-.members-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-// ─── Member card ──────────────────────────────────────────────────────────────
 .member-card {
-  background: c.$surface;
-  border: none;
   border-radius: 16px;
+  background: var(--ss-surface);
   overflow: hidden;
 }
-
-// ─── Member row ───────────────────────────────────────────────────────────────
-.member-row {
-  display: flex;
+.member-card + .member-card {
+  margin-top: 8px;
+}
+button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  text-align: start;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
-  user-select: none;
-
   &:active {
-    opacity: 0.75;
+    background: var(--ss-surface-subtle);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--ss-primary);
+    outline-offset: -2px;
   }
 }
-
-// ─── Member avatar ────────────────────────────────────────────────────────────
-.member-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  flex-shrink: 0;
-  border: 1.5px solid transparent;
-
-  &.avatar-positive {
-    background: rgba(c.$success, 0.12);
-    color: c.$success;
-    border-color: rgba(c.$success, 0.3);
-    box-shadow: 0 0 10px rgba(c.$success, 0.1);
+.member-header {
+  --balance-color: var(--ss-text);
+  --balance-bg: var(--ss-surface-subtle);
+  padding: 12px 16px;
+  &.positive {
+    --balance-color: var(--ss-balance-owed);
+    --balance-bg: var(--ss-balance-owed-bg);
   }
-
-  &.avatar-negative {
-    background: rgba(c.$error, 0.12);
-    color: c.$error;
-    border-color: rgba(c.$error, 0.3);
-    box-shadow: 0 0 10px rgba(c.$error, 0.1);
-  }
-
-  &.avatar-neutral {
-    background: rgba(c.$text, 0.08);
-    color: c.$text;
-    border-color: rgba(c.$text, 0.15);
+  &.negative {
+    --balance-color: var(--ss-balance-owe);
+    --balance-bg: var(--ss-balance-owe-bg);
   }
 }
-
-// ─── Member info ──────────────────────────────────────────────────────────────
-.member-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.details {
+  display: grid;
   gap: 3px;
-  min-width: 0;
+  overflow-wrap: anywhere;
 }
-
-.member-name {
+strong {
+  color: var(--ss-header-color);
   font-size: 15px;
   font-weight: 600;
-  color: c.$text-light;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
+.net {
+  color: var(--balance-color);
+  font-size: 14px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.debt-amount {
+  color: var(--ss-header-color);
+  font-size: 15px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.incoming {
+  color: var(--ss-balance-owed);
+}
+.outgoing {
+  color: var(--ss-balance-owe);
+}
+ion-icon {
+  font-size: 18px;
+  color: var(--ss-text);
+}
+.member-header ion-icon {
+  transition: transform 180ms ease;
+}
+.rotated {
+  transform: rotate(180deg);
+}
+.debt-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms ease;
 
-.member-net {
-  font-size: 13px;
+  &.expanded {
+    grid-template-rows: 1fr;
+  }
+}
+.debts {
+  overflow: hidden;
+  min-height: 0;
+  margin: 0 16px;
+  box-shadow: inset 0 1px var(--ss-border);
+}
+.debt-row {
+  position: relative;
+  min-height: 58px;
+  padding: 10px 0;
+  color: var(--ss-text);
+  font-size: 14px;
+  & + &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 50px;
+    border-top: 1px solid var(--ss-border);
+  }
+}
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--ss-primary);
   font-weight: 500;
 }
-
-.member-status {
-  flex-shrink: 0;
+.action ion-icon {
+  color: inherit;
 }
-
-// ─── Expand chevron ───────────────────────────────────────────────────────────
-.expand-chevron {
-  color: c.$text;
-  font-size: 18px;
-  flex-shrink: 0;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &.rotated {
-    transform: rotate(180deg);
+@media (prefers-reduced-motion: reduce) {
+  .debt-panel,
+  .member-header ion-icon {
+    transition: none;
   }
 }
-
-// ─── Debt details panel ───────────────────────────────────────────────────────
-.debt-details {
-  border-top: 1px solid c.$borders;
-  padding: 14px 16px;
-  background: c.$surface;
-  animation: slideDown 0.18s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.debt-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: c.$text;
-  margin-bottom: 10px;
-}
-
-.settled-row {
+.state,
+.settled {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 0;
-
-  ion-icon {
-    font-size: 18px;
-  }
-
-  span {
-    font-size: 14px;
-  }
+  color: var(--ss-text);
 }
-
-// ─── Debt edge row ────────────────────────────────────────────────────────────
-.debt-edge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 8px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(c.$borders, 0.5);
-  }
-
-  &:active {
-    background: rgba(c.$primary, 0.08);
-
-    .settle-cta {
-      background: rgba(c.$primary, 0.18);
-      border-color: rgba(c.$primary, 0.35);
-    }
-  }
-}
-
-// ─── Edge participants ────────────────────────────────────────────────────────
-.edge-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  width: 64px;
-  flex-shrink: 0;
-
-  &.edge-side-right {
-    align-items: center;
-  }
-
-  &.edge-focus .edge-avatar {
-    box-shadow: 0 0 0 2px currentColor;
-  }
-}
-
-.edge-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-
-  &.edge-debtor {
-    background: rgba(c.$error, 0.12);
-    color: c.$error;
-    border: 1px solid rgba(c.$error, 0.25);
-  }
-
-  &.edge-creditor {
-    background: rgba(c.$success, 0.12);
-    color: c.$success;
-    border: 1px solid rgba(c.$success, 0.25);
-  }
-}
-
-.edge-name {
-  font-size: 10px;
-  color: c.$text;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-}
-
-// ─── Arrow + amount ───────────────────────────────────────────────────────────
-.edge-flow {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.edge-amount {
-  font-size: 12px;
-  font-weight: 600;
-  color: c.$text-light;
-}
-
-.arrow-track {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 0 6px;
-}
-
-.arrow-line {
-  flex: 1;
-  height: 1.5px;
-  background: rgba(c.$primary, 0.35);
-}
-
-.arrow-head {
-  flex-shrink: 0;
-  width: 0;
-  height: 0;
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
-  border-left: 6px solid rgba(c.$primary, 0.55);
-}
-
-// Tap affordance so it's obvious the row opens the settle-up dialog
-.settle-cta {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(c.$primary, 0.1);
-  border: 1px solid rgba(c.$primary, 0.2);
-  color: c.$primary;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.state {
   padding: 48px 0;
-
-  ion-icon {
-    font-size: 32px;
-    color: c.$text;
-  }
-
-  p {
-    font-size: 14px;
-  }
+}
+.settled {
+  min-height: 48px;
 }
