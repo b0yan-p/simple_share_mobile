@@ -4,7 +4,207 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <p>settings works!</p>
-  <ion-button (click)="logout()">Logout</ion-button>
+<ion-content class="settings-content">
+  <main class="settings-body">
+    <div class="profile-card">
+      <app-avatar [name]="fullName()" [src]="null" [size]="58" aria-hidden="true" />
+      <div class="profile-copy">
+        <p class="profile-name">{{ fullName() }}</p>
+        <div class="profile-details">
+          @if (user()?.email; as email) {
+            <div class="profile-detail">
+              <ion-icon name="mail-outline" aria-hidden="true" />
+              <span class="detail-label">Email</span>
+              <span class="detail-value profile-email" [title]="email">{{ email }}</span>
+            </div>
+          }
+          @if (user()?.displayName; as displayName) {
+            <div class="profile-detail">
+              <ion-icon name="person-outline" aria-hidden="true" />
+              <span class="detail-label">Display name</span>
+              <span class="detail-value profile-display-name" [title]="displayName">{{
+                displayName
+              }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <section class="settings-section" aria-labelledby="settings-profile">
+      <h2 class="card-title font-14" id="settings-profile">Profile</h2>
+      <ion-list class="settings-list">
+        <ion-item [button]="true" [detail]="false" lines="none" (click)="editProfile()">
+          <ion-icon slot="start" class="row-icon" name="person-outline" aria-hidden="true" />
+          <span class="row-label">Edit Profile</span>
+          <ion-icon
+            slot="end"
+            class="row-arrow"
+            name="chevron-forward-outline"
+            aria-hidden="true"
+          />
+        </ion-item>
+      </ion-list>
+    </section>
+
+    @for (section of sections; track section.title; let sectionIndex = $index) {
+      <section
+        class="settings-section"
+        [attr.aria-labelledby]="'settings-section-' + sectionIndex"
+      >
+        <h2 class="card-title font-14" [id]="'settings-section-' + sectionIndex">
+          {{ section.title }}
+        </h2>
+        <ion-list class="settings-list">
+          @for (row of section.rows; track row.label; let last = $last) {
+            <ion-item [lines]="last ? 'none' : 'inset'">
+              <ion-icon
+                slot="start"
+                class="row-icon"
+                [class.danger]="row.danger"
+                [name]="row.icon"
+                aria-hidden="true"
+              />
+              <span class="row-label" [class.danger]="row.danger">{{ row.label }}</span>
+              <ion-icon
+                slot="end"
+                class="row-arrow"
+                name="chevron-forward-outline"
+                aria-hidden="true"
+              />
+            </ion-item>
+          }
+        </ion-list>
+      </section>
+    }
+
+    <ion-item
+      class="logout-row"
+      [button]="true"
+      [detail]="false"
+      lines="none"
+      (click)="logout()"
+    >
+      <ion-icon slot="start" class="row-icon" name="log-out-outline" aria-hidden="true" />
+      <span class="row-label">Log out</span>
+    </ion-item>
+
+    <footer class="settings-footer">
+      <ion-icon name="planet-outline" aria-hidden="true" />
+      <span class="footer-brand">ShareOrb</span>
+      <span aria-hidden="true">·</span>
+      <span>Version {{ appVersion }}</span>
+    </footer>
+  </main>
 </ion-content>
+
+<ion-modal
+  class="modal-sheet profile-modal"
+  [isOpen]="editOpen()"
+  [breakpoints]="breakpoints"
+  [initialBreakpoint]="1"
+  aria-label="Edit Profile"
+  [canDismiss]="canDismiss"
+  (didDismiss)="dismissProfile()"
+>
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-title>Edit Profile</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            fill="clear"
+            aria-label="Close"
+            [disabled]="state() === 'saving'"
+            (click)="dismissProfile()"
+          >
+            <ion-icon
+              name="close-outline"
+              slot="icon-only"
+              class="close-icon"
+              aria-hidden="true"
+            />
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      @if (state() === 'loading') {
+        <p class="ion-padding" role="status">Loading profile...</p>
+      } @else if (state() === 'loadError') {
+        <div class="ion-padding">
+          <p role="alert">Could not load your profile.</p>
+          <ion-button (click)="loadProfile()">Try again</ion-button>
+        </div>
+      } @else {
+        <form class="profile-form" [formGroup]="form" (ngSubmit)="saveProfile()">
+          <div class="profile-field">
+            <label class="field-label" for="profile-first-name">First name</label>
+            <div class="profile-field-input">
+              <ion-input
+                id="profile-first-name"
+                type="text"
+                [readonly]="state() === 'saving'"
+                formControlName="firstName"
+                aria-label="First name"
+                autocomplete="given-name"
+                autocapitalize="words"
+              />
+            </div>
+          </div>
+          <div class="profile-field">
+            <label class="field-label" for="profile-last-name">Last name</label>
+            <div class="profile-field-input">
+              <ion-input
+                id="profile-last-name"
+                type="text"
+                [readonly]="state() === 'saving'"
+                formControlName="lastName"
+                aria-label="Last name"
+                autocomplete="family-name"
+                autocapitalize="words"
+              />
+            </div>
+          </div>
+          <div class="profile-field">
+            <label class="field-label" for="profile-display-name">Display name</label>
+            <div class="profile-field-input">
+              <ion-input
+                id="profile-display-name"
+                type="text"
+                [readonly]="state() === 'saving'"
+                formControlName="displayName"
+                aria-label="Display name"
+                autocomplete="nickname"
+              />
+            </div>
+          </div>
+          @if (error()) {
+            <p role="alert">{{ error() }}</p>
+          }
+          <div class="sheet-actions">
+            <ion-button
+              type="submit"
+              [disabled]="state() === 'saving'"
+              expand="block"
+              color="primary"
+              class="confirm-btn"
+            >
+              Save
+            </ion-button>
+            <ion-button
+              type="button"
+              expand="block"
+              fill="clear"
+              class="cancel-btn"
+              [disabled]="state() === 'saving'"
+              (click)="dismissProfile()"
+            >
+              Cancel
+            </ion-button>
+          </div>
+        </form>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>
