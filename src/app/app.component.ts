@@ -62,13 +62,16 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   * Only the path is used: the host is the API domain that verified the link,
-   * and the path already matches an app route, so authGuard and its returnUrl
-   * handling keep working untouched.
+   * Reset links carry credentials in the fragment and open without updating browser history.
    */
   private followDeepLink(url: string): void {
     try {
-      const { pathname, search } = new URL(url);
+      const { pathname, search, hash } = new URL(url);
+      if (pathname === '/reset-password') {
+        void this.router.navigateByUrl(`${pathname}${hash}`, { skipLocationChange: true });
+        return;
+      }
+
       void this.router.navigateByUrl(`${pathname}${search}`);
     } catch {
       // A malformed URL is nothing the app can act on.

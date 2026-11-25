@@ -127,7 +127,10 @@ export class LoginComponent {
   }
 
   forgotPassword() {
-    // Password recovery lands here once the backend endpoint exists.
+    void this.router.navigate(['/forgot-password'], {
+      info: this.form.controls.email.value,
+      queryParams: { returnUrl: this.returnUrl },
+    });
   }
 
   goToRegister() {

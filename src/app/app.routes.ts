@@ -38,6 +38,21 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./auth/pages/forgot-password/forgot-password.component').then(
+        (c) => c.ForgotPasswordComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./auth/pages/reset-password/reset-password.component').then(
+        (c) => c.ResetPasswordComponent,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     canActivateChild: [authGuard],

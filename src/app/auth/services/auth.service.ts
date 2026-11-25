@@ -56,6 +56,18 @@ export class AuthService {
     return this.http.post<ConfirmEmailResult>(this.confirmEmailAPI, input).pipe(first());
   }
 
+  public forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${environment.baseAPIUrl}/auth/forgot-password`, { email });
+  }
+
+  public resetPassword(input: {
+    userId: string;
+    token: string;
+    newPassword: string;
+  }): Observable<void> {
+    return this.http.post<void>(`${environment.baseAPIUrl}/auth/forgot-password`, input);
+  }
+
   public changePassword(input: {
     currentPassword: string;
     newPassword: string;
@@ -91,6 +103,10 @@ export class AuthService {
   }
 
   public logout() {
+    this.clearSession().subscribe(() => this.router.navigate(['welcome']));
+  }
+
+  public clearSession(): Observable<boolean> {
     // Started first so it overlaps the local clear, but deliberately not waited
     // on: Play Services spends ~3s clearing the restore credential, while
     // dropping the local session - the part the user actually experiences as
@@ -106,9 +122,6 @@ export class AuthService {
       )
       .subscribe();
 
-    this.tokenStorage
-      .clearAll()
-      .pipe(first())
-      .subscribe(() => this.router.navigate(['welcome']));
+    return this.tokenStorage.clearAll().pipe(first());
   }
 }

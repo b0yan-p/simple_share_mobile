@@ -9,6 +9,7 @@ const SKIP_AUTH: (string | RegExp)[] = [
   // Signing in is how a token is obtained, so these cannot require one.
   '/auth/register',
   '/auth/login',
+  '/auth/forgot-password',
   '/auth/google',
   // Email confirmation happens before there is ever a session: the resend form
   // is reached from a refused login, and the confirmation link is followed out
