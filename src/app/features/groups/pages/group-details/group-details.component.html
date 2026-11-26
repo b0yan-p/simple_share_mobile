@@ -1,51 +1,66 @@
 @if (group(); as group) {
-  @let net = group.myDebtSummary.net;
-  @let balances = totals();
-  @let unsettled = balances.owe > 0 || balances.owed > 0;
+  @if (group.memberCount <= 1) {
+    <section class="invite-card" aria-labelledby="invite-card-title">
+      <img src="assets/images/invite-members.png" alt="" />
+      <h2 id="invite-card-title">Your group is ready</h2>
+      <p>Add friends first so you can start splitting expenses together.</p>
+      <ion-button expand="block" shape="round" (click)="openAddPeople.emit()">
+        <ion-icon slot="start" [icon]="icons.personAddOutline" />
+        Add group members
+      </ion-button>
+    </section>
+  } @else {
+    @let net = group.myDebtSummary.net;
+    @let balances = totals();
+    @let unsettled = balances.owe > 0 || balances.owed > 0;
 
-  <section class="balance-card" aria-label="Your balance">
-    <h2>Your balance</h2>
-    <div class="net">
-      <strong>{{ net | number: '1.2-2' }} {{ group.currency }}</strong>
-      <small class="font-w-500">{{
-        net < 0 ? 'You owe' : net > 0 ? 'You are owed' : 'Net balance is zero'
-      }}</small>
-    </div>
-    <div class="breakdown">
-      <div class="debt">
-        <span class="balance-arrow" aria-hidden="true">
-          <ion-icon [icon]="icons.arrowUpOutline" />
-        </span>
-        <div>
-          <small>You owe</small><b>{{ balances.owe | number: '1.2-2' }} {{ group.currency }}</b>
+    <section class="balance-card" aria-label="Your balance">
+      <h2>Your balance</h2>
+      <div class="net">
+        <strong>{{ net | number: '1.2-2' }} {{ group.currency }}</strong>
+        <small class="font-w-500">{{
+          net < 0 ? 'You owe' : net > 0 ? 'You are owed' : 'Net balance is zero'
+        }}</small>
+      </div>
+      <div class="breakdown">
+        <div class="debt">
+          <span class="balance-arrow" aria-hidden="true">
+            <ion-icon [icon]="icons.arrowUpOutline" />
+          </span>
+          <div>
+            <small>You owe</small
+            ><b>{{ balances.owe | number: '1.2-2' }} {{ group.currency }}</b>
+          </div>
+        </div>
+        <div class="credit">
+          <span class="balance-arrow" aria-hidden="true">
+            <ion-icon [icon]="icons.arrowDownOutline" />
+          </span>
+          <div>
+            <small>You are owed</small
+            ><b>{{ balances.owed | number: '1.2-2' }} {{ group.currency }}</b>
+          </div>
         </div>
       </div>
-      <div class="credit">
-        <span class="balance-arrow" aria-hidden="true">
-          <ion-icon [icon]="icons.arrowDownOutline" />
-        </span>
-        <div>
-          <small>You are owed</small
-          ><b>{{ balances.owed | number: '1.2-2' }} {{ group.currency }}</b>
-        </div>
-      </div>
-    </div>
-  </section>
-  <button
-    type="button"
-    class="settlements"
-    [disabled]="!unsettled"
-    (click)="openSettleUp.emit()"
-  >
-    <span class="settlements-icon" aria-hidden="true">
-      <ion-icon [icon]="icons.walletOutline" />
-    </span>
-    <span>
-      <b>Your settlements </b>
-      <small>{{ unsettled ? 'You have unsettled balances.' : "You're all settled up." }}</small>
-    </span>
-    @if (unsettled) {
-      <span class="action">Settle up <ion-icon [icon]="icons.chevronForwardOutline" /></span>
-    }
-  </button>
+    </section>
+    <button
+      type="button"
+      class="settlements"
+      [disabled]="!unsettled"
+      (click)="openSettleUp.emit()"
+    >
+      <span class="settlements-icon" aria-hidden="true">
+        <ion-icon [icon]="icons.walletOutline" />
+      </span>
+      <span>
+        <b>Your settlements </b>
+        <small>{{
+          unsettled ? 'You have unsettled balances.' : "You're all settled up."
+        }}</small>
+      </span>
+      @if (unsettled) {
+        <span class="action">Settle up <ion-icon [icon]="icons.chevronForwardOutline" /></span>
+      }
+    </button>
+  }
 }

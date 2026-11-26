@@ -52,7 +52,7 @@
               <ion-item
                 button
                 detail="false"
-                (click)="openMembers(group?.currentMemberId ?? null)"
+                (click)="openMembers(group?.currentMemberId || null)"
               >
                 <ion-label>Manage people</ion-label>
               </ion-item>
@@ -127,10 +127,14 @@
       <div class="tab-content" [class.ion-padding]="store.activeTab() !== 'expenses'">
         @switch (store.activeTab()) {
           @case ('overview') {
-            <app-group-details [group]="group" (openSettleUp)="openSettleUp()" />
+            <app-group-details
+              [group]="group"
+              (openSettleUp)="openSettleUp()"
+              (openAddPeople)="openAddMembers()"
+            />
           }
           @case ('expenses') {
-            <app-expense-list [currentMemberId]="group?.currentMemberId ?? null" />
+            <app-expense-list [currentMemberId]="group?.currentMemberId || null" />
           }
           @case ('balance') {
             <app-group-balance (paymentRecorded)="refreshOverview()" />
@@ -138,7 +142,10 @@
         }
       </div>
 
-      @if (store.activeTab() === 'overview' || store.activeTab() === 'expenses') {
+      @if (
+        (store.activeTab() === 'overview' && group.memberCount > 1) ||
+        store.activeTab() === 'expenses'
+      ) {
         <ion-button
           color="primary"
           class="add-expense"

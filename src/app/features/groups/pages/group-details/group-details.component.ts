@@ -1,10 +1,11 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import {
   arrowDownOutline,
   arrowUpOutline,
   chevronForwardOutline,
+  personAddOutline,
   walletOutline,
 } from 'ionicons/icons';
 import { GroupOverview } from '../../models/group-overview.model';
@@ -14,16 +15,18 @@ import { GroupOverview } from '../../models/group-overview.model';
   templateUrl: './group-details.component.html',
   styleUrls: ['./group-details.component.scss'],
   standalone: true,
-  imports: [DecimalPipe, IonIcon],
+  imports: [DecimalPipe, IonButton, IonIcon],
 })
 export class GroupDetailsComponent {
   readonly group = input<GroupOverview | null>(null);
   readonly openSettleUp = output<void>();
+  readonly openAddPeople = output<void>();
 
   protected readonly icons = {
     arrowDownOutline,
     arrowUpOutline,
     chevronForwardOutline,
+    personAddOutline,
     walletOutline,
   };
 

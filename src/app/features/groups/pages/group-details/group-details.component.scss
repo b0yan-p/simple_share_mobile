@@ -5,6 +5,73 @@
   --secondary: #585378;
 }
 
+.invite-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 10px 20px 20px;
+  border: 2px solid #fff;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff 40%, #f5f2ff);
+  box-shadow: 0 8px 24px rgba(84, 60, 171, 0.12);
+  text-align: center;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    width: 42%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #eee9ff;
+  }
+
+  &::before {
+    top: -31%;
+    left: -21%;
+  }
+
+  &::after {
+    right: -23%;
+    bottom: -38%;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    margin: -8px auto -20px;
+  }
+
+  h2 {
+    display: block;
+    padding: 0;
+    margin: 0;
+    font-size: clamp(21px, 6vw, 26px);
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 10px 0 22px;
+    color: var(--secondary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  ion-button {
+    margin: 0;
+    min-height: 48px;
+    font-weight: 600;
+    text-transform: none;
+    --border-radius: 999px;
+  }
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
 .balance-card,
 .settlements {
   position: relative;
