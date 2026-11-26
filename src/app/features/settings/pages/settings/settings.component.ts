@@ -36,6 +36,7 @@ import { environment } from 'src/environments/environment';
 import { ChangePasswordDialogComponent } from '../../components/change-password-dialog/change-password-dialog.component';
 import { EditProfileDialogComponent } from '../../components/edit-profile-dialog/edit-profile-dialog.component';
 import { DeleteAccountDialogComponent } from '../../components/delete-account-dialog/delete-account-dialog.component';
+import { HelpFeedbackSheetComponent } from '../../components/help-feedback-sheet/help-feedback-sheet.component';
 import { ProfileService } from '../../services/profile.service';
 
 @Component({
@@ -47,6 +48,7 @@ import { ProfileService } from '../../services/profile.service';
     ChangePasswordDialogComponent,
     EditProfileDialogComponent,
     DeleteAccountDialogComponent,
+    HelpFeedbackSheetComponent,
     IonContent,
     IonHeader,
     IonIcon,

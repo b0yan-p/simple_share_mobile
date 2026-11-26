@@ -14,17 +14,17 @@
           @if (user()?.email; as email) {
             <div class="profile-detail">
               <ion-icon name="mail-outline" aria-hidden="true" />
-              <span class="detail-label">Email</span>
-              <span class="detail-value profile-email" [title]="email">{{ email }}</span>
+              <span class="detail-label"
+                >Email: <strong>{{ email }}</strong>
+              </span>
             </div>
           }
           @if (user()?.displayName; as displayName) {
             <div class="profile-detail">
               <ion-icon name="person-outline" aria-hidden="true" />
-              <span class="detail-label">Display name</span>
-              <span class="detail-value profile-display-name" [title]="displayName">{{
-                displayName
-              }}</span>
+              <span class="detail-label">
+                Name: <strong>{{ displayName }}</strong>
+              </span>
             </div>
           }
         </div>
@@ -63,12 +63,14 @@
         <ion-list class="settings-list">
           @for (row of section.rows; track row.label; let last = $last) {
             <ion-item
-              [button]="section.title === 'Account'"
+              [button]="section.title === 'Account' || row.label === 'Help & Feedback'"
               [detail]="false"
               (click)="
                 row.label === 'Change password'
                   ? changePasswordDialog.open()
-                  : row.label === 'Delete Account' && deleteAccountDialog.open()
+                  : row.label === 'Delete Account'
+                    ? deleteAccountDialog.open()
+                    : row.label === 'Help & Feedback' && helpFeedbackSheet.open()
               "
               [lines]="last ? 'none' : 'inset'"
             >
@@ -114,6 +116,7 @@
 
 <app-edit-profile-dialog #editProfileDialog />
 <app-change-password-dialog #changePasswordDialog />
+<app-help-feedback-sheet #helpFeedbackSheet />
 <app-delete-account-dialog
   #deleteAccountDialog
   [deleting]="deleting()"

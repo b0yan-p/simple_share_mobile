@@ -126,26 +126,30 @@
       @if (activeTab() === 'virtual') {
         <p class="hint c-text">Add someone who doesn't use ShareOrb.</p>
 
-        <div class="name-row">
-          <ion-input
-            type="text"
-            [formControl]="displayName"
-            fill="outline"
-            label="Name"
-            labelPlacement="floating"
-            placeholder="e.g. Nikola"
-            autocapitalize="words"
-            (keyup.enter)="addVirtual()"
-          />
-          <ion-button
-            fill="outline"
-            class="add-btn"
-            [disabled]="submitting()"
-            (click)="addVirtual()"
-          >
-            <ion-icon name="add-outline" slot="start" />
-            Add
-          </ion-button>
+        <div class="name-field">
+          <label class="field-label" for="virtual-member-name">Name</label>
+          <div class="name-row">
+            <div class="name-input">
+              <ion-input
+                id="virtual-member-name"
+                type="text"
+                [formControl]="displayName"
+                placeholder="e.g. Nikola"
+                autocapitalize="words"
+                enterkeyhint="done"
+                (keyup.enter)="addVirtual()"
+              />
+            </div>
+            <ion-button
+              fill="outline"
+              class="add-btn"
+              [disabled]="submitting()"
+              (click)="addVirtual()"
+            >
+              <ion-icon name="add-outline" slot="start" />
+              Add
+            </ion-button>
+          </div>
         </div>
       }
 

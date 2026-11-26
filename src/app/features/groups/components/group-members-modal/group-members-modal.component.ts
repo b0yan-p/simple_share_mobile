@@ -119,8 +119,8 @@ export class GroupMembersModalComponent implements OnInit {
         tap(({ data }) => {
           this.addedCount.set(data?.addedCount ?? 0);
           this.changed.set(true);
-          this.load().subscribe();
         }),
+        switchMap(() => this.load()),
       )
       .subscribe();
   }
@@ -147,8 +147,8 @@ export class GroupMembersModalComponent implements OnInit {
         tap(() => {
           this.addedCount.set(0);
           this.changed.set(true);
-          this.load();
         }),
+        switchMap(() => this.load()),
       )
       .subscribe();
   }

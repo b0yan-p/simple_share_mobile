@@ -280,19 +280,56 @@ ion-content {
   font-size: 13px;
 }
 
+.name-field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .name-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+}
+
+.name-input {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 4px 14px;
+  border: 1px solid var(--ss-border-input);
+  border-radius: 14px;
+  background: var(--ss-surface);
+
+  &:focus-within {
+    border-color: var(--ss-border-focus);
+    box-shadow: 0 0 0 3px var(--ss-primary-subtle);
+  }
 
   ion-input {
     flex: 1;
+    min-width: 0;
+    --highlight-height: 0;
+    --padding-start: 0;
   }
+}
+
+.icon-tile {
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  height: 34px;
+  border-radius: 11px;
+  color: var(--ss-positive);
+  background: var(--ss-positive-bg);
+  font-size: 18px;
 }
 
 .add-btn {
   flex-shrink: 0;
+  height: 52px;
   margin: 0;
 }
 

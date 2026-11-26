@@ -33,6 +33,7 @@ import {
   close,
   closeOutline,
   ellipseOutline,
+  personOutline,
   qrCodeOutline,
   shareSocialOutline,
 } from 'ionicons/icons';
@@ -162,6 +163,7 @@ export class AddMemberModalComponent implements OnInit {
       close,
       closeOutline,
       ellipseOutline,
+      personOutline,
       qrCodeOutline,
       shareSocialOutline,
     });
