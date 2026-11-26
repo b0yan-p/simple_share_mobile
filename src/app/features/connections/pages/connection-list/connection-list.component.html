@@ -16,6 +16,14 @@
     <div class="loading-state">
       <ion-spinner name="crescent" />
     </div>
+  } @else if (service.error() && service.items().length === 0 && network.isOnline()) {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load friends"
+      [subtitle]="service.error()!"
+      actionLabel="Try again"
+      (action)="service.getAll()"
+    />
   } @else if (service.items().length === 0 && network.isOnline()) {
     <app-empty-state
       icon="people-outline"

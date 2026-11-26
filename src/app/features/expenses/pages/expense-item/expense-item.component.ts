@@ -38,8 +38,9 @@ import {
   timeOutline,
   walletOutline,
 } from 'ionicons/icons';
-import { concatMap, first, from, forkJoin } from 'rxjs';
+import { first, from, forkJoin } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { UiService } from 'src/app/core/services/ui.service';
 import { GroupMember } from 'src/app/features/groups/models/group-member.model';
 import { GroupMemberFacade } from 'src/app/features/groups/services/group-member-facade.service';
@@ -112,6 +113,8 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
 
   /** Members could not be loaded from either the network or the cache. */
   readonly membersError = signal(false);
+  readonly loading = signal(true);
+  readonly loadError = signal('');
   /** One save request at a time , guards against double taps on the CTA. */
   readonly saving = signal(false);
 
@@ -278,7 +281,9 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
    * cache fallback, which this screen used to reimplement without the fallback.
    */
   loadMembers(): void {
+    this.loading.set(true);
     this.membersError.set(false);
+    this.loadError.set('');
 
     forkJoin({
       members: this.groupMemberFacade.getGroupMembers(this.groupId),
@@ -286,21 +291,30 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     }).subscribe({
       next: ({ members, group }) => {
         if (!group?.currency) {
+          this.loading.set(false);
           this.membersError.set(true);
+          this.loadError.set('Group currency is unavailable. Try again.');
           return;
         }
         const key = this.currentDraftKey();
 
         if (this.pendingMode) this.loadPendingExpenseData(key, members);
         else if (this.editMode) this.loadExpenseData(key, members);
-        else this.draftStore.start(key, this.groupId, members, group.currency);
+        else {
+          this.draftStore.start(key, this.groupId, members, group.currency);
+          this.loading.set(false);
+        }
 
         this.syncFormFromDraft();
       },
       // An inline state rather than a redirect: router.navigate() from the async
       // tail of ionViewWillEnter races the Ionic transition and can be dropped,
       // which left the user on a page with no members and no explanation.
-      error: () => this.membersError.set(true),
+      error: (err) => {
+        this.loading.set(false);
+        this.membersError.set(true);
+        this.loadError.set(apiErrorMessage(err, 'Could not load group members.'));
+      },
     });
   }
 
@@ -353,9 +367,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
       // The draft is deliberately left intact so the user can retry.
       this.saving.set(false);
       this.uiService.itemLoading.set(false);
-      this.toastService.errorToast(
-        err?.error?.detail ?? err?.error?.message ?? 'Failed to save expense',
-      );
+      this.toastService.errorToast(apiErrorMessage(err, 'Failed to save expense'));
     };
 
     if (this.pendingMode) {
@@ -371,7 +383,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     } else if (this.editMode) {
       // The legacy service does not touch the cache, so drop it explicitly ,
       // otherwise the list would keep serving the pre-edit rows.
-      this.expenseService
+      this.expenseFacade
         .updateExpense(this.groupId, {
           id: this.expenseId,
           description: draft.description,
@@ -387,10 +399,11 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
               }
             : {}),
         })
-        .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
         .subscribe({
-          next: () => {
-            this.finishSave('Expense updated!');
+          next: (refreshed) => {
+            this.finishSave(
+              refreshed ? 'Expense updated!' : 'Expense updated. Display may be out of date.',
+            );
             this.router.navigate(
               ['groups', this.groupId, 'expenses', this.expenseId, 'details'],
               { replaceUrl: true },
@@ -400,9 +413,13 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
         });
     } else {
       this.expenseFacade.createExpense(this.groupId, basePayload).subscribe({
-        next: ({ queued }) => {
+        next: ({ queued, refreshed }) => {
           this.finishSave(
-            queued ? 'Expense saved offline, will sync when connected' : 'Expense added!',
+            queued
+              ? 'Expense saved offline, will sync when connected'
+              : refreshed
+                ? 'Expense added!'
+                : 'Expense added. Display may be out of date.',
           );
           this.router.navigate(['groups', this.groupId, 'details'], { replaceUrl: true });
         },
@@ -458,7 +475,12 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
   private loadPendingExpenseData(key: string, members: GroupMember[]): void {
     this.expenseFacade.getPendingExpense(this.pendingTempId).subscribe({
       next: (pending) => {
-        if (!pending) return;
+        if (!pending) {
+          this.loading.set(false);
+          this.membersError.set(true);
+          this.loadError.set('Pending expense was not found.');
+          return;
+        }
 
         this.draftStore.hydrate(key, this.groupId, members, {
           id: pending.tempId,
@@ -476,8 +498,13 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
           })),
         });
         this.syncFormFromDraft();
+        this.loading.set(false);
       },
-      error: () => this.toastService.errorToast('Failed to load pending expense'),
+      error: (err) => {
+        this.loading.set(false);
+        this.membersError.set(true);
+        this.loadError.set(apiErrorMessage(err, 'Failed to load pending expense'));
+      },
     });
   }
 
@@ -500,8 +527,13 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
           })),
         });
         this.syncFormFromDraft();
+        this.loading.set(false);
       },
-      error: () => this.toastService.errorToast('Failed to load expense'),
+      error: (err) => {
+        this.loading.set(false);
+        this.membersError.set(true);
+        this.loadError.set(apiErrorMessage(err, 'Failed to load expense'));
+      },
     });
   }
 }

@@ -19,6 +19,7 @@ import {
   peopleOutline,
 } from 'ionicons/icons';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { BalanceResponse, DebtEdge } from '../../models/balance-response.model';
 import { GroupBalanceFacade } from '../../services/group-balance-facade.service';
 import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.component';
@@ -28,10 +29,10 @@ import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.compo
   templateUrl: './group-balance.component.html',
   styleUrls: ['./group-balance.component.scss'],
   standalone: true,
-  imports: [AvatarComponent, DecimalPipe, IonIcon, IonSpinner],
+  imports: [AvatarComponent, EmptyStateComponent, DecimalPipe, IonIcon, IonSpinner],
 })
 export class GroupBalanceComponent implements OnInit {
-  private balanceFacade = inject(GroupBalanceFacade);
+  readonly balanceFacade = inject(GroupBalanceFacade);
   private route = inject(ActivatedRoute);
   private destroy = inject(DestroyRef);
   private modalController = inject(ModalController);

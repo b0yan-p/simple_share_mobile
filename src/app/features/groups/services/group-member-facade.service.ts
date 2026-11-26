@@ -17,7 +17,11 @@ export class GroupMemberFacade {
     if (!this.networkService.isOnline()) return this.getCachedMembers(groupId);
 
     return this.groupService.getGroupMembers(groupId).pipe(
-      tap((members) => this.groupMemberIdb.saveGroupMembers(groupId, members).subscribe()),
+      tap((members) =>
+        this.groupMemberIdb.saveGroupMembers(groupId, members).subscribe({
+          error: (err) => console.warn('Could not cache group members', err),
+        }),
+      ),
       catchError(() => this.getCachedMembers(groupId)),
     );
   }

@@ -1,12 +1,14 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, first } from 'rxjs';
+import { catchError, finalize, first, EMPTY } from 'rxjs';
 import { BaseService } from 'src/app/core/services/base.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ConnectionItem } from '../models/connection.model';
 
 @Injectable({ providedIn: 'root' })
 export class ConnectionService extends BaseService<ConnectionItem> {
   loading = signal(false);
+  error = signal<string | null>(null);
 
   private readonly network = inject(NetworkService);
 
@@ -20,6 +22,7 @@ export class ConnectionService extends BaseService<ConnectionItem> {
 
   override getAll(): void {
     this.loading.set(true);
+    this.error.set(null);
     this.httpClient
       .get<ConnectionItem[]>(this.baseApi)
       .pipe(
@@ -33,13 +36,9 @@ export class ConnectionService extends BaseService<ConnectionItem> {
 
           // A request that raced the connection dropping fails with a raw
           // "0 Unknown Error"; surface the offline cause instead.
-          if (!this.network.isOnline()) {
-            this.toastService.infoToast("You're offline. Showing what we have.");
-          } else {
-            this.toastService.errorToast(err.message);
-          }
-
-          throw err;
+          this.error.set(apiErrorMessage(err, 'Could not load friends.'));
+          if (this.items().length) this.toastService.errorToast(this.error()!);
+          return EMPTY;
         }),
       )
       .subscribe((data) => {

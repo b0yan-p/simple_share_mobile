@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonList, IonSpinner } from '@ionic/angular/standalone';
+import { NetworkService } from 'src/app/core/services/network.service';
 import { LoadStatus } from 'src/app/core/store/models/list-state.model';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
@@ -10,11 +11,12 @@ import { GroupFacade } from '../../services/group-facade.service';
   selector: 'app-recent-groups',
   templateUrl: './recent-groups.component.html',
   styleUrls: ['./recent-groups.component.scss'],
-  imports: [IonList, IonButton, ListItemComponent, EmptyStateComponent],
+  imports: [IonList, IonButton, IonSpinner, ListItemComponent, EmptyStateComponent],
 })
 export class RecentGroupsComponent {
   router = inject(Router);
   facade = inject(GroupFacade);
+  network = inject(NetworkService);
 
   readonly loading = computed(() => this.facade.recentStore.status() === LoadStatus.Loading);
 

@@ -38,6 +38,7 @@ import {
   shareSocialOutline,
 } from 'ionicons/icons';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ConnectionItem } from 'src/app/features/connections/models/connection.model';
 import { ConnectionService } from 'src/app/features/connections/services/connection.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
@@ -82,7 +83,7 @@ export class AddMemberModalComponent implements OnInit {
 
   private modalController = inject(ModalController);
   private groupService = inject(GroupService);
-  private connectionService = inject(ConnectionService);
+  readonly connectionService = inject(ConnectionService);
   private toastService = inject(ToastService);
 
   /**
@@ -93,6 +94,7 @@ export class AddMemberModalComponent implements OnInit {
   activeTab = signal<'connections' | 'virtual'>('connections');
   submitting = signal(false);
   error = signal(false);
+  errorMessage = signal('');
 
   connectionsLoading = this.connectionService.loading;
 
@@ -248,6 +250,7 @@ export class AddMemberModalComponent implements OnInit {
 
     this.submitting.set(true);
     this.error.set(false);
+    this.errorMessage.set('');
 
     this.groupService.addGroupMembers(this.groupId, { members }).subscribe({
       next: (res) => {
@@ -259,11 +262,14 @@ export class AddMemberModalComponent implements OnInit {
         // a normal outcome and must not be reported as a plain failure.
         if (added === 0) {
           this.error.set(true);
+          this.errorMessage.set(errors.join(' ') || 'No one could be added. Please try again.');
           return;
         }
 
         if (errors.length) {
-          void this.toastService.warnToast(`${added} of ${members.length} added. ${errors[0]}`);
+          void this.toastService.warnToast(
+            `${added} of ${members.length} added. ${errors.join(' ')}`,
+          );
         } else {
           void this.toastService.successToast(
             added > 1 ? `${added} people added` : 'Person added',
@@ -272,9 +278,10 @@ export class AddMemberModalComponent implements OnInit {
 
         this.modalController.dismiss({ success: true, addedCount: added }, 'confirm');
       },
-      error: () => {
+      error: (err) => {
         this.submitting.set(false);
         this.error.set(true);
+        this.errorMessage.set(apiErrorMessage(err, 'Could not add people. Please try again.'));
       },
     });
   }

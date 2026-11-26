@@ -19,7 +19,23 @@
         />
       }
     </ion-list>
-  } @else if (!loading()) {
+  } @else if (facade.recentStore.status() === 'error') {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load recent groups"
+      [subtitle]="facade.recentStore.error() ?? ''"
+      actionLabel="Try again"
+      (action)="facade.loadRecentGroups()"
+    />
+  } @else if (loading()) {
+    <div class="ion-text-center ion-padding" role="status"><ion-spinner name="crescent" /></div>
+  } @else if (!network.isOnline()) {
+    <app-empty-state
+      icon="cloud-offline-outline"
+      title="You're offline"
+      subtitle="No saved groups on this device yet. Reconnect to load them."
+    />
+  } @else {
     <app-empty-state
       icon="people-outline"
       title="No groups yet"

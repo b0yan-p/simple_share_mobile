@@ -9,80 +9,94 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form" class="group-form">
-    <div class="field">
-      <label class="field-label" for="group-name">Group name</label>
-      <div class="name-row">
-        <span class="icon-tile"><ion-icon name="people-outline" aria-hidden="true" /></span>
-        <ion-input
-          id="group-name"
-          aria-label="Group name"
-          formControlName="name"
-          type="text"
-          placeholder="e.g. Summer trip"
-          required
-        />
+  @if (loading()) {
+    <div class="ion-text-center ion-padding" role="status"><ion-spinner name="crescent" /></div>
+  } @else if (loadError()) {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load group"
+      [subtitle]="loadError() ?? ''"
+      actionLabel="Try again"
+      (action)="loadGroup()"
+    />
+  } @else {
+    <form [formGroup]="form" class="group-form">
+      <div class="field">
+        <label class="field-label" for="group-name">Group name</label>
+        <div class="name-row">
+          <span class="icon-tile"><ion-icon name="people-outline" aria-hidden="true" /></span>
+          <ion-input
+            id="group-name"
+            aria-label="Group name"
+            formControlName="name"
+            type="text"
+            placeholder="e.g. Summer trip"
+            required
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="field">
-      <app-currency-picker
-        label="Group currency"
-        [value]="form.controls.currency.value"
-        [disabled]="form.controls.currency.disabled"
-        (valueChange)="
-          form.controls.currency.setValue($event); form.controls.currency.markAsDirty()
-        "
+      <div class="field">
+        <app-currency-picker
+          label="Group currency"
+          [value]="form.controls.currency.value"
+          [disabled]="form.controls.currency.disabled"
+          (valueChange)="
+            form.controls.currency.setValue($event); form.controls.currency.markAsDirty()
+          "
+        />
+        <p class="currency-note" [class.locked]="form.controls.currency.disabled">
+          <ion-icon name="information-circle-outline" aria-hidden="true" />
+          @if (currencyLocked) {
+            Currency is locked after the first expense or settlement to preserve past balances.
+          } @else if (form.controls.currency.disabled) {
+            Only the group owner can change the currency.
+          } @else {
+            Used for group balances and settlements.
+          }
+        </p>
+      </div>
+
+      <app-group-type-picker
+        [value]="form.controls.type.value"
+        (valueChange)="changeGroupType($event)"
       />
-      <p class="currency-note" [class.locked]="form.controls.currency.disabled">
-        <ion-icon name="information-circle-outline" aria-hidden="true" />
-        @if (currencyLocked) {
-          Currency is locked after the first expense or settlement to preserve past balances.
-        } @else if (form.controls.currency.disabled) {
-          Only the group owner can change the currency.
-        } @else {
-          Used for group balances and settlements.
-        }
-      </p>
-    </div>
 
-    <app-group-type-picker
-      [value]="form.controls.type.value"
-      (valueChange)="changeGroupType($event)"
-    />
+      <app-group-cover-picker
+        [groupType]="form.controls.type.value"
+        [value]="form.controls.coverImageKey.value"
+        (valueChange)="selectCover($event)"
+      />
 
-    <app-group-cover-picker
-      [groupType]="form.controls.type.value"
-      [value]="form.controls.coverImageKey.value"
-      (valueChange)="selectCover($event)"
-    />
-
-    <div class="setting-row">
-      <ion-toggle
-        formControlName="simplifyDebts"
-        class="custom-toggle"
-        justify="space-between"
-        aria-describedby="simplify-description"
-      >
-        <span class="setting-label"
-          ><ion-icon name="git-network-outline" aria-hidden="true" />Simplify debts</span
+      <div class="setting-row">
+        <ion-toggle
+          formControlName="simplifyDebts"
+          class="custom-toggle"
+          justify="space-between"
+          aria-describedby="simplify-description"
         >
-      </ion-toggle>
-      <p id="simplify-description">
-        Combine debts so the group can settle up with fewer payments. Each person’s balance
-        stays the same.
-      </p>
-    </div>
-  </form>
+          <span class="setting-label"
+            ><ion-icon name="git-network-outline" aria-hidden="true" />Simplify debts</span
+          >
+        </ion-toggle>
+        <p id="simplify-description">
+          Combine debts so the group can settle up with fewer payments. Each person’s balance
+          stays the same.
+        </p>
+      </div>
+    </form>
+  }
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <ion-button
-    expand="block"
-    color="primary"
-    [disabled]="form.invalid || uiService.itemLoading()"
-    (click)="submit()"
-  >
-    {{ itemId === 'new' ? 'Create group' : 'Save' }}
-  </ion-button>
+  @if (!loading() && !loadError()) {
+    <ion-button
+      expand="block"
+      color="primary"
+      [disabled]="form.invalid || uiService.itemLoading()"
+      (click)="submit()"
+    >
+      {{ itemId === 'new' ? 'Create group' : 'Save' }}
+    </ion-button>
+  }
 </ion-footer>

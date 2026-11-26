@@ -29,9 +29,11 @@ import {
   closeOutline,
   informationCircleOutline,
 } from 'ionicons/icons';
-import { catchError, concatMap, of, startWith } from 'rxjs';
+import { concatMap, startWith } from 'rxjs';
 import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { ExpenseService } from 'src/app/features/expenses/services/expense.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { fromMinor, toMinor } from 'src/app/features/expenses/utils/money.util';
 
 /** How the entered amount relates to the outstanding balance. */
@@ -76,6 +78,7 @@ export class SettleUpModalComponent implements OnInit {
   private modalController = inject(ModalController);
   private expenseService = inject(ExpenseService);
   private expenseFacade = inject(ExpenseFacade);
+  private toastService = inject(ToastService);
 
   @Input({ required: true }) currency!: string;
   readonly maxDate = localCalendarDate();
@@ -83,6 +86,7 @@ export class SettleUpModalComponent implements OnInit {
 
   submitting = false;
   error = false;
+  errorMessage = '';
   fromInitials = '';
   toInitials = '';
   /** "You pay Marinko R." — built from the labels the opener already resolved. */
@@ -189,6 +193,7 @@ export class SettleUpModalComponent implements OnInit {
     this.submitting = true;
     this.submittingChange.emit(true);
     this.error = false;
+    this.errorMessage = '';
 
     const { amount, date } = this.form.value;
     this.expenseService
@@ -198,26 +203,24 @@ export class SettleUpModalComponent implements OnInit {
         amount: amount!,
         date: date!.slice(0, 10),
       })
-      .pipe(
-        concatMap(() =>
-          this.expenseFacade.refreshExpenses(this.groupId).pipe(
-            catchError((error) => {
-              console.warn('[API ERROR] refreshing expenses after settlement', error);
-              return of(void 0);
-            }),
-          ),
-        ),
-      )
+      .pipe(concatMap(() => this.expenseFacade.refreshAfterMutation(this.groupId)))
       .subscribe({
-        next: () => {
+        next: (refreshed) => {
           this.submitting = false;
           this.submittingChange.emit(false);
           this.modalController.dismiss({ success: true }, 'confirm');
+          if (!refreshed) {
+            this.toastService.warnToast('Payment recorded. Display may be out of date.');
+          }
         },
-        error: () => {
+        error: (err) => {
           this.submitting = false;
           this.submittingChange.emit(false);
           this.error = true;
+          this.errorMessage = apiErrorMessage(
+            err,
+            'Could not record payment. Please try again.',
+          );
         },
       });
   }

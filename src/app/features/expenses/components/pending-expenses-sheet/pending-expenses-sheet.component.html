@@ -15,35 +15,51 @@
       These expenses will sync automatically when you're back online.
     </p>
 
-    <div class="pending-list">
-      @for (item of pendingExpenses; track item.tempId) {
-        <div class="pending-card">
-          <div class="pending-card__main">
-            <ion-icon name="time-outline" class="pending-card__icon" />
-            <div class="pending-card__info">
-              <span class="pending-card__description"
-                >{{ item.payload.description }}
-                @if (item.lastError) {
-                  <p role="alert">{{ item.lastError }}</p>
-                }
-              </span>
-              <span class="pending-card__meta">
-                {{ item.payload.originalAmount | number: '1.2-2' }}
-                {{ item.payload.originalCurrency }} &nbsp;·&nbsp;
-                {{ item.createdAt | date: 'dd MMM yyyy' }}
-              </span>
+    @if (loading()) {
+      <div class="ion-text-center ion-padding" role="status">
+        <ion-spinner name="crescent" />
+      </div>
+    } @else if (error()) {
+      <app-empty-state
+        icon="alert-circle-outline"
+        title="Could not load pending expenses"
+        subtitle="Please try again."
+        actionLabel="Try again"
+        (action)="loadPendingExpenses()"
+      />
+    } @else if (pendingExpenses.length === 0) {
+      <app-empty-state icon="receipt-outline" title="No pending expenses" />
+    } @else {
+      <div class="pending-list">
+        @for (item of pendingExpenses; track item.tempId) {
+          <div class="pending-card">
+            <div class="pending-card__main">
+              <ion-icon name="time-outline" class="pending-card__icon" />
+              <div class="pending-card__info">
+                <span class="pending-card__description"
+                  >{{ item.payload.description }}
+                  @if (item.lastError) {
+                    <p role="alert">{{ item.lastError }}</p>
+                  }
+                </span>
+                <span class="pending-card__meta">
+                  {{ item.payload.originalAmount | number: '1.2-2' }}
+                  {{ item.payload.originalCurrency }} &nbsp;·&nbsp;
+                  {{ item.createdAt | date: 'dd MMM yyyy' }}
+                </span>
+              </div>
+            </div>
+            <div class="pending-card__actions">
+              <button class="action-btn action-btn--edit" (click)="onEdit(item)">
+                <ion-icon name="create-outline" />
+              </button>
+              <button class="action-btn action-btn--delete" (click)="onDelete(item)">
+                <ion-icon name="trash-outline" />
+              </button>
             </div>
           </div>
-          <div class="pending-card__actions">
-            <button class="action-btn action-btn--edit" (click)="onEdit(item)">
-              <ion-icon name="create-outline" />
-            </button>
-            <button class="action-btn action-btn--delete" (click)="onDelete(item)">
-              <ion-icon name="trash-outline" />
-            </button>
-          </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
   </div>
 </ion-content>

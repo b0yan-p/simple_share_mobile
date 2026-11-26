@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -122,7 +123,9 @@ export class ResetPasswordComponent {
             password.setErrors({ policy: true });
             password.markAsTouched();
           } else {
-            this.error.set('Could not reset your password. Please try again.');
+            this.error.set(
+              apiErrorMessage(error, 'Could not reset your password. Please try again.'),
+            );
           }
         },
       });

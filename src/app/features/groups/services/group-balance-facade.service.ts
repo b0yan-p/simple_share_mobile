@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
 import { GroupBalanceStore } from '../store/group-balance-store';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
+import { ToastService } from 'src/app/core/services/toast.service';
 import { GroupService } from './group.service';
 
 /**
@@ -10,6 +12,7 @@ import { GroupService } from './group.service';
 @Injectable({ providedIn: 'root' })
 export class GroupBalanceFacade {
   private readonly groupService = inject(GroupService);
+  private readonly toast = inject(ToastService);
   readonly store = inject(GroupBalanceStore);
 
   /**
@@ -20,11 +23,15 @@ export class GroupBalanceFacade {
   loadBalances(groupId: string): Observable<void> {
     this.store.enter(groupId);
     this.store.loading.set(true);
+    this.store.error.set(null);
 
     return this.groupService.getGroupBalances(groupId).pipe(
       tap((balance) => this.store.balance.set(balance)),
       catchError((err) => {
         console.warn('[API ERROR] group balances', err);
+        const message = apiErrorMessage(err, 'Could not load balances.');
+        this.store.error.set(message);
+        if (this.store.balance()) this.toast.errorToast(message);
         return of(null);
       }),
       tap(() => this.store.loading.set(false)),

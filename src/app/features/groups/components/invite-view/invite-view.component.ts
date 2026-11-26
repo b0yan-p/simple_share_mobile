@@ -11,6 +11,7 @@ import {
 } from 'ionicons/icons';
 import { first, from } from 'rxjs';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { GroupService } from '../../services/group.service';
 import { environment } from 'src/environments/environment';
 
@@ -37,6 +38,7 @@ export class InviteViewComponent implements OnInit {
   inviteLink = signal('');
   loading = signal(false);
   failed = signal(false);
+  errorMessage = signal('');
 
   clientUrl = environment.clientUrl;
 
@@ -67,8 +69,9 @@ export class InviteViewComponent implements OnInit {
         this.inviteLink.set(`${this.clientUrl}/join/${invitation.token}`);
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.failed.set(true);
+        this.errorMessage.set(apiErrorMessage(err, "Couldn't load the invite link."));
         this.loading.set(false);
       },
     });

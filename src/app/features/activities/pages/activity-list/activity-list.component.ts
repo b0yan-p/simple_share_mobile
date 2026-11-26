@@ -8,13 +8,13 @@ import {
   IonList,
   IonRefresher,
   IonRefresherContent,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { Observable } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
-import { UiService } from 'src/app/core/services/ui.service';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { ListItemComponent } from 'src/app/shared/components/list-item/list-item.component';
 import { OfflineEmptyStateComponent } from 'src/app/shared/components/offline-empty-state/offline-empty-state.component';
@@ -37,6 +37,7 @@ import { ActivityService } from '../../services/activity.service';
     IonInfiniteScrollContent,
     IonRefresher,
     IonRefresherContent,
+    IonSpinner,
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
@@ -46,7 +47,6 @@ import { ActivityService } from '../../services/activity.service';
 })
 export class ActivityListComponent implements ViewWillEnter {
   service = inject(ActivityService);
-  ui = inject(UiService);
   protected readonly network = inject(NetworkService);
   private router = inject(Router);
 

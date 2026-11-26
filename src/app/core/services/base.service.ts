@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   catchError,
+  EMPTY,
   filter,
   finalize,
   first,
@@ -18,6 +19,7 @@ import { runAndSettle } from '../../shared/utils/settle.helper';
 import { BaseModel } from '../models/base-model';
 import { PageData } from '../models/page-data';
 import { PaginatorService } from './paginator.service';
+import { apiErrorMessage } from './api-error';
 import { ToastService } from './toast.service';
 import { UiService } from './ui.service';
 
@@ -40,6 +42,8 @@ export abstract class BaseService<
   private rootUrl = environment.baseAPIUrl;
 
   items = signal<ListT[]>([]);
+  listError = signal<string | null>(null);
+  listLoading = signal(false);
 
   private listSubscription?: Subscription;
 
@@ -57,6 +61,7 @@ export abstract class BaseService<
 
   public getAll(url?: string): void {
     this.listSubscription?.unsubscribe();
+    this.listError.set(null);
     this.resetPagination();
 
     const api = this.buildApiUrl(url ?? this.listApi);
@@ -65,6 +70,7 @@ export abstract class BaseService<
       .pipe(
         switchMap((qp) => {
           this.uiService.listLoading.set(qp.skip === 0);
+          this.listLoading.set(qp.skip === 0);
           this.pageLoading.set(qp.skip > 0);
 
           return this.httpClient
@@ -79,14 +85,19 @@ export abstract class BaseService<
               }),
               tap(() => {
                 this.uiService.listLoading.set(false);
+                this.listLoading.set(false);
                 this.pageLoading.set(false);
               }),
               catchError((err) => {
+                if (this.pageLoading()) this.pageError.set(true);
                 console.error(err);
                 this.uiService.listLoading.set(false);
+                this.listLoading.set(false);
                 this.pageLoading.set(false);
-                this.toastService.errorToast(err.message);
-                throw err;
+                const message = apiErrorMessage(err, 'Failed to load data.');
+                this.listError.set(message);
+                if (this.items().length) this.toastService.errorToast(message);
+                return EMPTY;
               }),
               finalize(() => this.listSettled.next()),
             );
@@ -119,7 +130,6 @@ export abstract class BaseService<
       finalize(() => this.uiService.itemLoading.set(false)),
       catchError((err) => {
         console.error(err);
-        this.toastService.errorToast(err.message);
         throw err;
       }),
     );
@@ -140,7 +150,7 @@ export abstract class BaseService<
       catchError((err) => {
         console.error(err);
         this.uiService.itemLoading.set(false);
-        this.toastService.errorToast(err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Failed to update item.'));
         throw err;
       }),
     );
@@ -158,7 +168,7 @@ export abstract class BaseService<
       catchError((err) => {
         console.error(err);
         this.uiService.itemLoading.set(false);
-        this.toastService.errorToast(err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Failed to create item.'));
         throw err;
       }),
     );
@@ -182,7 +192,7 @@ export abstract class BaseService<
       catchError((err) => {
         console.error(err);
         this.uiService.itemLoading.set(false);
-        this.toastService.errorToast(err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Failed to delete item.'));
         throw err;
       }),
     );

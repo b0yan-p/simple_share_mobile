@@ -80,7 +80,7 @@
       @if (error()) {
         <div class="error-banner">
           <ion-icon name="alert-circle-outline" />
-          <span>Something went wrong. Please try again.</span>
+          <span>{{ errorMessage() }}</span>
         </div>
       }
 
@@ -89,6 +89,11 @@
         @if (connectionsLoading()) {
           <div class="state-msg">
             <ion-spinner name="crescent" />
+          </div>
+        } @else if (connectionService.error() && connections().length === 0) {
+          <div class="state-msg" role="alert">
+            {{ connectionService.error() }}
+            <ion-button fill="clear" (click)="connectionService.getAll()">Try again</ion-button>
           </div>
         } @else if (connections().length === 0) {
           <div class="state-msg c-text">You don't have any connections yet.</div>

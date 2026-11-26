@@ -17,6 +17,7 @@ import { closeOutline } from 'ionicons/icons';
 import { AdvanceInputDirective } from '../advance-input.directive';
 import { Subscription } from 'rxjs';
 import { ProfileService } from '../../services/profile.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 
 @Component({
   selector: 'app-edit-profile-dialog',
@@ -73,7 +74,10 @@ export class EditProfileDialogComponent {
           this.form.reset(profile);
           this.state.set('ready');
         },
-        error: () => this.state.set('loadError'),
+        error: (err) => {
+          this.error.set(apiErrorMessage(err, 'Could not load your profile.'));
+          this.state.set('loadError');
+        },
       });
   }
 
@@ -102,9 +106,11 @@ export class EditProfileDialogComponent {
           this.state.set('ready');
           this.editOpen.set(false);
         },
-        error: () => {
+        error: (err) => {
           this.state.set('ready');
-          this.error.set('Could not save your profile. Please try again.');
+          this.error.set(
+            apiErrorMessage(err, 'Could not save your profile. Please try again.'),
+          );
         },
       });
   }

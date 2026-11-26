@@ -44,7 +44,7 @@
         }
         @case ('error') {
           <div class="picker-status">
-            <p role="alert">Could not load your balances.</p>
+            <p role="alert">{{ errorMessage() }}</p>
             <ion-button fill="outline" (click)="loadBalances()">Try again</ion-button>
           </div>
         }

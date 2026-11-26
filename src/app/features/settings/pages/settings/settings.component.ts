@@ -30,6 +30,7 @@ import { DeletedAccountCleanup } from 'src/app/auth/services/deleted-account-cle
 import { TokenStorageService } from 'src/app/auth/services/token-storage.service';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { environment } from 'src/environments/environment';
 
@@ -116,7 +117,10 @@ export class SettingsComponent {
         .load()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          error: () => void this.toast.errorToast('Could not load account settings.'),
+          error: (err) =>
+            void this.toast.errorToast(
+              apiErrorMessage(err, 'Could not load account settings.'),
+            ),
         });
     }
   }
@@ -163,7 +167,7 @@ export class SettingsComponent {
         void this.toast.errorToast(
           error instanceof HttpErrorResponse && error.status === 0
             ? 'Connection lost. Account deletion could not be confirmed. Please try again.'
-            : 'Could not delete your account. Please try again.',
+            : apiErrorMessage(error, 'Could not delete your account. Please try again.'),
         );
       }
       return;

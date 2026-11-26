@@ -33,7 +33,7 @@
         <p class="ion-padding" role="status">Loading profile...</p>
       } @else if (state() === 'loadError') {
         <div class="ion-padding">
-          <p role="alert">Could not load your profile.</p>
+          <p role="alert">{{ error() }}</p>
           <ion-button (click)="loadProfile()">Try again</ion-button>
         </div>
       } @else {

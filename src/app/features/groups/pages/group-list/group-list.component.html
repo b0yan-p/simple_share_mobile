@@ -33,7 +33,17 @@
       title="You're offline"
       subtitle="No saved groups on this device yet. Reconnect to load them."
     />
-  } @else if (!loading()) {
+  } @else if (facade.store.status() === 'error') {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load groups"
+      [subtitle]="facade.store.error() ?? ''"
+      actionLabel="Try again"
+      (action)="facade.loadGroups()"
+    />
+  } @else if (loading()) {
+    <div class="ion-text-center ion-padding" role="status"><ion-spinner name="crescent" /></div>
+  } @else {
     <app-empty-state
       icon="people-outline"
       title="No groups yet"
@@ -43,9 +53,19 @@
     />
   }
 
-  <ion-infinite-scroll [appPaginate]="paginator">
-    <ion-infinite-scroll-content />
-  </ion-infinite-scroll>
+  @if (network.isOnline() && paginator.pageError()) {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load more groups"
+      actionLabel="Try again"
+      (action)="facade.loadGroups()"
+    />
+  }
+  @if (network.isOnline()) {
+    <ion-infinite-scroll [appPaginate]="paginator">
+      <ion-infinite-scroll-content />
+    </ion-infinite-scroll>
+  }
 
   @if (network.isOnline()) {
     <ion-fab slot="fixed" vertical="bottom" horizontal="end" [routerLink]="['new']">

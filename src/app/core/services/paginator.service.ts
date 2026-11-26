@@ -7,10 +7,13 @@ export abstract class PaginatorService {
   readonly pageSize = signal<number>(10);
   protected pageRequest = signal<PageQueryParams>({ skip: 0, take: this.pageSize() });
   public pageLoading = signal<boolean>(false);
+  public pageError = signal(false);
 
   totalCount = signal<number>(0);
   hasMoreData = computed(
-    () => this.pageRequest().skip + this.pageRequest().take < this.totalCount(),
+    () =>
+      !this.pageError() &&
+      this.pageRequest().skip + this.pageRequest().take < this.totalCount(),
   );
 
   readonly pageRequest$ = toObservable(this.pageRequest).pipe(
@@ -22,6 +25,7 @@ export abstract class PaginatorService {
   }
 
   public resetPagination(skip: number = 0, take: number = this.pageSize()) {
+    this.pageError.set(false);
     this.setPagination(skip, take);
   }
 

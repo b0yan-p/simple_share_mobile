@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -54,11 +54,7 @@ export class ForgotPasswordComponent {
       .subscribe({
         next: () => this.sent.set(true),
         error: (error: unknown) =>
-          this.error.set(
-            error instanceof HttpErrorResponse && error.status === 0
-              ? 'Check your connection and try again.'
-              : 'Could not submit the request. Please try again.',
-          ),
+          this.error.set(apiErrorMessage(error, 'Could not submit the request. Please try again.')),
       });
   }
 }

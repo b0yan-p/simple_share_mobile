@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   AlertController,
@@ -8,12 +8,15 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { ExpenseFacade } from '../../services/expense-facade.service';
 import { PendingExpense } from '../../services/expense-idb.service';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 @Component({
   selector: 'app-pending-expenses-sheet',
@@ -28,6 +31,8 @@ import { PendingExpense } from '../../services/expense-idb.service';
     IonButton,
     IonContent,
     IonIcon,
+    IonSpinner,
+    EmptyStateComponent,
     IonTitle,
   ],
 })
@@ -38,16 +43,28 @@ export class PendingExpensesSheetComponent implements OnInit {
   private readonly alertController = inject(AlertController);
   private readonly expenseFacade = inject(ExpenseFacade);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
   pendingExpenses: PendingExpense[] = [];
+  readonly loading = signal(true);
+  readonly error = signal(false);
 
   ngOnInit(): void {
     this.loadPendingExpenses();
   }
 
-  private loadPendingExpenses(): void {
-    this.expenseFacade.getPendingExpenses().subscribe((all) => {
-      this.pendingExpenses = all.filter((e) => e.groupId === this.groupId);
+  protected loadPendingExpenses(): void {
+    this.loading.set(true);
+    this.error.set(false);
+    this.expenseFacade.getPendingExpenses().subscribe({
+      next: (all) => {
+        this.pendingExpenses = all.filter((e) => e.groupId === this.groupId);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set(true);
+      },
     });
   }
 
@@ -79,11 +96,12 @@ export class PendingExpensesSheetComponent implements OnInit {
 
     if (role !== 'confirm') return;
 
-    this.expenseFacade.removePendingExpense(item.tempId).subscribe(() => {
-      this.pendingExpenses = this.pendingExpenses.filter((e) => e.tempId !== item.tempId);
-      if (this.pendingExpenses.length === 0) {
-        this.modalController.dismiss();
-      }
+    this.expenseFacade.removePendingExpense(item.tempId).subscribe({
+      next: () => {
+        this.pendingExpenses = this.pendingExpenses.filter((e) => e.tempId !== item.tempId);
+        if (this.pendingExpenses.length === 0) this.modalController.dismiss();
+      },
+      error: () => this.toast.errorToast('Could not delete pending expense. Please try again.'),
     });
   }
 

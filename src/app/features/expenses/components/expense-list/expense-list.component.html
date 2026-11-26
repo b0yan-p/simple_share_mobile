@@ -80,8 +80,22 @@
       }
     </ion-list>
   }
-} @else if (ui.listLoading()) {
+} @else if (facade.store.status() === 'loading') {
   <div class="list-loading"><ion-spinner name="crescent" /></div>
+} @else if (!networkService.isOnline()) {
+  <app-empty-state
+    icon="cloud-offline-outline"
+    title="You're offline"
+    subtitle="No saved expenses on this device yet. Reconnect to load them."
+  />
+} @else if (facade.store.status() === 'error') {
+  <app-empty-state
+    icon="alert-circle-outline"
+    title="Could not load expenses"
+    [subtitle]="facade.store.error() ?? ''"
+    actionLabel="Try again"
+    (action)="facade.loadExpenses(route.snapshot.params['id'], { force: true })"
+  />
 } @else {
   <app-empty-state
     icon="receipt-outline"
@@ -90,9 +104,21 @@
     subtitle="Add your first expense to start tracking this group."
   />
 }
-<ion-infinite-scroll [appPaginate]="paginator">
-  <ion-infinite-scroll-content />
-</ion-infinite-scroll>
+@if (networkService.isOnline() && paginator.pageError()) {
+  <app-empty-state
+    icon="alert-circle-outline"
+    title="Could not load more expenses"
+    actionLabel="Try again"
+    (action)="
+      facade.loadExpenses(route.snapshot.params['id'], { force: true, skipCache: true })
+    "
+  />
+}
+@if (networkService.isOnline()) {
+  <ion-infinite-scroll [appPaginate]="paginator">
+    <ion-infinite-scroll-content />
+  </ion-infinite-scroll>
+}
 
 <ion-alert
   [isOpen]="isDeleteAlertOpen"

@@ -196,6 +196,14 @@
       actionLabel="Back to group"
       (action)="router.navigate(['groups', groupId, 'details'])"
     />
+  } @else if (loadError()) {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load expense"
+      [subtitle]="loadError() ?? ''"
+      actionLabel="Try again"
+      (action)="loadExpense(expenseId)"
+    />
   }
 </ion-content>
 

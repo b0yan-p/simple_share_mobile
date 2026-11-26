@@ -14,7 +14,7 @@
       <app-empty-state
         icon="alert-circle-outline"
         title="Invite unavailable"
-        subtitle="This invite link is no longer valid, or the group has been removed."
+        [subtitle]="failureMessage()"
         actionLabel="Try again"
         (action)="loadPreview()"
       />

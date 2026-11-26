@@ -1,5 +1,13 @@
 @if (loading() && !balance()) {
   <div class="state"><ion-spinner name="crescent" color="primary" /></div>
+} @else if (balanceFacade.store.error() && !balance()) {
+  <app-empty-state
+    icon="alert-circle-outline"
+    title="Could not load balances"
+    [subtitle]="balanceFacade.store.error() ?? ''"
+    actionLabel="Try again"
+    (action)="balanceFacade.loadBalances(groupId() ?? '').subscribe()"
+  />
 } @else if (balance(); as data) {
   @for (section of sections(); track section.title) {
     <section>

@@ -11,12 +11,14 @@ import {
   IonList,
   IonRefresher,
   IonRefresherContent,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ViewWillEnter,
 } from '@ionic/angular/standalone';
 import { Observable } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { LoadStatus } from 'src/app/core/store/models/list-state.model';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
@@ -45,6 +47,7 @@ import { GroupPaginatorService } from '../../services/group-paginator.service';
     IonInfiniteScrollContent,
     IonRefresher,
     IonRefresherContent,
+    IonSpinner,
     ListItemComponent,
     EmptyStateComponent,
     PaginateDirective,
@@ -89,7 +92,8 @@ export class GroupListComponent implements ViewWillEnter {
   onDelete(id: string) {
     this.facade.deleteGroup(id).subscribe({
       next: () => this.toastService.successToast('Group deleted successfully!'),
-      error: (err) => this.toastService.errorToast(err.message),
+      error: (err) =>
+        this.toastService.errorToast(apiErrorMessage(err, 'Could not delete group.')),
     });
   }
 }

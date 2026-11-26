@@ -25,6 +25,7 @@ import {
   IonRefresherContent,
   IonSegment,
   IonSegmentButton,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -45,9 +46,11 @@ import {
   tap,
 } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ExpenseListComponent } from 'src/app/features/expenses/components/expense-list/expense-list.component';
 import { ExpenseFacade } from 'src/app/features/expenses/services/expense-facade.service';
 import { OfflineWarningComponent } from 'src/app/shared/components/offline-warning/offline-warning.component';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
 import { runAndSettle } from 'src/app/shared/utils/settle.helper';
 import { AddMemberModalComponent } from '../../components/add-member-modal/add-member-modal.component';
@@ -81,6 +84,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     IonContent,
     IonSegment,
     IonSegmentButton,
+    IonSpinner,
     IonLabel,
     IonList,
     IonItem,
@@ -93,6 +97,7 @@ import { GroupDetailsComponent } from '../group-details/group-details.component'
     GroupBalanceComponent,
     GroupOverviewHeaderComponent,
     OfflineWarningComponent,
+    EmptyStateComponent,
   ],
 })
 export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewWillLeave {
@@ -106,6 +111,9 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
   readonly store = inject(GroupDetailStore);
   protected networkService = inject(NetworkService);
   protected readonly failedCoverUrl = signal('');
+  readonly shellLoading = signal(true);
+  readonly shellError = signal<string | null>(null);
+  readonly membersError = signal<string | null>(null);
 
   private readonly content = viewChild(IonContent);
   private readonly contentElement = viewChild(IonContent, { read: ElementRef<HTMLElement> });
@@ -145,15 +153,29 @@ export class GroupDetailWrapperComponent implements OnInit, ViewWillEnter, ViewW
    * what used to leave the whole page blank offline.
    */
   shell$ = combineLatest([this.route.params, this.refresh$]).pipe(
-    switchMap(([p]) =>
-      forkJoin({
-        group: this.groupFacade.loadGroupOverview(p['id']).pipe(catchError(() => of(null))),
-        members: this.groupMemberFacade
-          .getGroupMembers(p['id'])
-          .pipe(catchError(() => of([] as GroupMember[]))),
-      }),
-    ),
-    tap(({ members }) => {
+    switchMap(([p]) => {
+      this.shellLoading.set(true);
+      this.shellError.set(null);
+      this.membersError.set(null);
+      return forkJoin({
+        group: this.groupFacade.loadGroupOverview(p['id']).pipe(
+          catchError((err) => {
+            this.shellError.set(apiErrorMessage(err, 'Could not load this group.'));
+            return of(null);
+          }),
+        ),
+        members: this.groupMemberFacade.getGroupMembers(p['id']).pipe(
+          catchError((err) => {
+            this.membersError.set(apiErrorMessage(err, 'Could not load group members.'));
+            return of([] as GroupMember[]);
+          }),
+        ),
+      });
+    }),
+    tap(({ group, members }) => {
+      if (!group && !this.shellError())
+        this.shellError.set('No saved group data is available.');
+      this.shellLoading.set(false);
       this.members = members;
       this.failedCoverUrl.set('');
     }),

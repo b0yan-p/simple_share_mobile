@@ -17,7 +17,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { concatMap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { GroupFacade } from 'src/app/features/groups/services/group-facade.service';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
@@ -67,6 +68,7 @@ export class ExpenseDetailComponent implements OnInit {
   expense = signal<ExpenseDetail | null>(null);
   loading = signal(true);
   notFound = signal(false);
+  loadError = signal<string | null>(null);
 
   /** The logged-in user's net on this expense: what they paid minus their share. */
   readonly myNet = computed(() => {
@@ -97,9 +99,10 @@ export class ExpenseDetailComponent implements OnInit {
   ngOnInit(): void {
     this.groupId = this.route.snapshot.params['id'];
     this.expenseId = this.route.snapshot.params['expenseId'];
-    this.groups
-      .loadGroupOverview(this.groupId)
-      .subscribe((group) => this.currentMemberId.set(group?.currentMemberId ?? null));
+    this.groups.loadGroupOverview(this.groupId).subscribe({
+      next: (group) => this.currentMemberId.set(group?.currentMemberId ?? null),
+      error: () => this.currentMemberId.set(null),
+    });
 
     this.loadExpense(this.expenseId);
   }
@@ -109,28 +112,31 @@ export class ExpenseDetailComponent implements OnInit {
   }
 
   private confirmDelete(): void {
-    this.expenseService
-      .deleteExpense(this.groupId, this.expenseId)
-      .pipe(concatMap(() => this.expenseFacade.refreshExpenses(this.groupId)))
-      .subscribe({
-        next: () => {
-          this.toastService.successToast('Expense deleted');
-          this.router.navigate(['groups', this.groupId, 'details']);
-        },
-        error: () => this.toastService.errorToast('Failed to delete expense'),
-      });
+    this.expenseFacade.deleteExpense(this.groupId, this.expenseId).subscribe({
+      next: (refreshed) => {
+        this.toastService.successToast(
+          refreshed ? 'Expense deleted' : 'Expense deleted. Display may be out of date.',
+        );
+        this.router.navigate(['groups', this.groupId, 'details']);
+      },
+      error: (err) =>
+        this.toastService.errorToast(apiErrorMessage(err, 'Failed to delete expense')),
+    });
   }
 
-  private loadExpense(expenseId: string): void {
+  protected loadExpense(expenseId: string): void {
+    this.loading.set(true);
+    this.notFound.set(false);
+    this.loadError.set(null);
     this.expenseService.getExpense(this.groupId, expenseId).subscribe({
       next: (data) => {
         this.expense.set(data);
         this.loading.set(false);
       },
-      error: () => {
-        this.toastService.errorToast('Failed to load expense');
+      error: (err) => {
         this.loading.set(false);
-        this.notFound.set(true);
+        if (err instanceof HttpErrorResponse && err.status === 404) this.notFound.set(true);
+        else this.loadError.set(apiErrorMessage(err, 'Could not load expense.'));
       },
     });
   }

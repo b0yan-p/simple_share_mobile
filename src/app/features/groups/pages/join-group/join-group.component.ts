@@ -12,6 +12,8 @@ import {
 import { addIcons } from 'ionicons';
 import { alertCircleOutline, checkmarkCircle } from 'ionicons/icons';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { InvitePreview } from '../../models/invite-preview.model';
@@ -57,6 +59,7 @@ export class JoinGroupComponent implements OnInit {
   preview = signal<InvitePreview | null>(null);
   loading = signal(true);
   failed = signal(false);
+  failureMessage = signal('');
   joining = signal(false);
   joined = signal(false);
   /** The backend treats re-joining as success, so say so instead of celebrating. */
@@ -73,6 +76,7 @@ export class JoinGroupComponent implements OnInit {
   loadPreview(): void {
     this.loading.set(true);
     this.failed.set(false);
+    this.failureMessage.set('');
 
     this.groupService.getInvitePreview(this.token).subscribe({
       next: (preview) => {
@@ -80,8 +84,13 @@ export class JoinGroupComponent implements OnInit {
         this.groupId = preview.groupId;
         this.loading.set(false);
       },
-      error: () => {
+      error: (err) => {
         this.failed.set(true);
+        this.failureMessage.set(
+          err instanceof HttpErrorResponse && err.status === 404
+            ? 'This invite link is no longer valid, or the group has been removed.'
+            : apiErrorMessage(err, 'Could not load this invitation.'),
+        );
         this.loading.set(false);
       },
     });
@@ -100,7 +109,7 @@ export class JoinGroupComponent implements OnInit {
       },
       error: (err) => {
         this.joining.set(false);
-        this.toastService.errorToast(err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Could not join group.'));
       },
     });
   }

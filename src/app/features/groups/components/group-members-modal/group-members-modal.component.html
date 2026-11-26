@@ -39,6 +39,14 @@
       <div class="state-msg">
         <ion-spinner name="crescent" />
       </div>
+    } @else if (error()) {
+      <app-empty-state
+        icon="alert-circle-outline"
+        title="Could not load members"
+        [subtitle]="error() ?? ''"
+        actionLabel="Try again"
+        (action)="load().subscribe()"
+      />
     } @else {
       <ion-list class="member-list" lines="none">
         @for (row of rows(); track row.member.memberId) {

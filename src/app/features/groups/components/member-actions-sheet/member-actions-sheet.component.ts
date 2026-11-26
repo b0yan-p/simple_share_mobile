@@ -16,6 +16,7 @@ import {
 import { addIcons } from 'ionicons';
 import { closeOutline, trashOutline } from 'ionicons/icons';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { GroupMember, isGroupOwner, isVirtualMember } from '../../models/group-member.model';
@@ -116,7 +117,7 @@ export class MemberActionsSheetComponent {
         this.removing.set(false);
         const code = err.error?.code as string | undefined;
         void this.toastService.errorToast(
-          (code && REMOVE_ERRORS[code]) || 'Something went wrong. Please try again.',
+          (code && REMOVE_ERRORS[code]) || apiErrorMessage(err, 'Could not remove member.'),
         );
       },
     });

@@ -1,5 +1,5 @@
 import { CurrencyPickerComponent } from 'src/app/shared/components/currency-picker/currency-picker.component';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -10,6 +10,7 @@ import {
   IonFooter,
   IonHeader,
   IonInput,
+  IonSpinner,
   IonIcon,
   IonTitle,
   IonToggle,
@@ -19,6 +20,8 @@ import { addIcons } from 'ionicons';
 import { peopleOutline, informationCircleOutline, gitNetworkOutline } from 'ionicons/icons';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { GroupCoverPickerComponent } from '../../components/group-cover-picker/group-cover-picker.component';
 import { GroupTypePickerComponent } from '../../components/group-type-picker/group-type-picker.component';
 import { isGroupCoverKey, resolveGroupCover } from '../../models/group-cover-catalog';
@@ -40,6 +43,8 @@ import { GroupService } from '../../services/group.service';
     IonIcon,
     IonToggle,
     IonInput,
+    IonSpinner,
+    EmptyStateComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -60,6 +65,8 @@ export class GroupItemComponent implements OnInit {
 
   itemId = 'new';
   currencyLocked = false;
+  readonly loading = signal(true);
+  readonly loadError = signal<string | null>(null);
 
   form = new FormGroup(
     {
@@ -90,8 +97,19 @@ export class GroupItemComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (this.route.snapshot.params['id'] === 'new') {
+      this.loading.set(false);
+      return;
+    }
+    this.loadGroup();
+  }
+
+  loadGroup(): void {
+    this.loading.set(true);
+    this.loadError.set(null);
     this.item$.subscribe({
       next: (data) => {
+        this.loading.set(false);
         console.log(data);
         this.itemId = data.id;
         const type = data.type ?? GroupType.Other;
@@ -102,6 +120,10 @@ export class GroupItemComponent implements OnInit {
         });
         this.currencyLocked = !!data.currencyLocked;
         if (data.id !== 'new' && !data.canChangeCurrency) this.form.controls.currency.disable();
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.loadError.set(apiErrorMessage(err, 'Could not load this group.'));
       },
     });
   }
@@ -138,7 +160,7 @@ export class GroupItemComponent implements OnInit {
       },
       error: (err) => {
         console.error('ERROR: ', err);
-        this.toastService.errorToast(err?.error?.detail ?? err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Could not create group.'));
       },
     });
   }
@@ -151,7 +173,7 @@ export class GroupItemComponent implements OnInit {
       },
       error: (err) => {
         console.error('ERROR: ', err);
-        this.toastService.errorToast(err?.error?.detail ?? err.message);
+        this.toastService.errorToast(apiErrorMessage(err, 'Could not update group.'));
       },
     });
   }

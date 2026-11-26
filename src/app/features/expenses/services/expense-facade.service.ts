@@ -17,8 +17,10 @@ import {
   toArray,
 } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
+import { LoadStatus } from 'src/app/core/store/models/list-state.model';
 import { runAndSettle } from 'src/app/shared/utils/settle.helper';
 import { CreateExpenseRequest, UpdateExpenseRequest } from '../models/create-expense.model';
 import { ExpenseListItem, ExpenseListItemDetails } from '../models/expense-list-item.model';
@@ -59,7 +61,10 @@ export class ExpenseFacade {
    * pageRequest$ pipeline — and therefore the infinite scroll offset — exactly
    * where the user left it.
    */
-  loadExpenses(groupId: string, opts: { force?: boolean; skipCache?: boolean } = {}): void {
+  loadExpenses(
+    groupId: string,
+    opts: { force?: boolean; skipCache?: boolean; silentError?: boolean } = {},
+  ): void {
     if (!opts.force && this.$loadExpenses && this.store.isFreshFor(groupId)) return;
 
     this.$loadExpenses?.unsubscribe();
@@ -89,7 +94,12 @@ export class ExpenseFacade {
         this.ui.listLoading.set(true);
 
         if (page.skip === 0) {
-          return this.loadFirstPage(groupId, page, opts.skipCache ?? false);
+          return this.loadFirstPage(
+            groupId,
+            page,
+            opts.skipCache ?? false,
+            opts.silentError ?? false,
+          );
         }
 
         return this.loadNextPage(groupId, page);
@@ -111,9 +121,17 @@ export class ExpenseFacade {
     groupId: string,
     page: { skip: number; take: number },
     skipCache = false,
+    silentError = false,
   ) {
     const cached$: Observable<{ items: ExpenseListItemDetails[]; totalCount: number } | null> =
-      skipCache ? of(null) : this.idb.getExpenses(groupId);
+      skipCache
+        ? of(null)
+        : this.idb.getExpenses(groupId).pipe(
+            catchError((err) => {
+              console.warn('Could not read cached expenses', err);
+              return of(null);
+            }),
+          );
 
     return cached$.pipe(
       switchMap((cached) => {
@@ -130,7 +148,7 @@ export class ExpenseFacade {
           this.ui.listLoading.set(false);
           this.paginator.pageLoading.set(false);
           if (!cached) {
-            this.toastService.errorToast('No cached data available');
+            this.store.setError('No saved expenses on this device. Reconnect and try again.');
           }
           return of([] as ExpenseListItem[]);
         }
@@ -146,17 +164,27 @@ export class ExpenseFacade {
             if (!items.length) {
               this.ui.listLoading.set(false);
               this.paginator.pageLoading.set(false);
-              if (!cached) {
-                this.store.setItems([]);
-                this.store.setReady();
-                this.paginator.totalCount.set(0);
-              } else if (res.totalCount > 0) {
-                this.toastService.warnToast('Could not refresh expenses. Showing cached data.');
+              if (res.totalCount > 0) {
+                if (cached)
+                  this.toastService.warnToast(
+                    'Could not refresh expenses. Showing cached data.',
+                  );
+                else this.store.setError('Could not load expenses. Please try again.');
+                return of([] as ExpenseListItem[]);
               }
+              this.store.setItems([]);
+              this.store.setReady();
+              this.idb.saveExpenses(groupId, res.totalCount, []).subscribe({
+                error: (err) => console.warn('Could not cache empty expense list', err),
+              });
               return of([] as ExpenseListItem[]);
             }
 
             return this.idb.saveExpenses(groupId, res.totalCount, items).pipe(
+              catchError((err) => {
+                console.warn('Could not cache expenses', err);
+                return of(void 0);
+              }),
               tap(() => {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
@@ -166,9 +194,10 @@ export class ExpenseFacade {
               switchMap(() => of([] as ExpenseListItem[])),
             );
           }),
-          catchError((err) => this.handleError(err, groupId)),
+          catchError((err) => this.handleError(err, groupId, silentError)),
         );
       }),
+      catchError((err) => this.handleError(err, groupId, silentError)),
     );
   }
 
@@ -196,9 +225,25 @@ export class ExpenseFacade {
 
         // Read existing cached items, append new ones, re-map the full list
         return this.idb.getExpenses(groupId).pipe(
+          catchError((err) => {
+            console.warn('Could not read cached expense page', err);
+            return of(null);
+          }),
           switchMap((existing) => {
-            const allItems = [...(existing?.items ?? []), ...newItems];
+            const previousItems =
+              existing?.items ??
+              this.store
+                .items()
+                .reduce<ExpenseListItemDetails[]>(
+                  (all, month) => [...all, ...month.expenses],
+                  [],
+                );
+            const allItems = [...previousItems, ...newItems];
             return this.idb.saveExpenses(groupId, res.totalCount, allItems).pipe(
+              catchError((err) => {
+                console.warn('Could not cache expense page', err);
+                return of(void 0);
+              }),
               tap(() => {
                 this.ui.listLoading.set(false);
                 this.paginator.pageLoading.set(false);
@@ -215,13 +260,14 @@ export class ExpenseFacade {
     );
   }
 
-  private handleError(err: any, groupId?: string) {
+  private handleError(err: any, groupId?: string, silentError = false) {
     console.warn(`[API ERROR] group=${groupId}`, err);
-    this.store.setError(err.message);
+    if (this.paginator.pageLoading()) this.paginator.pageError.set(true);
     this.ui.listLoading.set(false);
     this.paginator.pageLoading.set(false);
-    this.paginator.totalCount.set(0);
-    this.toastService.errorToast(err.message);
+    const message = apiErrorMessage(err, 'Failed to load expenses');
+    this.store.setError(message);
+    if (this.store.items().length && !silentError) this.toastService.errorToast(message);
     return of([] as ExpenseListItem[]);
   }
 
@@ -234,32 +280,43 @@ export class ExpenseFacade {
   createExpense(
     groupId: string,
     payload: CreateExpenseRequest,
-  ): Observable<{ id: string; queued: boolean }> {
+  ): Observable<{ id: string; queued: boolean; refreshed: boolean }> {
     if (!this.networkService.isOnline()) {
       const tempId = payload.clientExpenseId;
       return this.idb
         .savePendingExpense({ tempId, groupId, payload, createdAt: new Date().toISOString() })
-        .pipe(map(() => ({ id: tempId, queued: true })));
+        .pipe(map(() => ({ id: tempId, queued: true, refreshed: true })));
     }
 
     return this.expenseApi.createExpense(groupId, payload).pipe(
       concatMap((res) =>
-        this.afterAcceptance(() => this.refreshExpenses(groupId)).pipe(map(() => res)),
+        this.refreshAfterMutation(groupId).pipe(map((refreshed) => ({ ...res, refreshed }))),
       ),
       map((res) => ({ ...res, queued: false })),
     );
   }
 
-  updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<void> {
+  updateExpense(groupId: string, payload: UpdateExpenseRequest): Observable<boolean> {
     return this.expenseApi
       .updateExpense(groupId, payload)
-      .pipe(concatMap(() => this.refreshExpenses(groupId)));
+      .pipe(concatMap(() => this.refreshAfterMutation(groupId)));
   }
 
-  deleteExpense(groupId: string, expenseId: string): Observable<void> {
+  deleteExpense(groupId: string, expenseId: string): Observable<boolean> {
     return this.expenseApi
       .deleteExpense(groupId, expenseId)
-      .pipe(concatMap(() => this.refreshExpenses(groupId)));
+      .pipe(concatMap(() => this.refreshAfterMutation(groupId)));
+  }
+
+  /** A successful mutation stays successful if its subsequent local refresh fails. */
+  refreshAfterMutation(groupId: string): Observable<boolean> {
+    return defer(() => this.refreshExpenses(groupId, true)).pipe(
+      map(() => this.store.status() !== LoadStatus.Error),
+      catchError((error) => {
+        console.warn('[EXPENSE] Could not refresh after accepted mutation', error);
+        return of(false);
+      }),
+    );
   }
   // #endregion
 
@@ -298,17 +355,19 @@ export class ExpenseFacade {
    * so ExpenseListComponent.ngOnInit does not reliably run again on the way
    * back and cannot be relied on to notice that the data went stale.
    */
-  refreshExpenses(groupId: string): Observable<void> {
-    return this.invalidateExpenses(groupId).pipe(switchMap(() => this.reloadExpenses(groupId)));
+  refreshExpenses(groupId: string, silentError = false): Observable<void> {
+    return this.invalidateExpenses(groupId).pipe(
+      switchMap(() => this.reloadExpenses(groupId, silentError)),
+    );
   }
 
   /**
    * Page one straight from the API, no cache paint, completing once the list has
    * settled. Shared by pull-to-refresh and by the post-mutation reload.
    */
-  reloadExpenses(groupId: string): Observable<void> {
+  reloadExpenses(groupId: string, silentError = false): Observable<void> {
     return runAndSettle(this.expensesSettled, () =>
-      this.loadExpenses(groupId, { force: true, skipCache: true }),
+      this.loadExpenses(groupId, { force: true, skipCache: true, silentError }),
     );
   }
 

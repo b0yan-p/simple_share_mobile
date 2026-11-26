@@ -4,7 +4,7 @@
   </div>
 } @else if (failed()) {
   <div class="link-state">
-    <p class="c-text">Couldn't load the invite link.</p>
+    <p class="c-text" role="alert">{{ errorMessage() }}</p>
     <ion-button fill="outline" (click)="loadLink()">Try again</ion-button>
   </div>
 } @else if (mode === 'link') {

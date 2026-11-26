@@ -24,7 +24,17 @@
         />
       }
     </ion-list>
-  } @else if (!ui.listLoading() && network.isOnline()) {
+  } @else if (network.isOnline() && service.listLoading()) {
+    <div class="ion-text-center ion-padding" role="status"><ion-spinner name="crescent" /></div>
+  } @else if (network.isOnline() && service.listError()) {
+    <app-empty-state
+      icon="alert-circle-outline"
+      title="Could not load activities"
+      [subtitle]="service.listError()!"
+      actionLabel="Try again"
+      (action)="service.getAll()"
+    />
+  } @else if (network.isOnline()) {
     <app-empty-state
       icon="pulse-outline"
       title="No activity yet"
@@ -33,6 +43,14 @@
   }
 
   @if (network.isOnline()) {
+    @if (service.pageError()) {
+      <app-empty-state
+        icon="alert-circle-outline"
+        title="Could not load more activities"
+        actionLabel="Try again"
+        (action)="service.getAll()"
+      />
+    }
     <ion-infinite-scroll [appPaginate]="service">
       <ion-infinite-scroll-content />
     </ion-infinite-scroll>

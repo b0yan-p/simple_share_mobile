@@ -20,7 +20,7 @@ import { timeOutline } from 'ionicons/icons';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
 import { ToastService } from 'src/app/core/services/toast.service';
-import { UiService } from 'src/app/core/services/ui.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
 import { PaginateDirective } from 'src/app/shared/directives/paginate.directive';
 import { ExpenseListItem, ExpenseListItemDetails } from '../../models/expense-list-item.model';
@@ -56,7 +56,6 @@ export class ExpenseListComponent implements OnInit {
   facade = inject(ExpenseFacade);
   toastService = inject(ToastService);
   paginator = inject(ExpensePaginatorService);
-  ui = inject(UiService);
   private readonly modalController = inject(ModalController);
   readonly currentMemberId = input<string | null>(null);
   protected readonly networkService = inject(NetworkService);
@@ -190,12 +189,15 @@ export class ExpenseListComponent implements OnInit {
   private confirmDelete(): void {
     const groupId = this.route.snapshot.params['id'];
     this.facade.deleteExpense(groupId, this.pendingDeleteId).subscribe({
-      next: () => {
+      next: (refreshed) => {
         // TODO instead of reloading the whole list (facade.deleteExpense does that
         // for us now) we should just drop the deleted expense from state and cache
-        this.toastService.successToast('Expense deleted');
+        this.toastService.successToast(
+          refreshed ? 'Expense deleted' : 'Expense deleted. Display may be out of date.',
+        );
       },
-      error: () => this.toastService.errorToast('Failed to delete expense'),
+      error: (err) =>
+        this.toastService.errorToast(apiErrorMessage(err, 'Failed to delete expense')),
     });
   }
 }

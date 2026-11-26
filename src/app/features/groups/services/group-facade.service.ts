@@ -14,6 +14,7 @@ import {
   throwError,
 } from 'rxjs';
 import { NetworkService } from 'src/app/core/services/network.service';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { UiService } from 'src/app/core/services/ui.service';
 import { runAndSettle } from 'src/app/shared/utils/settle.helper';
@@ -111,7 +112,12 @@ export class GroupFacade {
   private loadFirstPage(page: { skip: number; take: number }, skipCache = false) {
     const cached$: Observable<{ items: GroupListItem[]; totalCount: number } | null> = skipCache
       ? of(null)
-      : this.idb.getGroups();
+      : this.idb.getGroups().pipe(
+          catchError((err) => {
+            console.warn('Could not read cached groups', err);
+            return of(null);
+          }),
+        );
 
     return cached$.pipe(
       switchMap((cached) => {
@@ -143,16 +149,25 @@ export class GroupFacade {
 
             if (!items.length) {
               this.paginator.pageLoading.set(false);
-              if (!cached) {
-                this.store.setItems([]);
-                this.store.setReady();
-              } else if (res.totalCount > 0) {
-                this.toastService.warnToast('Could not refresh groups. Showing cached data.');
+              if (res.totalCount > 0) {
+                if (cached)
+                  this.toastService.warnToast('Could not refresh groups. Showing cached data.');
+                else this.store.setError('Could not load groups. Please try again.');
+                return of([] as GroupListItem[]);
               }
+              this.store.setItems([]);
+              this.store.setReady();
+              this.idb.saveGroups(res.totalCount, []).subscribe({
+                error: (err) => console.warn('Could not cache empty group list', err),
+              });
               return of([] as GroupListItem[]);
             }
 
             return this.idb.saveGroups(res.totalCount, items).pipe(
+              catchError((err) => {
+                console.warn('Could not cache groups', err);
+                return of(void 0);
+              }),
               tap(() => {
                 this.paginator.pageLoading.set(false);
                 this.store.setItems(mapGroupListItems(items));
@@ -164,6 +179,7 @@ export class GroupFacade {
           catchError((err) => this.handleError(err)),
         );
       }),
+      catchError((err) => this.handleError(err)),
     );
   }
 
@@ -188,9 +204,17 @@ export class GroupFacade {
         }
 
         return this.idb.getGroups().pipe(
+          catchError((err) => {
+            console.warn('Could not read cached groups for pagination', err);
+            return of(null);
+          }),
           switchMap((existing) => {
-            const allItems = [...(existing?.items ?? []), ...newItems];
+            const allItems = [...(existing?.items ?? this.store.items()), ...newItems];
             return this.idb.saveGroups(res.totalCount, allItems).pipe(
+              catchError((err) => {
+                console.warn('Could not cache group page', err);
+                return of(void 0);
+              }),
               tap(() => {
                 this.paginator.pageLoading.set(false);
                 this.store.setItems(mapGroupListItems(allItems));
@@ -213,10 +237,11 @@ export class GroupFacade {
    */
   private handleError(err: { message?: string }) {
     console.warn('[API ERROR] groups', err);
-    const message = err?.message ?? 'Failed to load groups';
+    const message = apiErrorMessage(err, 'Failed to load groups');
+    if (this.paginator.pageLoading()) this.paginator.pageError.set(true);
     this.store.setError(message);
     this.paginator.pageLoading.set(false);
-    this.toastService.errorToast(message);
+    if (this.store.items().length) this.toastService.errorToast(message);
     return of([] as GroupListItem[]);
   }
   /**
@@ -231,7 +256,12 @@ export class GroupFacade {
 
     const cached$: Observable<GroupListItem[] | null> = opts.skipCache
       ? of(null)
-      : this.idb.getRecentGroups();
+      : this.idb.getRecentGroups().pipe(
+          catchError((err) => {
+            console.warn('Could not read cached recent groups', err);
+            return of(null);
+          }),
+        );
 
     const ref$ = cached$.pipe(
       switchMap((cached) => {
@@ -256,6 +286,10 @@ export class GroupFacade {
             console.log(`[API] recentGroups=${items.length}`);
 
             return this.idb.saveRecentGroups(items).pipe(
+              catchError((err) => {
+                console.warn('Could not cache recent groups', err);
+                return of(void 0);
+              }),
               tap(() => {
                 this.recentStore.setItems(mapGroupListItems(items));
                 this.recentStore.setReady();
@@ -266,6 +300,7 @@ export class GroupFacade {
           catchError((err) => this.handleRecentError(err)),
         );
       }),
+      catchError((err) => this.handleRecentError(err)),
     );
 
     this.$loadRecentGroups = ref$.subscribe({
@@ -277,9 +312,9 @@ export class GroupFacade {
   /** Swallows the error the way handleError does, so a cache paint survives it. */
   private handleRecentError(err: { message?: string }) {
     console.warn('[API ERROR] recent groups', err);
-    const message = err?.message ?? 'Failed to load recent groups';
+    const message = apiErrorMessage(err, 'Failed to load recent groups');
     this.recentStore.setError(message);
-    this.toastService.errorToast(message);
+    if (this.recentStore.items().length) this.toastService.errorToast(message);
     return of([] as GroupListItem[]);
   }
 
@@ -304,8 +339,16 @@ export class GroupFacade {
     if (!this.networkService.isOnline()) return this.idb.getGroupOverview(groupId);
 
     return this.groupService.groupOverview(groupId).pipe(
-      tap((overview) => this.idb.saveGroupOverview(groupId, overview).subscribe()),
-      catchError(() => this.idb.getGroupOverview(groupId)),
+      tap((overview) =>
+        this.idb.saveGroupOverview(groupId, overview).subscribe({
+          error: (err) => console.warn('Could not cache group overview', err),
+        }),
+      ),
+      catchError((err) =>
+        this.idb
+          .getGroupOverview(groupId)
+          .pipe(switchMap((cached) => (cached ? of(cached) : throwError(() => err)))),
+      ),
     );
   }
   // #endregion

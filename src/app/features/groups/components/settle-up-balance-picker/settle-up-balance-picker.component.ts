@@ -19,6 +19,7 @@ import {
   swapHorizontalOutline,
 } from 'ionicons/icons';
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { BalanceResponse, DebtEdge } from '../../models/balance-response.model';
 import { GroupService } from '../../services/group.service';
 import { SettleUpModalComponent } from '../settle-up-modal/settle-up-modal.component';
@@ -59,6 +60,7 @@ export class SettleUpBalancePickerComponent implements OnInit {
 
   protected readonly balance = signal<BalanceResponse | null>(null);
   protected readonly loadState = signal<'loading' | 'ready' | 'error'>('loading');
+  protected readonly errorMessage = signal('');
   protected readonly selection = signal<{ debt: DebtEdge; outgoing: boolean } | null>(null);
 
   protected readonly sections = computed(() => {
@@ -94,7 +96,10 @@ export class SettleUpBalancePickerComponent implements OnInit {
           this.balance.set(balance);
           this.loadState.set('ready');
         },
-        error: () => this.loadState.set('error'),
+        error: (err) => {
+          this.errorMessage.set(apiErrorMessage(err, 'Could not load your balances.'));
+          this.loadState.set('error');
+        },
       });
   }
 

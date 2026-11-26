@@ -13,6 +13,7 @@ export class GroupBalanceStore {
   readonly groupId = signal<string | null>(null);
   readonly balance = signal<BalanceResponse | null>(null);
   readonly loading = signal<boolean>(true);
+  readonly error = signal<string | null>(null);
 
   /** Opening a different group starts fresh; re-entering the same one keeps what it has. */
   enter(groupId: string): void {
@@ -21,5 +22,6 @@ export class GroupBalanceStore {
     this.groupId.set(groupId);
     this.balance.set(null);
     this.loading.set(true);
+    this.error.set(null);
   }
 }

@@ -16,6 +16,7 @@ import { addIcons } from 'ionicons';
 import { closeOutline, eyeOffOutline, eyeOutline } from 'ionicons/icons';
 import { AdvanceInputDirective } from '../advance-input.directive';
 import { HttpErrorResponse } from '@angular/common/http';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { PASSWORD_HINT, PASSWORD_PATTERN, passwordsMatch } from 'src/app/auth/password-policy';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -130,9 +131,7 @@ export class ChangePasswordDialogComponent {
               break;
             default:
               this.passwordError.set(
-                error.status === 0
-                  ? 'Connection lost. The password change could not be confirmed.'
-                  : 'Could not change your password. Please try again.',
+                apiErrorMessage(error, 'Could not change your password. Please try again.'),
               );
           }
         },

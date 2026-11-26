@@ -20,6 +20,8 @@ import { catchError, filter, forkJoin, from, map, Observable, of, switchMap, tap
 import { AvatarComponent } from 'src/app/shared/components/avatar/avatar.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { RefreshDirective } from 'src/app/shared/directives/refresher.directive';
+import { EmptyStateComponent } from 'src/app/shared/components/empty-state/empty-state.component';
+import { apiErrorMessage } from 'src/app/core/services/api-error';
 import { GroupMember, GroupRole, isVirtualMember } from '../../models/group-member.model';
 import { GroupMemberFacade } from '../../services/group-member-facade.service';
 import { GroupService } from '../../services/group.service';
@@ -47,6 +49,7 @@ import { MemberActionsSheetComponent } from '../member-actions-sheet/member-acti
     IonRefresher,
     IonRefresherContent,
     RefreshDirective,
+    EmptyStateComponent,
   ],
 })
 export class GroupMembersModalComponent implements OnInit {
@@ -60,6 +63,7 @@ export class GroupMembersModalComponent implements OnInit {
 
   members = signal<GroupMember[]>([]);
   loading = signal(true);
+  error = signal<string | null>(null);
   /** Non-zero right after a bulk add, driving the green confirmation banner. */
   addedCount = signal(0);
 
@@ -154,15 +158,19 @@ export class GroupMembersModalComponent implements OnInit {
   }
 
   /** Returns the load so the refresher can wait for it; callers subscribe. */
-  private load(): Observable<void> {
+  protected load(): Observable<void> {
     this.loading.set(true);
+    this.error.set(null);
 
     // Balances are decoration here: if that call fails the member list must
     // still render, so it collapses to null rather than erroring the pair.
     return forkJoin({
-      members: this.groupMemberFacade
-        .getGroupMembers(this.groupId)
-        .pipe(catchError(() => of([] as GroupMember[]))),
+      members: this.groupMemberFacade.getGroupMembers(this.groupId).pipe(
+        catchError((err) => {
+          this.error.set(apiErrorMessage(err, 'Could not load members.'));
+          return of([] as GroupMember[]);
+        }),
+      ),
       balances: this.groupService
         .getGroupBalances(this.groupId)
         .pipe(catchError(() => of(null))),

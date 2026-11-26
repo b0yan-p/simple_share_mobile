@@ -12,11 +12,13 @@
   @if (membersError()) {
     <app-empty-state
       icon="cloud-offline-outline"
-      title="Members unavailable"
-      subtitle="We couldn't load the group members. Open the group once while online, then try again."
+      title="Could not load expense form"
+      [subtitle]="loadError()"
       actionLabel="Try again"
       (action)="loadMembers()"
     />
+  } @else if (loading()) {
+    <div class="ion-text-center ion-padding" role="status"><ion-spinner name="crescent" /></div>
   } @else {
     <form [formGroup]="form" class="bdd-flex bdd-flex-col bdd-gap-3 expense-form">
       @if (pendingMode) {
@@ -227,7 +229,7 @@
 
 <!-- ─── Pinned CTA (above the safe area; content scrolls behind it) ─── -->
 <ion-footer class="cta-footer">
-  @if (!membersError()) {
+  @if (!membersError() && !loading()) {
     <ion-button color="primary" class="cta-button" [disabled]="!canSave()" (click)="submit()">
       @if (saving()) {
         <ion-spinner name="crescent" aria-hidden="true" />
