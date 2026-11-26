@@ -11,9 +11,10 @@
 ion-tab-bar {
   // Floating pill
   background: var(--ss-surface);
-  border-radius: var(--ss-radius-2xl);
+  border-radius: 32px;
   border: none;
   box-shadow: var(--ss-shadow-md);
+  overflow: hidden;
 
   margin-inline: 16px;
 
@@ -22,13 +23,14 @@ ion-tab-bar {
   max-width: 480px;
   margin-inline: auto;
   width: calc(100% - 32px);
+  margin-top: 4px;
 
   // Keep the pill a fixed height and push it above the home indicator by
   // adding the safe-area inset to the outer margin. Ionic's default injects
   // `padding-bottom: var(--ion-safe-area-bottom)` *inside* the bar, which
   // inflates its height and pushes the icons up — zero it out here.
   margin-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  padding: 0;
+  padding: 0 6px;
   --padding-top: 0;
   --padding-bottom: 0;
 
@@ -44,37 +46,80 @@ ion-tab-bar {
 
 ion-tab-button {
   background: transparent;
+  --ripple-color: transparent;
   --color: var(--ss-text);
   --color-selected: var(--ss-primary);
+  flex: 1 1 0;
+  min-width: 0;
+  height: 56px;
+  margin-block: 4px;
 
-  // Icon sizing
-  ion-icon {
-    font-size: 24px;
-    margin-bottom: 2px;
+  &::part(native) {
+    overflow: hidden;
+    border-radius: 999px;
   }
 
-  // Label
+  .tab-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 52px;
+    height: 32px;
+    border-radius: 999px;
+    background-color: transparent;
+    overflow: hidden;
+    --ripple-color: var(--ss-primary);
+    transition: background-color 180ms ease;
+
+    ion-ripple-effect {
+      color: var(--ss-primary);
+    }
+
+    ion-icon {
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+    }
+  }
+
   ion-label {
+    display: block;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-3px);
     font-size: 12px;
     font-weight: 500;
-    letter-spacing: 0.01em;
-    margin-top: 2px;
+    line-height: 16px;
+    white-space: nowrap;
+    transition:
+      height 180ms ease,
+      margin-top 180ms ease,
+      opacity 150ms ease,
+      transform 180ms ease;
   }
 
-  // Dot indicator — visible only on active tab
-  &::after {
-    content: '';
-    display: block;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: transparent;
-    margin-top: 3px;
-    transition: background 0.2s ease;
-  }
+  &.tab-selected {
+    .tab-icon {
+      background-color: var(--ss-primary-subtle);
+    }
 
-  &[aria-selected='true']::after {
-    background: var(--ss-primary);
+    ion-label {
+      height: 16px;
+      margin-top: 3px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ion-tab-button .tab-icon,
+  ion-tab-button ion-label {
+    transition: none;
   }
 }
 

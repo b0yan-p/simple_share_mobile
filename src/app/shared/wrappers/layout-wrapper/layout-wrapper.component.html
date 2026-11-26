@@ -1,13 +1,21 @@
 <ion-tabs #tabs>
   <ion-tab-bar slot="bottom" [class.tab-bar--hidden]="!uiService.tabBarVisible()">
     @for (item of tabItems; track item.name) {
-      <ion-tab-button [tab]="item.name" [routerLink]="item.routerLink">
-        @if (tabs.tabBar?.selectedTab === item.name) {
-          <ion-icon aria-hidden="true" [name]="item.activeIcon" />
-        } @else {
-          <ion-icon aria-hidden="true" [name]="item.icon" />
-        }
-        <ion-label>{{ item.name | titlecase }}</ion-label>
+      <ion-tab-button
+        [tab]="item.name"
+        [routerLink]="item.routerLink"
+        [attr.aria-label]="item.label"
+        layout="icon-top"
+      >
+        <span class="tab-icon ion-activatable" aria-hidden="true">
+          <ion-ripple-effect />
+          @if (tabs.tabBar?.selectedTab === item.name) {
+            <ion-icon [src]="item.activeIcon" />
+          } @else {
+            <ion-icon [src]="item.icon" />
+          }
+        </span>
+        <ion-label>{{ item.label }}</ion-label>
       </ion-tab-button>
     }
   </ion-tab-bar>

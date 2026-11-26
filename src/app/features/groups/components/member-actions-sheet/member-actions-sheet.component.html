@@ -36,13 +36,6 @@
       </span>
     </div>
 
-    @if (isVirtual()) {
-      <ion-button expand="block" color="primary" class="link-btn" (click)="linkToAccount()">
-        Link to account
-      </ion-button>
-      <p class="link-hint c-text">Connect this person to an existing ShareOrb account.</p>
-    }
-
     @if (canRemove) {
       <ion-button
         expand="block"

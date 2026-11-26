@@ -18,7 +18,13 @@
   .field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0px;
+  }
+
+  .date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .field-error {
@@ -131,6 +137,7 @@
   ion-input.description-input {
     flex: 1;
     min-width: 0;
+    --highlight-height: 0;
     --padding-start: 0;
     --padding-end: 0;
     font-size: 16px;
@@ -164,10 +171,14 @@
   // ─── Payment details card ───
 
   .section-heading {
-    margin: 6px 0 0;
-    font-size: 19px;
-    font-weight: 700;
-    color: c.$text-light;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: c.$text;
+  }
+
+  .section-heading + .detail-card {
+    margin-top: -16px;
   }
 
   .detail-card {

@@ -63,20 +63,6 @@ ion-content {
   }
 }
 
-// ─── Link (stub) ──────────────────────────────────────────────────────────────
-.link-btn {
-  height: 52px;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
-.link-hint {
-  margin: 10px 0 20px;
-  font-size: 13px;
-  text-align: center;
-}
-
 // ─── Actions ──────────────────────────────────────────────────────────────────
 // Outline fill for the shape, then the error tone forced in locally: the theme's
 // `ion-button[color='danger']` is a solid red block, and it also wins over

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Connections</ion-title>
+    <ion-title>Friends</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,8 +19,8 @@
   } @else if (service.items().length === 0 && network.isOnline()) {
     <app-empty-state
       icon="people-outline"
-      title="No connections yet"
-      subtitle="Connections are created automatically when you share a group with someone."
+      title="No friends yet"
+      subtitle="Friends are added automatically when you share a group with someone."
     />
   } @else {
     <ion-list [inset]="true">

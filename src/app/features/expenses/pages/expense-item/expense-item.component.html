@@ -78,6 +78,8 @@
             formControlName="description"
             placeholder="Food, transport..."
             [maxlength]="descriptionMaxLength"
+            enterkeyhint="go"
+            (keydown.enter)="finishDescription($event)"
             (ionFocus)="descriptionFocused.set(true)"
             (ionBlur)="descriptionFocused.set(false)"
           />
@@ -96,45 +98,6 @@
           <div class="field-error" role="alert">Description is required</div>
         }
       </div>
-
-      <!-- ─── Date ─── -->
-      <button type="button" id="open-expense-date-picker" class="detail-row">
-        <span class="icon-tile icon-tile--purple" aria-hidden="true">
-          <ion-icon name="calendar-outline" />
-        </span>
-        <span class="detail-row__label">Date</span>
-        <span class="detail-row__value">
-          {{ form.value.expenseDate | date: 'EE, dd MMM yyyy' }}
-        </span>
-        <ion-icon
-          class="detail-row__chevron"
-          name="chevron-forward-outline"
-          aria-hidden="true"
-        />
-      </button>
-
-      <ion-modal
-        class="date-modal"
-        trigger="open-expense-date-picker"
-        [keepContentsMounted]="true"
-      >
-        <ng-template>
-          <ion-header>
-            <ion-toolbar>
-              <div class="bdd-px-3">Select date</div>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content>
-            <ion-datetime
-              size="cover"
-              [showDefaultButtons]="true"
-              presentation="date"
-              [max]="maxDate"
-              formControlName="expenseDate"
-            />
-          </ion-content>
-        </ng-template>
-      </ion-modal>
 
       <!-- ─── Payment details ─── -->
       <h2 class="section-heading">Payment details</h2>
@@ -201,6 +164,39 @@
         </button>
       </div>
 
+      <ion-modal
+        #dateModal
+        class="date-modal"
+        trigger="open-expense-date-picker"
+        [keepContentsMounted]="true"
+      >
+        <ng-template>
+          <ion-header>
+            <ion-toolbar>
+              <div class="bdd-px-3">Select date</div>
+              <ion-buttons slot="end">
+                <ion-button
+                  fill="clear"
+                  aria-label="Close date picker"
+                  (click)="dateModal.dismiss()"
+                >
+                  <ion-icon name="close-outline" slot="icon-only" />
+                </ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <ion-datetime
+              size="cover"
+              presentation="date"
+              [max]="maxDate"
+              formControlName="expenseDate"
+              (ionChange)="dateModal.dismiss()"
+            />
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+
       <!-- ─── Summary ─── -->
       @if (summary()) {
         <p class="summary">
@@ -208,6 +204,23 @@
           <span>{{ summary() }}</span>
         </p>
       }
+
+      <div class="date-field">
+        <label class="field-label" for="open-expense-date-picker">Date</label>
+        <button type="button" id="open-expense-date-picker" class="detail-row">
+          <span class="icon-tile icon-tile--purple" aria-hidden="true">
+            <ion-icon name="calendar-outline" />
+          </span>
+          <span class="detail-row__value">
+            {{ form.value.expenseDate | date: 'EE, dd MMM yyyy' }}
+          </span>
+          <ion-icon
+            class="detail-row__chevron"
+            name="chevron-forward-outline"
+            aria-hidden="true"
+          />
+        </button>
+      </div>
     </form>
   }
 </ion-content>

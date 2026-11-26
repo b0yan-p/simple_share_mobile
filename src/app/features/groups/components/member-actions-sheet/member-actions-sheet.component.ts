@@ -82,10 +82,6 @@ export class MemberActionsSheetComponent {
     this.modalController.dismiss(null, 'cancel');
   }
 
-  linkToAccount(): void {
-    void this.toastService.infoToast('Linking accounts is coming soon');
-  }
-
   /**
    * AlertController rather than an inline <ion-alert>: inside a sheet the inline
    * variant misbehaves — see pending-expenses-sheet.component.ts for the detail.

@@ -5,11 +5,26 @@
 // `ion-modal.modal-sheet` rules in theme/components/_modal.scss.
 ion-header ion-toolbar {
   --background: #{c.$bg};
+  --color: #{c.$text-light};
+  --padding-start: 8px;
   --border-width: 0;
+
+  ion-button {
+    --color: #{c.$text-light};
+  }
+
+  ion-title {
+    text-align: start;
+  }
 }
 
 ion-content {
   --background: #{c.$bg};
+}
+
+.back-icon {
+  font-size: 22px;
+  color: c.$text-light;
 }
 
 .close-icon {

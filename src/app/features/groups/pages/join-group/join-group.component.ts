@@ -106,7 +106,9 @@ export class JoinGroupComponent implements OnInit {
   }
 
   openGroup(): void {
-    if (this.groupId) this.router.navigate(['groups', this.groupId, 'details']);
+    if (this.groupId) {
+      this.router.navigate(['groups', this.groupId, 'details'], { replaceUrl: true });
+    }
   }
 
   goHome(): void {

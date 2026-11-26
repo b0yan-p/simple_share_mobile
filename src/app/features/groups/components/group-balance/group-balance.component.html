@@ -19,7 +19,7 @@
               [src]="null"
               [name]="member.displayName"
               [colors]="[{ bg: 'var(--balance-bg)', text: 'var(--balance-color)' }]"
-              [round]="false"
+              [round]="true"
               [size]="42"
               aria-hidden="true"
             />
@@ -48,7 +48,7 @@
                     [src]="null"
                     [name]="memberIsDebtor ? edge.creditorDisplayName : edge.debtorDisplayName"
                     [colorKey]="memberIsDebtor ? edge.creditorMemberId : edge.debtorMemberId"
-                    [round]="false"
+                    [round]="true"
                     [size]="38"
                     aria-hidden="true"
                   />

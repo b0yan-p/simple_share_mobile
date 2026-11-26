@@ -1,7 +1,13 @@
-import { TitleCasePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import {
+  IonIcon,
+  IonLabel,
+  IonRippleEffect,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   home,
@@ -22,7 +28,7 @@ import { TabItem, TabItems } from '../tab-items.model';
   selector: 'app-layout-wrapper',
   templateUrl: './layout-wrapper.component.html',
   styleUrls: ['./layout-wrapper.component.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, RouterModule, TitleCasePipe],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRippleEffect, RouterModule],
 })
 export class LayoutWrapperComponent {
   readonly uiService = inject(UiService);

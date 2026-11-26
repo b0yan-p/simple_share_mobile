@@ -324,6 +324,11 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
     this.formTick.update((tick) => tick + 1);
   }
 
+  finishDescription(event: Event): void {
+    event.preventDefault();
+    (event.target as HTMLInputElement | null)?.blur();
+  }
+
   submit(): void {
     if (!this.canSave()) return;
 
@@ -359,7 +364,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
         .subscribe({
           next: () => {
             this.finishSave('Pending expense updated');
-            this.router.navigate(['groups', this.groupId, 'details']);
+            this.router.navigate(['groups', this.groupId, 'details'], { replaceUrl: true });
           },
           error: onError,
         });
@@ -386,13 +391,10 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
         .subscribe({
           next: () => {
             this.finishSave('Expense updated!');
-            this.router.navigate([
-              'groups',
-              this.groupId,
-              'expenses',
-              this.expenseId,
-              'details',
-            ]);
+            this.router.navigate(
+              ['groups', this.groupId, 'expenses', this.expenseId, 'details'],
+              { replaceUrl: true },
+            );
           },
           error: onError,
         });
@@ -402,7 +404,7 @@ export class ExpenseItemComponent implements ViewDidEnter, ViewWillEnter, ViewWi
           this.finishSave(
             queued ? 'Expense saved offline, will sync when connected' : 'Expense added!',
           );
-          this.router.navigate(['groups', this.groupId, 'details']);
+          this.router.navigate(['groups', this.groupId, 'details'], { replaceUrl: true });
         },
         error: onError,
       });

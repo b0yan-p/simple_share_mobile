@@ -37,7 +37,9 @@
     [disabled]="!unsettled"
     (click)="openSettleUp.emit()"
   >
-    <ion-icon [icon]="icons.walletOutline" aria-hidden="true" />
+    <span class="settlements-icon" aria-hidden="true">
+      <ion-icon [icon]="icons.walletOutline" />
+    </span>
     <span>
       <b>Your settlements </b>
       <small>{{ unsettled ? 'You have unsettled balances.' : "You're all settled up." }}</small>

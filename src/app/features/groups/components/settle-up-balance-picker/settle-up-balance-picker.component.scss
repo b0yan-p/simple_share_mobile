@@ -10,6 +10,7 @@ app-settle-up-modal {
 
 .picker-toolbar {
   --background: var(--ss-bg);
+  --color: #{c.$text-light};
   --padding-top: 24px;
   --padding-start: 20px;
   --padding-end: 8px;
@@ -30,8 +31,8 @@ ion-content {
 
   h1 {
     margin: 0;
-    color: var(--ss-header-color);
-    font-size: 24px;
+    color: c.$text-light;
+    font-size: 22px;
     font-weight: 700;
   }
 
@@ -119,10 +120,10 @@ ion-content {
   width: 100%;
   min-height: 68px;
   padding: 10px 14px;
-  border: 1px solid c.$borders;
-  border-radius: 16px;
+  border: 0;
+  border-radius: 14px;
   background: var(--ss-surface);
-  box-shadow: 0 2px 6px rgba(c.$primary, 0.08);
+  box-shadow: none;
   text-align: start;
   cursor: pointer;
 
@@ -156,15 +157,15 @@ ion-content {
 }
 
 .payment-label {
-  color: var(--ss-header-color);
-  font-size: 15px;
-  font-weight: 700;
+  color: c.$text-light;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .payment-amount {
-  color: var(--direction-color);
-  font-size: 18px;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--direction-color) 78%, var(--ss-text));
+  font-size: 14px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
