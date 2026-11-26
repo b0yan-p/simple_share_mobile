@@ -29,7 +29,7 @@
 
   <!-- Options -->
   <ion-item-options>
-    <ion-item-option color="danger" (click)="openDeleteAlert(true)">
+    <ion-item-option color="danger" (click)="openDeleteAlert($event, true)">
       <ion-icon name="trash-outline" />
     </ion-item-option>
     <ion-item-option (click)="onUpdate.emit()">
@@ -44,5 +44,5 @@
   header="Delete '{{ title() }}'"
   message="Are you sure you want to delete '{{ title() }}'"
   [buttons]="alertButtons"
-  (didDismiss)="openDeleteAlert(false)"
+  (didDismiss)="openDeleteAlert($event, false)"
 />

@@ -64,7 +64,8 @@ export class ListItemComponent {
     },
   ];
 
-  openDeleteAlert(isOpen: boolean) {
+  openDeleteAlert(event: Event, isOpen: boolean) {
+    event.stopPropagation();
     this.isAlertOpen = isOpen;
   }
 

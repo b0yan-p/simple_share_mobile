@@ -15,7 +15,9 @@
           [descriptionColor]="
             group.netBalance === 0 ? 'default' : group.netBalance < 0 ? 'error' : 'success'
           "
-          (click)="navigateToGroupDetails(group.id)"
+          (onClick)="navigateToGroupDetails(group.id)"
+          (onUpdate)="navigateToEditGroup(group.id)"
+          (onDelete)="onDelete(group.id)"
         />
       }
     </ion-list>

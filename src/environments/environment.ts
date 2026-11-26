@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   appVersion: '1.0.0',
   // baseAPIUrl: 'https://1dnnt4tf-5169.euw.devtunnels.ms/api',
-  baseAPIUrl: 'http://localhost:5169/api',
+  baseAPIUrl: 'https://api.shareorb.app/api',
   clientUrl: 'http://localhost:4200',
 
   // Web OAuth client id - the audience the backend accepts. Not a secret: an
